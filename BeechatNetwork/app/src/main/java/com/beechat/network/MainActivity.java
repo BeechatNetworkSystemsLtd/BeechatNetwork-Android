@@ -1,14 +1,21 @@
 package com.beechat.network;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -24,13 +31,25 @@ import com.digi.xbee.api.android.DigiMeshDevice;
 import com.digi.xbee.api.android.connection.usb.AndroidUSBPermissionListener;
 import com.digi.xbee.api.exceptions.XBeeException;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 
+
 public class MainActivity extends AppCompatActivity {
+
     // Constants.
     private static final int BAUD_RATE = 57600;
+    private static final File root = new File(String.valueOf(Environment.getExternalStorageDirectory()));
+    private static final String sFileName = "log.txt";
+    private static final File gpxfile = new File(root, sFileName);
+    private static final String separator = System.getProperty("line.separator");
+    private static final File fdelete = new File(gpxfile.getPath());
 
     // Variables.
     private AndroidUSBPermissionListener permissionListener;
@@ -59,20 +78,90 @@ public class MainActivity extends AppCompatActivity {
         devicesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                logOnSd("MainActivity, onItemClick(AdapterView<?> adapterView, View view, int i, long l), 82");
                 selectedDevice = remoteXBeeDeviceAdapter.getItem(i);
+                logOnSd("selectedDevice:"+selectedDevice.toString());
                 connectToDevice(selectedDevice);
             }
         });
+
         refreshButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                logOnSd("MainActivity, refreshButton.setOnClickListener(new View.OnClickListener(), 89");
                 remoteXBeeDeviceAdapter.clear();
                 startScan();
+
             }
         });
+
         requestPermission();
+
+        if (shouldAskPermissions()) {
+            askPermissions();
+        } else {
+            if (fdelete.exists()) {
+                if (fdelete.delete()) {
+                    System.out.println("File log.txt deleted :" + gpxfile.getPath());
+                } else {
+                    System.out.println("file log.txt not deleted :" + gpxfile.getPath());
+                }
+            }
+        }
+        logOnSd("MainActivity, onCreate(Bundle savedInstanceState)), 108");
+    }
+
+
+    /*@Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case 1: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    generateNoteOnSD("log.txt","Hello");
+                }
+            }
+        }
+    }*/
+
+    public static void logOnSd(String sBody) {
+        try {
+            //Log.i("File path is ", String.valueOf(Environment.getExternalStorageDirectory()));
+            if (!root.exists()) {
+                root.mkdirs();
+            }
+            Date currentTime = Calendar.getInstance().getTime();
+            FileWriter writer = new FileWriter(gpxfile.getAbsoluteFile(), true);
+            writer.append(separator);
+            writer.append(currentTime.toString() +" ,"+sBody);
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected boolean shouldAskPermissions() {
+        if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            return false;
+        }
+        int permission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        return  (permission != PackageManager.PERMISSION_GRANTED);
+    }
+
+    protected void askPermissions() {
+        String[] permissions = {
+                "android.permission.READ_EXTERNAL_STORAGE",
+                "android.permission.WRITE_EXTERNAL_STORAGE"
+        };
+        int permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                    this, permissions, 1);
+        }
     }
 
     private void requestPermission() {
+        logOnSd("MainActivity, requestPermission(), 162");
         permissionListener = new AndroidUSBPermissionListener() {
             @Override
             public void permissionReceived(boolean permissionGranted) {
@@ -87,23 +176,30 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        logOnSd("MainActivity, onResume(), 177");
         remoteXBeeDeviceAdapter.clear();
-        startScan();
+        //startScan();
     }
 
     private void startScan() {
+        logOnSd("MainActivity, startScan(), 183");
         myDevice = new DigiMeshDevice(MainActivity.this, BAUD_RATE, permissionListener);
         listnodes(myDevice);
         remoteXBeeDeviceAdapter.notifyDataSetChanged();
     }
 
-    public static DigiMeshDevice getDMDevice() {return myDevice;}
+    public static DigiMeshDevice getDMDevice() {
+        logOnSd("MainActivity, getDMDevice(), 190");
+        return myDevice;
+    }
 
     public static String getSelectedDevice() {
+        logOnSd("MainActivity, getSelectedDevice(), 195");
         return selectedDevice;
     }
 
     private void connectToDevice(final String device) {
+        logOnSd("MainActivity, connectToDevice(final String device), 200");
         final ProgressDialog dialog = ProgressDialog.show(this, getResources().getString(R.string.connecting_device_title),
                 getResources().getString(R.string.connecting_device_description), true);
 
@@ -111,31 +207,41 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
+                    logOnSd("MainActivity, connectToDevice(final String device), 208");
+                    logOnSd("myDevice:"+myDevice.toString());
                     myDevice.open();
 
                     MainActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            logOnSd("MainActivity, connectToDevice(final String device), 214");
                             dialog.dismiss();
                             Intent intent = new Intent(MainActivity.this, ChatActivity.class);
                             startActivity(intent);
+                            logOnSd("MainActivity, connectToDevice(final String device), 218");
                         }
                     });
                 } catch (final XBeeException e) {
+                    logOnSd("MainActivity, connectToDevice(final String device), 222");
                     e.printStackTrace();
                     MainActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            logOnSd("MainActivity, connectToDevice(final String device), 227");
                             dialog.dismiss();
                             new AlertDialog.Builder(MainActivity.this).setTitle(getResources().getString(R.string.error_connecting_title))
                                     .setMessage(getResources().getString(R.string.error_connecting_description, e.getMessage()))
                                     .setPositiveButton(android.R.string.ok, null).show();
                         }
                     });
+                    myDevice.close();
                 }
+                logOnSd("MainActivity, connectToDevice(final String device), 237");
             }
         }).start();
+        logOnSd("MainActivity, connectToDevice(final String device), 240");
     }
+
 
     private class CustomDeviceAdapter extends ArrayAdapter<String> {
 
@@ -166,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static List<RemoteXBeeDevice> listnodes(DigiMeshDevice myDevice) {
-
+        logOnSd("MainActivity, listnodes(DigiMeshDevice myDevice), 264");
         List<RemoteXBeeDevice> devices = null;
 
         if (myDevice.isOpen() == true) {
