@@ -1,12 +1,18 @@
 package com.beechat.network;
 
+import android.app.KeyguardManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.View;
@@ -42,14 +48,19 @@ public class ChatActivity extends AppCompatActivity {
     private static RemoteDigiMeshDevice remote = null;
     private static String message = null;
 
+    private static boolean flagNotification = false;
+    private KeyguardManager myKM= null;
+
     Button sendButton, backButton;
     TextView nameTextView;
-    static ListView chatListView;
+    ListView chatListView;
     EditText inputField;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        myKM = (KeyguardManager) ChatActivity.this.getSystemService(Context.KEYGUARD_SERVICE);
+        MainActivity.logOnSd("ChatActivity, onCreate(Bundle savedInstanceState), 62 ");
         setContentView(R.layout.activity_chat);
 
         device = MainActivity.getDMDevice();
@@ -70,9 +81,11 @@ public class ChatActivity extends AppCompatActivity {
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //chatDeviceAdapter.clear();
-                //device.close();
-               finish();
+                MainActivity.logOnSd("ChatActivity, backButton.setOnClickListener(new View.OnClickListener(), 83 ");
+                chatDeviceAdapter.clear();
+                device.close();
+                finish();
+                //onBackPressed();
 
             }
         });
@@ -80,6 +93,7 @@ public class ChatActivity extends AppCompatActivity {
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                MainActivity.logOnSd("ChatActivity, sendButton.setOnClickListener(new View.OnClickListener(), 94 ");
                 message = inputField.getText().toString();
                 if (message.isEmpty())
                 {
@@ -113,12 +127,20 @@ public class ChatActivity extends AppCompatActivity {
             }
         }
 
+        createNotificationChannel();
+
         final Handler handler = new Handler();
         final int delay = 1000;
 
         handler.postDelayed(new Runnable() {
             public void run() {
                 chatDeviceAdapter.notifyDataSetChanged();
+                if( myKM.inKeyguardRestrictedInputMode() && flagNotification) {
+                    String message = MainActivity.getSelectedDevice() + ":\n" + messages.get(messages.size() - 1);
+                    message = removeLastChar(message);
+                    notifyThis("Beechat notification", message);
+                    flagNotification = false;
+                }
                 handler.postDelayed(this, delay);
             }
         }, delay);
@@ -127,6 +149,7 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        MainActivity.logOnSd("ChatActivity, onResume() , 148 ");
         chatDeviceAdapter.notifyDataSetChanged();
     }
 
@@ -186,6 +209,7 @@ public class ChatActivity extends AppCompatActivity {
         @Override
         public void dataReceived(XBeeMessage xbeeMessage) {
             messages.add(new String(xbeeMessage.getData()) + "\nS");
+            flagNotification = true;
         }
     }
 
@@ -193,5 +217,35 @@ public class ChatActivity extends AppCompatActivity {
         return (s == null || s.length() == 0)
                 ? null
                 : (s.substring(0, s.length() - 1));
+    }
+
+    private void createNotificationChannel() {
+        MainActivity.logOnSd("ChatActivity, createNotificationChannel(), 219");
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "R.string.channel_name";
+            String description = "R.string.channel_description";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel("CHANNEL_ID", name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    public void notifyThis(String title, String message) {
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "CHANNEL_ID")
+                .setSmallIcon(R.drawable.digi_icon)
+                .setContentTitle(title)
+                .setContentText(message)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+
+        // notificationId is a unique int for each notification that you must define
+        notificationManager.notify(0, mBuilder.build());
     }
 }
