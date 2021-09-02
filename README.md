@@ -67,13 +67,13 @@ Features
 **Beta Features** Q3 2021
 | Category | Feature | Description |
 | ------ | ------ | ------ |
+| UX | Notifications |  **Added on 2/9/2021** add system notifications for messages received when the device is locked or in another app. |
 | Optimisations | Separate thread for listnodes | run listnodes method on a separate thread to prevent app hang-up. |
 | Security | Extended error catching | add better error catching to prevent unexpected hang-ups. |
 | UX | Splash screen | add a splash screen on startup with progress bar. |
 | Misc. | Receipts | Sent & read receipts as well as timestamped  messages. |
 | Misc. | SQLite DB | add database file to be able to save conversations with and other data persistently. |
 | UX | Saved conversations window | add a new window containing saved conversations & broadcasts. |
-| UX | Notifications | add system notifications for messages received when the device is locked or in another app. |
 |Security | kyber-JNI implementation | implementing asymmetric encryption of messages utilising our [kyber-JNI](https://github.com/BeechatNetworkSystemsLtd/kyber-JNI) repo. | 
 |Security | dilithium-JNI implementation | implementing digital signature scheme authenticated messages utilising our [dilithium-JNI](https://github.com/BeechatNetworkSystemsLtd/dilithium-JNI) repo. |
 | UX | Settings window | baud rate slider, language, dark mode, wipe database. |
