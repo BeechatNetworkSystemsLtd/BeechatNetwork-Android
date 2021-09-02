@@ -67,8 +67,8 @@ Features
 **Beta Features** Q3 2021
 | Category | Feature | Description |
 | ------ | ------ | ------ |
-| UX | Notifications |  **Added on 2/9/2021** add system notifications for messages received when the device is locked or in another app. |
-| Security | Extended error catching and debug log system | **Added on 2/9/2021** add better error catching to prevent unexpected hang-ups. |
+| UX | Notifications |  **Added on 1/9/2021** add system notifications for messages received when the device is locked or in another app. |
+| Security | Extended error catching and debug log system | **Added on 1/9/2021** add better error catching to prevent unexpected hang-ups. |
 | Optimisations | Separate thread for listnodes | run listnodes method on a separate thread to prevent app hang-up. |
 | UX | Splash screen | add a splash screen on startup with progress bar. |
 | Misc. | Receipts | Sent & read receipts as well as timestamped  messages. |
