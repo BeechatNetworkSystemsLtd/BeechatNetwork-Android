@@ -15,7 +15,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -39,8 +38,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-
-
+/***
+ *  --- MainActivity ----
+ *  The class that is responsible for the main application window.
+ ***/
 public class MainActivity extends AppCompatActivity {
 
     // Constants.
@@ -55,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
     private AndroidUSBPermissionListener permissionListener;
     private CustomDeviceAdapter remoteXBeeDeviceAdapter;
     private static String selectedDevice = null;
-
     private static DigiMeshDevice myDevice;
     private static ArrayList<String> dmaDevices = new ArrayList<>();
 
@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
         remoteXBeeDeviceAdapter = new CustomDeviceAdapter(this, dmaDevices);
         devicesListView.setAdapter(remoteXBeeDeviceAdapter);
 
+        // Handling an event on clicking an item from the list of available devices.
         devicesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -85,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Handling and event  by clicking the "Refresh" button.
         refreshButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 logOnSd("MainActivity, refreshButton.setOnClickListener(new View.OnClickListener(), 89");
@@ -94,8 +96,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Request for permission to access  phone ports.
         requestPermission();
 
+        // Checking the conditions for permission to create and write a file with a log to the phone.
         if (shouldAskPermissions()) {
             askPermissions();
         } else {
@@ -110,21 +114,14 @@ public class MainActivity extends AppCompatActivity {
         logOnSd("MainActivity, onCreate(Bundle savedInstanceState)), 108");
     }
 
-
-    /*@Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case 1: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    generateNoteOnSD("log.txt","Hello");
-                }
-            }
-        }
-    }*/
-
+    /***
+     *  --- logOnSd(String) ----
+     *  The function of writing information to a log file on the phone.
+     *
+     *  @param sBody Logged message text.
+     ***/
     public static void logOnSd(String sBody) {
         try {
-            //Log.i("File path is ", String.valueOf(Environment.getExternalStorageDirectory()));
             if (!root.exists()) {
                 root.mkdirs();
             }
@@ -139,6 +136,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /***
+     *  --- shouldAskPermissions() ----
+     *  The function of checking for permission to create and write information to the phone.
+     ***/
     protected boolean shouldAskPermissions() {
         if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1) {
             return false;
@@ -147,6 +148,10 @@ public class MainActivity extends AppCompatActivity {
         return  (permission != PackageManager.PERMISSION_GRANTED);
     }
 
+    /***
+     *  --- askPermissions() ----
+     *  The function of requesting permission to access the internal storage of the phone.
+     ***/
     protected void askPermissions() {
         String[] permissions = {
                 "android.permission.READ_EXTERNAL_STORAGE",
@@ -160,6 +165,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /***
+     *  --- requestPermission() ----
+     *  The function of requesting permission to access the ports of the phone.
+     ***/
     private void requestPermission() {
         logOnSd("MainActivity, requestPermission(), 162");
         permissionListener = new AndroidUSBPermissionListener() {
@@ -181,6 +190,10 @@ public class MainActivity extends AppCompatActivity {
         //startScan();
     }
 
+    /***
+     *  --- startScan() ----
+     *  The function of starting scanning for available Xbee devices.
+     ***/
     private void startScan() {
         logOnSd("MainActivity, startScan(), 183");
         myDevice = new DigiMeshDevice(MainActivity.this, BAUD_RATE, permissionListener);
@@ -188,16 +201,30 @@ public class MainActivity extends AppCompatActivity {
         remoteXBeeDeviceAdapter.notifyDataSetChanged();
     }
 
+    /***
+     *  --- getDMDevice() ----
+     *  The function of gaining access to your device..
+     ***/
     public static DigiMeshDevice getDMDevice() {
         logOnSd("MainActivity, getDMDevice(), 190");
         return myDevice;
     }
 
+    /***
+     *  --- getSelectedDevice() ----
+     *  The function of gaining access to the selected device
+     ***/
     public static String getSelectedDevice() {
         logOnSd("MainActivity, getSelectedDevice(), 195");
         return selectedDevice;
     }
 
+    /***
+     *  --- connectToDevice(String) ----
+     *  The function of establishing a connection with the selected device.
+     *
+     *  @param device Selected device number.
+     ***/
     private void connectToDevice(final String device) {
         logOnSd("MainActivity, connectToDevice(final String device), 200");
         final ProgressDialog dialog = ProgressDialog.show(this, getResources().getString(R.string.connecting_device_title),
@@ -242,9 +269,11 @@ public class MainActivity extends AppCompatActivity {
         logOnSd("MainActivity, connectToDevice(final String device), 240");
     }
 
-
+    /***
+     *  --- CustomDeviceAdapter ----
+     *  The class that initializes the list of available devices.
+     ***/
     private class CustomDeviceAdapter extends ArrayAdapter<String> {
-
         private Context context;
 
         CustomDeviceAdapter(@NonNull Context context, ArrayList<String> devices) {
@@ -271,6 +300,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /***
+     *  --- listnodes(DigiMeshDevice) ----
+     *  The function searches for available devices for the specified device..
+     *
+     *  @param myDevice Current device.
+     ***/
     public static List<RemoteXBeeDevice> listnodes(DigiMeshDevice myDevice) {
         logOnSd("MainActivity, listnodes(DigiMeshDevice myDevice), 264");
         List<RemoteXBeeDevice> devices = null;

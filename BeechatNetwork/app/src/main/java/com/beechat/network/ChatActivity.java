@@ -34,6 +34,10 @@ import com.digi.xbee.api.models.XBeeMessage;
 import java.util.ArrayList;
 
 
+/***
+ *  --- ChatActivity ----
+ *  The class that is responsible for the chat window.
+ ***/
 public class ChatActivity extends AppCompatActivity {
 
     // Constants.
@@ -44,10 +48,8 @@ public class ChatActivity extends AppCompatActivity {
     private static DataReceiveListener listener = new DataReceiveListener();
     private static ChatDeviceAdapter chatDeviceAdapter;
     private static ArrayList<String> messages = new ArrayList<>();
-
     private static RemoteDigiMeshDevice remote = null;
     private static String message = null;
-
     private static boolean flagNotification = false;
     private KeyguardManager myKM= null;
 
@@ -78,6 +80,7 @@ public class ChatActivity extends AppCompatActivity {
 
         nameTextView.setText("Chatting with " + MainActivity.getSelectedDevice());
 
+        // Handling the event of returning to the main window.
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -90,6 +93,7 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
+        // Handling the message sending event.
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -110,6 +114,7 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
+        // Channel check events added to the device.
         device.addDataListener(listener);
 
         String REMOTE_NODE_ID = MainActivity.getSelectedDevice();
@@ -127,11 +132,13 @@ public class ChatActivity extends AppCompatActivity {
             }
         }
 
+        // Creation of a channel for processing notifications.
         createNotificationChannel();
 
         final Handler handler = new Handler();
         final int delay = 1000;
 
+        // Checking the message channel and generating notifications.
         handler.postDelayed(new Runnable() {
             public void run() {
                 chatDeviceAdapter.notifyDataSetChanged();
@@ -153,6 +160,10 @@ public class ChatActivity extends AppCompatActivity {
         chatDeviceAdapter.notifyDataSetChanged();
     }
 
+    /***
+     *  --- ChatDeviceAdapter ----
+     *  The class that is responsible for initializing the message list.
+     ***/
     private class ChatDeviceAdapter extends ArrayAdapter<String> {
 
         private Context context;
@@ -205,6 +216,10 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
+    /***
+     *  --- DataReceiveListener ----
+     *  The class that is responsible for listening to the message channel.
+     ***/
     private static class DataReceiveListener implements IDataReceiveListener {
         @Override
         public void dataReceived(XBeeMessage xbeeMessage) {
@@ -213,12 +228,22 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
+    /***
+     *  --- removeLastChar(String) ----
+     *  The function to remove the last character in a string.
+     *
+     *  @param s Transmitted message.
+     ***/
     public static String removeLastChar(String s) {
         return (s == null || s.length() == 0)
                 ? null
                 : (s.substring(0, s.length() - 1));
     }
 
+    /***
+     *  --- createNotificationChannel() ----
+     *  The function of creating a notification channel.
+     ***/
     private void createNotificationChannel() {
         MainActivity.logOnSd("ChatActivity, createNotificationChannel(), 219");
         // Create the NotificationChannel, but only on API 26+ because
@@ -236,6 +261,13 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
+    /***
+     *  --- notifyThis(String, String) ----
+     *  The function of sending a message to the notification channel.
+     *
+     *  @param title Notification header.
+     *  @param message Notification text.
+     ***/
     public void notifyThis(String title, String message) {
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "CHANNEL_ID")
                 .setSmallIcon(R.drawable.digi_icon)
