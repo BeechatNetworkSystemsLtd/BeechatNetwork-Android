@@ -35,10 +35,10 @@ import java.util.ArrayList;
 
 
 /***
- *  --- ChatActivity ----
+ *  --- ChatScreen ----
  *  The class that is responsible for the chat window.
  ***/
-public class ChatActivity extends AppCompatActivity {
+public class ChatScreen extends AppCompatActivity {
 
     // Constants.
     private static final String REMOTE_NODE_ID = "XBEE_B";
@@ -61,11 +61,10 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        myKM = (KeyguardManager) ChatActivity.this.getSystemService(Context.KEYGUARD_SERVICE);
-        MainActivity.logOnSd("ChatActivity, onCreate(Bundle savedInstanceState), 62 ");
-        setContentView(R.layout.activity_chat);
+        myKM = (KeyguardManager) ChatScreen.this.getSystemService(Context.KEYGUARD_SERVICE);
+        setContentView(R.layout.chat_screen);
 
-        device = MainActivity.getDMDevice();
+        device = NearbyDevicesScreen.getDMDevice();
 
         sendButton = findViewById(R.id.sendButton);
         nameTextView = findViewById(R.id.nameTextView);
@@ -78,13 +77,12 @@ public class ChatActivity extends AppCompatActivity {
         chatDeviceAdapter = new ChatDeviceAdapter(this, messages);
         chatListView.setAdapter(chatDeviceAdapter);
 
-        nameTextView.setText("Chatting with " + MainActivity.getSelectedDevice());
+        nameTextView.setText("Chatting with " + NearbyDevicesScreen.name);
 
         // Handling the event of returning to the main window.
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MainActivity.logOnSd("ChatActivity, backButton.setOnClickListener(new View.OnClickListener(), 83 ");
                 chatDeviceAdapter.clear();
                 device.close();
                 finish();
@@ -97,7 +95,6 @@ public class ChatActivity extends AppCompatActivity {
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MainActivity.logOnSd("ChatActivity, sendButton.setOnClickListener(new View.OnClickListener(), 94 ");
                 message = inputField.getText().toString();
                 if (message.isEmpty())
                 {
@@ -117,7 +114,7 @@ public class ChatActivity extends AppCompatActivity {
         // Channel check events added to the device.
         device.addDataListener(listener);
 
-        String REMOTE_NODE_ID = MainActivity.getSelectedDevice();
+        String REMOTE_NODE_ID = NearbyDevicesScreen.getSelectedDevice();
         XBee64BitAddress RemoteAddr = new XBee64BitAddress(REMOTE_NODE_ID);
 
         if (device.get64BitAddress().equals(REMOTE_NODE_ID)) {
@@ -143,7 +140,7 @@ public class ChatActivity extends AppCompatActivity {
             public void run() {
                 chatDeviceAdapter.notifyDataSetChanged();
                 if( myKM.inKeyguardRestrictedInputMode() && flagNotification) {
-                    String message = MainActivity.getSelectedDevice() + ":\n" + messages.get(messages.size() - 1);
+                    String message = NearbyDevicesScreen.getSelectedDevice() + ":\n" + messages.get(messages.size() - 1);
                     message = removeLastChar(message);
                     notifyThis("Beechat notification", message);
                     flagNotification = false;
@@ -156,7 +153,6 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        MainActivity.logOnSd("ChatActivity, onResume() , 148 ");
         chatDeviceAdapter.notifyDataSetChanged();
     }
 
@@ -202,7 +198,7 @@ public class ChatActivity extends AppCompatActivity {
                 layout.setPadding(40, 30, 40, 30);
 
                 TextView nameText = new TextView(context);
-                
+
                 nameText.setGravity(Gravity.RIGHT);
                 nameText.setText(message);
                 nameText.setTypeface(nameText.getTypeface(), Typeface.BOLD);
@@ -245,7 +241,6 @@ public class ChatActivity extends AppCompatActivity {
      *  The function of creating a notification channel.
      ***/
     private void createNotificationChannel() {
-        MainActivity.logOnSd("ChatActivity, createNotificationChannel(), 219");
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

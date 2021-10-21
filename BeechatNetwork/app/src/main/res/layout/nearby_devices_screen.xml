@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".NearbyDevicesScreen">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,6 +16,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/select_device" />
+        <Button
+            android:id="@+id/refreshButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="right"
+            android:background="@drawable/refresh_black"/>
+
 
         <ListView
             android:id="@+id/devicesListView"
@@ -25,14 +32,5 @@
             android:transcriptMode="alwaysScroll"
             >
         </ListView>
-
-        <Button
-            android:id="@+id/refreshButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|right"
-            android:text="Refresh"
-            />
-
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>
