@@ -5,6 +5,12 @@
         <item name="colorPrimary">#3577B6</item>
         <item name="colorPrimaryDark">#2D659B</item>
         <item name="colorAccent">#84C361</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
     </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
 
 </resources>

@@ -11,14 +11,19 @@
         android:theme="@style/AppTheme"
         android:requestLegacyExternalStorage="true"
         >
-        <activity android:name="com.beechat.network.ChatActivity"></activity>
-        <activity android:name="com.beechat.network.MainActivity">
+        <activity android:name="com.beechat.network.WelcomeScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="com.beechat.network.MainScreen"></activity>
+        <activity android:name="com.beechat.network.ChatScreen"></activity>
+        <activity android:name="com.beechat.network.EditContactScreen"></activity>
+        <activity android:name="com.beechat.network.DataScreen"></activity>
+
+
     </application>
 
 </manifest>
