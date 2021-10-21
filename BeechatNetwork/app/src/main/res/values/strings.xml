@@ -5,8 +5,13 @@
 
     <string name="back">Back</string>
     <string name="send">Send</string>
+    <string name="spin">Spinner</string>
 
     <string name="connecting_device_title">Connecting to device</string>
     <string name="connecting_device_description">Please wait while connecting to the selected XBee device...</string>
     <string name="error_connecting_title">Error connecting</string>
-    <string name="error_connecting_description">Could not connect to the selected XBee device: %1$s</string></resources>
+    <string name="error_connecting_description">Could not connect to the selected XBee device: %1$s</string>
+
+    <string name="eula_agreement">I agree to the <u>End User License Agreement</u></string>
+</resources>
+
