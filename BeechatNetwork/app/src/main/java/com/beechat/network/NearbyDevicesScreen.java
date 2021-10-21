@@ -14,12 +14,13 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -38,13 +39,18 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+
+
 /***
- *  --- MainActivity ----
- *  The class that is responsible for the main application window.
+ *  --- NearbyDevicesScreen ----
+ *  The class is responsible for the search and display devices.
  ***/
-public class MainActivity extends AppCompatActivity {
+public class NearbyDevicesScreen extends Fragment {
 
     // Constants.
+    //private static final int BAUD_RATE = 9600;
     private static final int BAUD_RATE = 57600;
     private static final File root = new File(String.valueOf(Environment.getExternalStorageDirectory()));
     private static final String sFileName = "log.txt";
@@ -59,40 +65,44 @@ public class MainActivity extends AppCompatActivity {
     private static DigiMeshDevice myDevice;
     private static ArrayList<String> dmaDevices = new ArrayList<>();
 
+    public static boolean flag = false;
+    public static Editable name = null;
+
     ListView devicesListView;
     Button refreshButton;
     TextView listDevicesText;
+    View view;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        view = inflater.inflate(R.layout.nearby_devices_screen, container, false);
+        listDevicesText = (TextView) view.findViewById(R.id.textView);
+        refreshButton = (Button) view.findViewById(R.id.refreshButton);
 
-        listDevicesText = (TextView) findViewById(R.id.textView);
-        refreshButton = (Button)findViewById(R.id.refreshButton);
-
-        devicesListView = (ListView)findViewById(R.id.devicesListView);
-        remoteXBeeDeviceAdapter = new CustomDeviceAdapter(this, dmaDevices);
+        devicesListView = (ListView) view.findViewById(R.id.devicesListView);
+        remoteXBeeDeviceAdapter = new CustomDeviceAdapter(getActivity(), dmaDevices);
         devicesListView.setAdapter(remoteXBeeDeviceAdapter);
 
         // Handling an event on clicking an item from the list of available devices.
         devicesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                logOnSd("MainActivity, onItemClick(AdapterView<?> adapterView, View view, int i, long l), 82");
-                selectedDevice = remoteXBeeDeviceAdapter.getItem(i);
-                logOnSd("selectedDevice:"+selectedDevice.toString());
-                connectToDevice(selectedDevice);
+                if (!flag) {
+                    Intent intent = new Intent(getActivity(), EditContactScreen.class);
+                    intent.putExtra("key", selectedDevice);
+                    startActivity(intent);
+                } else {
+                    selectedDevice = remoteXBeeDeviceAdapter.getItem(i);
+                    connectToDevice(selectedDevice);
+                }
             }
         });
 
         // Handling and event  by clicking the "Refresh" button.
         refreshButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                logOnSd("MainActivity, refreshButton.setOnClickListener(new View.OnClickListener(), 89");
                 remoteXBeeDeviceAdapter.clear();
                 startScan();
-
             }
         });
 
@@ -111,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-        logOnSd("MainActivity, onCreate(Bundle savedInstanceState)), 108");
+        return view;
     }
 
     /***
@@ -144,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
         if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1) {
             return false;
         }
-        int permission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int permission = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
         return  (permission != PackageManager.PERMISSION_GRANTED);
     }
 
@@ -157,11 +167,11 @@ public class MainActivity extends AppCompatActivity {
                 "android.permission.READ_EXTERNAL_STORAGE",
                 "android.permission.WRITE_EXTERNAL_STORAGE"
         };
-        int permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int permission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
         if (permission != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(
-                    this, permissions, 1);
+                    getActivity(), permissions, 1);
         }
     }
 
@@ -170,7 +180,6 @@ public class MainActivity extends AppCompatActivity {
      *  The function of requesting permission to access the ports of the phone.
      ***/
     private void requestPermission() {
-        logOnSd("MainActivity, requestPermission(), 162");
         permissionListener = new AndroidUSBPermissionListener() {
             @Override
             public void permissionReceived(boolean permissionGranted) {
@@ -183,10 +192,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
-        logOnSd("MainActivity, onResume(), 177");
-        remoteXBeeDeviceAdapter.clear();
+        //remoteXBeeDeviceAdapter.clear();
         //startScan();
     }
 
@@ -195,8 +203,7 @@ public class MainActivity extends AppCompatActivity {
      *  The function of starting scanning for available Xbee devices.
      ***/
     private void startScan() {
-        logOnSd("MainActivity, startScan(), 183");
-        myDevice = new DigiMeshDevice(MainActivity.this, BAUD_RATE, permissionListener);
+        myDevice = new DigiMeshDevice(getActivity(), BAUD_RATE, permissionListener);
         listnodes(myDevice);
         remoteXBeeDeviceAdapter.notifyDataSetChanged();
     }
@@ -206,7 +213,6 @@ public class MainActivity extends AppCompatActivity {
      *  The function of gaining access to your device..
      ***/
     public static DigiMeshDevice getDMDevice() {
-        logOnSd("MainActivity, getDMDevice(), 190");
         return myDevice;
     }
 
@@ -215,7 +221,6 @@ public class MainActivity extends AppCompatActivity {
      *  The function of gaining access to the selected device
      ***/
     public static String getSelectedDevice() {
-        logOnSd("MainActivity, getSelectedDevice(), 195");
         return selectedDevice;
     }
 
@@ -226,54 +231,45 @@ public class MainActivity extends AppCompatActivity {
      *  @param device Selected device number.
      ***/
     private void connectToDevice(final String device) {
-        logOnSd("MainActivity, connectToDevice(final String device), 200");
-        final ProgressDialog dialog = ProgressDialog.show(this, getResources().getString(R.string.connecting_device_title),
+        final ProgressDialog dialog = ProgressDialog.show(getActivity(), getResources().getString(R.string.connecting_device_title),
                 getResources().getString(R.string.connecting_device_description), true);
 
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    logOnSd("MainActivity, connectToDevice(final String device), 208");
-                    logOnSd("myDevice:"+myDevice.toString());
                     myDevice.open();
 
-                    MainActivity.this.runOnUiThread(new Runnable() {
+                   getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            logOnSd("MainActivity, connectToDevice(final String device), 214");
                             dialog.dismiss();
-                            Intent intent = new Intent(MainActivity.this, ChatActivity.class);
+                            Intent intent = new Intent(getActivity(), ChatScreen.class);
                             startActivity(intent);
-                            logOnSd("MainActivity, connectToDevice(final String device), 218");
-                        }
+                            }
                     });
                 } catch (final XBeeException e) {
-                    logOnSd("MainActivity, connectToDevice(final String device), 222");
                     e.printStackTrace();
-                    MainActivity.this.runOnUiThread(new Runnable() {
+                    getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            logOnSd("MainActivity, connectToDevice(final String device), 227");
                             dialog.dismiss();
-                            new AlertDialog.Builder(MainActivity.this).setTitle(getResources().getString(R.string.error_connecting_title))
+                            new AlertDialog.Builder(getActivity()).setTitle(getResources().getString(R.string.error_connecting_title))
                                     .setMessage(getResources().getString(R.string.error_connecting_description, e.getMessage()))
                                     .setPositiveButton(android.R.string.ok, null).show();
                         }
                     });
                     myDevice.close();
                 }
-                logOnSd("MainActivity, connectToDevice(final String device), 237");
-            }
+                }
         }).start();
-        logOnSd("MainActivity, connectToDevice(final String device), 240");
-    }
+        }
 
     /***
      *  --- CustomDeviceAdapter ----
      *  The class that initializes the list of available devices.
      ***/
-    private class CustomDeviceAdapter extends ArrayAdapter<String> {
+    class CustomDeviceAdapter extends ArrayAdapter<String> {
         private Context context;
 
         CustomDeviceAdapter(@NonNull Context context, ArrayList<String> devices) {
@@ -307,7 +303,6 @@ public class MainActivity extends AppCompatActivity {
      *  @param myDevice Current device.
      ***/
     public static List<RemoteXBeeDevice> listnodes(DigiMeshDevice myDevice) {
-        logOnSd("MainActivity, listnodes(DigiMeshDevice myDevice), 264");
         List<RemoteXBeeDevice> devices = null;
 
         if (myDevice.isOpen() == true) {
