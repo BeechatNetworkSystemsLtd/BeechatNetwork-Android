@@ -18,16 +18,11 @@ public class MainScreen extends AppCompatActivity {
     ViewPager viewPager;
     TabLayout tabLayout;
     ArrayList<Fragment> fragments;
-    Toolbar toolbar;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_screen);
-
-        //toolbar = (Toolbar) findViewById(R.id.toolbar);
-        //setSupportActionBar(toolbar);
-        //getSupportActionBar().setTitle(null);
 
         viewPager = (ViewPager) findViewById(R.id.pager);
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
