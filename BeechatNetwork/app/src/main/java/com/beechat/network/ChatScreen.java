@@ -32,6 +32,7 @@ import com.digi.xbee.api.models.XBee64BitAddress;
 import com.digi.xbee.api.models.XBeeMessage;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 /***
@@ -53,6 +54,7 @@ public class ChatScreen extends AppCompatActivity {
     private static boolean flagNotification = false;
     private KeyguardManager myKM= null;
 
+    public String test = "";
     Button sendButton, backButton;
     TextView nameTextView;
     ListView chatListView;
@@ -64,6 +66,11 @@ public class ChatScreen extends AppCompatActivity {
         myKM = (KeyguardManager) ChatScreen.this.getSystemService(Context.KEYGUARD_SERVICE);
         setContentView(R.layout.chat_screen);
 
+        List<Message> messagesDB = NearbyDevicesScreen.db.getAllMessages();
+        for (Message mg : messagesDB)
+        {
+            messages.add(mg.getContent());
+        }
         device = NearbyDevicesScreen.getDMDevice();
 
         sendButton = findViewById(R.id.sendButton);
@@ -77,7 +84,18 @@ public class ChatScreen extends AppCompatActivity {
         chatDeviceAdapter = new ChatDeviceAdapter(this, messages);
         chatListView.setAdapter(chatDeviceAdapter);
 
-        nameTextView.setText("Chatting with " + NearbyDevicesScreen.name);
+        // Reading all users
+        System.out.println("Reading: " + "Reading all users..");
+        List<User> users = NearbyDevicesScreen.db.getAllUsers();
+
+
+        if (NearbyDevicesScreen.name != null) {
+            test = NearbyDevicesScreen.name.toString();
+        }
+        else  {
+            test = NearbyDevicesScreen.names.get(0);
+        }
+        nameTextView.setText("Chatting with " +  test);
 
         // Handling the event of returning to the main window.
         backButton.setOnClickListener(new View.OnClickListener() {
@@ -86,8 +104,6 @@ public class ChatScreen extends AppCompatActivity {
                 chatDeviceAdapter.clear();
                 device.close();
                 finish();
-                //onBackPressed();
-
             }
         });
 
@@ -107,6 +123,7 @@ public class ChatScreen extends AppCompatActivity {
                 } catch (XBeeException e) {
                     messages.add("Error transmitting message: " + e.getMessage());
                 }
+                NearbyDevicesScreen.db.insertMessage(new Message(NearbyDevicesScreen.senderId, NearbyDevicesScreen.receiverId, message));
                 chatDeviceAdapter.notifyDataSetChanged();
             }
         });
@@ -220,6 +237,7 @@ public class ChatScreen extends AppCompatActivity {
         @Override
         public void dataReceived(XBeeMessage xbeeMessage) {
             messages.add(new String(xbeeMessage.getData()) + "\nS");
+            NearbyDevicesScreen.db.insertMessage(new Message(NearbyDevicesScreen.senderId, NearbyDevicesScreen.receiverId, new String(xbeeMessage.getData()) + "\nS"));
             flagNotification = true;
         }
     }
