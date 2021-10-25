@@ -1,5 +1,7 @@
 package com.beechat.network;
 
+import static android.support.v4.content.ContextCompat.getSystemService;
+
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -15,14 +17,17 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
+import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.digi.xbee.api.DigiMeshNetwork;
@@ -65,9 +70,14 @@ public class NearbyDevicesScreen extends Fragment {
     private static DigiMeshDevice myDevice;
     private static ArrayList<String> dmaDevices = new ArrayList<>();
 
-    public static boolean flag = false;
+    public static DatabaseHandler db = null;
     public static Editable name = null;
 
+    public static String senderId = null;
+    public static String receiverId = null;
+
+    public static List<String> xbee_names = new ArrayList<>();
+    public static List<String> names = new ArrayList<>();
     ListView devicesListView;
     Button refreshButton;
     TextView listDevicesText;
@@ -82,18 +92,41 @@ public class NearbyDevicesScreen extends Fragment {
         devicesListView = (ListView) view.findViewById(R.id.devicesListView);
         remoteXBeeDeviceAdapter = new CustomDeviceAdapter(getActivity(), dmaDevices);
         devicesListView.setAdapter(remoteXBeeDeviceAdapter);
+        db = new DatabaseHandler(getActivity());
 
         // Handling an event on clicking an item from the list of available devices.
         devicesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if (!flag) {
+                // Reading all users
+                System.out.println("Reading: " + "Reading all users..");
+                List<User> users = db.getAllUsers();
+
+
+                for (User cn : users) {
+                    xbee_names.add(cn.getXbeeDeviceNumber());
+                    names.add(cn.getName());
+                }
+
+                senderId = getDMDevice().toString();
+                selectedDevice = remoteXBeeDeviceAdapter.getItem(i);
+                receiverId = selectedDevice;
+
+                if (xbee_names.isEmpty()) {
+                    System.out.println("Account receiverId " + receiverId + " not exist!");
                     Intent intent = new Intent(getActivity(), EditContactScreen.class);
-                    intent.putExtra("key", selectedDevice);
+                    intent.putExtra("key", receiverId);
                     startActivity(intent);
                 } else {
-                    selectedDevice = remoteXBeeDeviceAdapter.getItem(i);
-                    connectToDevice(selectedDevice);
+                    if (xbee_names.contains(receiverId)) {
+                        System.out.println("Account receiverId " + receiverId + " exist!");
+                        connectToDevice(selectedDevice);
+                    } else {
+                        System.out.println("Account receiverId " + receiverId + " not exist!");
+                        Intent intent = new Intent(getActivity(), EditContactScreen.class);
+                        intent.putExtra("key", receiverId);
+                        startActivity(intent);
+                    }
                 }
             }
         });

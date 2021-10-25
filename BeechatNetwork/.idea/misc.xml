@@ -4,8 +4,10 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.19739583333333333" />
+        <entry key="app/src/main/res/drawable/client_message_box.xml" value="0.24722222222222223" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.19739583333333333" />
         <entry key="app/src/main/res/drawable/server_message_box.xml" value="0.19739583333333333" />
+        <entry key="app/src/main/res/drawable/tab_background.xml" value="0.24722222222222223" />
         <entry key="app/src/main/res/layout/activity_chat.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="app/src/main/res/layout/broadcast_screen.xml" value="0.10740740740740741" />
@@ -17,6 +19,7 @@
         <entry key="app/src/main/res/layout/item_list.xml" value="0.1" />
         <entry key="app/src/main/res/layout/main_screen.xml" value="0.10740740740740741" />
         <entry key="app/src/main/res/layout/nearby_devices_screen.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/popup_window.xml" value="0.1" />
         <entry key="app/src/main/res/layout/settings_screen.xml" value="0.10740740740740741" />
         <entry key="app/src/main/res/layout/welcome_screen.xml" value="0.12407407407407407" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.19739583333333333" />
