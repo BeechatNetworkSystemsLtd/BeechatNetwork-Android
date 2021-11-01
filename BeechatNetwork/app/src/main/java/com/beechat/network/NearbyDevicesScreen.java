@@ -85,11 +85,11 @@ public class NearbyDevicesScreen extends Fragment {
 
     public static List<String> xbee_names = new ArrayList<>();
     public static List<String> names = new ArrayList<>();
+
     ListView devicesListView;
-    public static ImageButton refreshButton;
+    ImageButton refreshButton;
     TextView listDevicesText;
     View view;
-    int count = 0;
 
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
