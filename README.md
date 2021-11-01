@@ -69,15 +69,16 @@ Features
 | ------ | ------ | ------ |
 | UX | Notifications |  **Added on 1/9/2021** add system notifications for messages received when the device is locked or in another app. |
 | Security | Extended error catching and debug log system | **Added on 1/9/2021** add better error catching to prevent unexpected hang-ups. |
-| Optimisations | Separate thread for listnodes | run listnodes method on a separate thread to prevent app hang-up. |
-| UX | Splash screen | add a splash screen on startup with progress bar. |
+| Optimisations |  Separate thread for listnodes | **(Added)** run listnodes method on a separate thread to prevent app hang-up. |
+| UX | Splash screen | **(Added)** add a splash screen on startup with progress bar. |
+| Misc. | SQLite DB | **(Added)** add database file to be able to save conversations with and other data persistently. |
+| UX | Saved conversations window | **(Added)** add a new window containing saved conversations & broadcasts. |
+| UX | Settings window | **(Added)** baud rate slider, language, dark mode, wipe database. |
+| UX | Refresh animation | **(Added)** show a loading animation when clicking on the refresh button. |
 | Misc. | Receipts | Sent & read receipts as well as timestamped  messages. |
-| Misc. | SQLite DB | add database file to be able to save conversations with and other data persistently. |
-| UX | Saved conversations window | add a new window containing saved conversations & broadcasts. |
 |Security | kyber-JNI implementation | implementing asymmetric encryption of messages utilising our [kyber-JNI](https://github.com/BeechatNetworkSystemsLtd/kyber-JNI) repo. | 
 |Security | dilithium-JNI implementation | implementing digital signature scheme authenticated messages utilising our [dilithium-JNI](https://github.com/BeechatNetworkSystemsLtd/dilithium-JNI) repo. |
-| UX | Settings window | baud rate slider, language, dark mode, wipe database. |
-| UX | Refresh animation | show a loading animation when clicking on the refresh button. |
+
 
 __Public launch__ (Q4 2021)
 
