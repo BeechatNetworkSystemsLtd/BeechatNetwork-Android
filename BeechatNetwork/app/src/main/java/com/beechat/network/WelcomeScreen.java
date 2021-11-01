@@ -1,9 +1,11 @@
 package com.beechat.network;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
@@ -12,10 +14,16 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
+import com.digi.xbee.api.android.DigiMeshDevice;
+import com.digi.xbee.api.android.connection.usb.AndroidUSBPermissionListener;
+import com.digi.xbee.api.exceptions.XBeeException;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
 /***
  *  --- WelcomeScreen ----
@@ -23,23 +31,40 @@ import java.io.UnsupportedEncodingException;
  ***/
 public class WelcomeScreen extends AppCompatActivity {
 
+    // Constants.
+    private static final int BAUD_RATE = 57600;
+
+    // Variables.
+    private AndroidUSBPermissionListener permissionListener;
+    private static DigiMeshDevice myDevice;
+    public static DatabaseHandler db = null;
+    public static List<String> xbee_names = new ArrayList<>();
+    public static List<String> names = new ArrayList<>();
+
     Button finishButton;
     CheckBox agreementCheckBox;
-    TextView eulaTextView;
+    TextView eulaTextView, idTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.welcome_screen);
 
+        db = new DatabaseHandler(this);
         eulaTextView = (TextView) findViewById(R.id.textViewEULA);
         String largeTextString = getStringFromRawRes(R.raw.eula);
-        if(largeTextString != null) {  //null check is optional
+
+        if(largeTextString != null) {
+            //null check is optional
             eulaTextView.setText(largeTextString);
         } else {
             eulaTextView.setText("EULA is empty!");
         }
+
         eulaTextView.setMovementMethod(new ScrollingMovementMethod());
+
+        idTextView = (TextView) findViewById(R.id.textViewMyID);
+
         finishButton = (Button)findViewById(R.id.finishButton);
         finishButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -61,14 +86,70 @@ public class WelcomeScreen extends AppCompatActivity {
                 } else {
                     finishButton.setEnabled(false);
                 }
-
             }
         });
+
+        final ProgressDialog dialog = ProgressDialog.show(this, getResources().getString(R.string.startup_device_title),
+                getResources().getString(R.string.startup_device), true);
+        myDevice = new DigiMeshDevice(this, BAUD_RATE, permissionListener);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    myDevice.open();
+                    WelcomeScreen.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            dialog.dismiss();
+                            if (myDevice != null) {
+                                idTextView.setText("My ID \n" + myDevice.get64BitAddress().toString());
+                            }
+                            // Reading all users
+                            System.out.println("Reading: " + "Reading all users..");
+                            List<User> users = db.getAllUsers();
+
+                            for (User cn : users) {
+                                xbee_names.add(cn.getXbeeDeviceNumber());
+                                names.add(cn.getName());
+                            }
+
+                            if (xbee_names.isEmpty()) {
+                                System.out.println("Account receiverId " + myDevice.get64BitAddress().toString()+ " not exist!");
+                                db.addUser(new User(myDevice.get64BitAddress().toString(), myDevice.get64BitAddress().toString()));
+                            } else {
+                                if (xbee_names.contains(myDevice.get64BitAddress().toString())) {
+                                    System.out.println("Account receiverId " + myDevice.get64BitAddress().toString() + " exist!");
+                                    Intent intent = new Intent(WelcomeScreen.this, MainScreen.class);
+                                    startActivity(intent);
+                                } else {
+                                    System.out.println("Account receiverId " + myDevice.get64BitAddress().toString() + " not exist!");
+                                    db.addUser(new User(myDevice.get64BitAddress().toString(), myDevice.get64BitAddress().toString()));
+                                }
+                            }
+                        }
+                    });
+
+                } catch (XBeeException e) {
+                    e.printStackTrace();
+                    myDevice.close();
+                } finally {
+                    myDevice.close();
+                }
+            }
+        }).start();
     }
+
+    /***
+     *  --- getStringFromRawRes(String) ----
+     *  The function of starting scanning for available Xbee devices.
+     *
+     *  @param rawRes The text of End User License Agreement.
+     ***/
     @Nullable
     private String getStringFromRawRes(int rawRes) {
-
         InputStream inputStream;
+
         try {
             inputStream = getResources().openRawResource(rawRes);
         } catch (Resources.NotFoundException e) {
