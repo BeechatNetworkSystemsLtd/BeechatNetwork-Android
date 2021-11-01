@@ -1,0 +1,19 @@
+Privacy Policy
+Beechat Network Systems Ltd. (hereinafter “Beechat”) does not collect any personally identifiable information (PII) from its users.
+End User License Agreement (EULA)
+	•	Enactment Date 09/2020
+	•	This is an End User License Agreement (EULA) between the end-user (you) and the provider of the service (Beechat), in relation to your use of Beechat. You must be 16 years of age, or older, to be able to legally agree to the EULA.
+	•	Permitted use
+	•	You should be aware of the governing laws of the country you use Beechat in. It is up to you to ensure that the way you use Beechat is compliant to governing law.
+	•	Restricted use
+	•	By using Beechat, you agree to not enable any activity which violates basic human rights or law.
+	•	Disclaimer of warranties
+	•	Beechat is the software provided, and the developers make no guarantees regarding the performance of the third-party hardware used.
+	•	The Beechat network topology depends on the existence of active nodes run by other users, thus the developers make no guarantee regarding uptime and availability.
+	•	Limitation of liability
+	•	Taking in consideration sections 3 & 4, Beechat and its developers are not liable for any activity you undertake while using Beechat.
+	•	Contact information
+	•	If you have any questions about this EULA or Beechat in general, you may contact us by email at beechatnetwork@protonmail.com
+
+Initial device log-in
+By clicking Accept, you agree to Beechat’s Privacy Policy and EULA.
