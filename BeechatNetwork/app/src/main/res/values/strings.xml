@@ -9,8 +9,10 @@
 
     <string name="connecting_device_title">Connecting to device</string>
     <string name="scanning_device_title">Scanning devices</string>
+    <string name="startup_device_title">Scanning ID device</string>
     <string name="connecting_device_description">Please wait while connecting to the selected XBee device...</string>
     <string name="scanning_devices">Please wait while scanning of XBee devices...</string>
+    <string name="startup_device">Please wait while scanning ID your device...</string>
     <string name="error_connecting_title">Error connecting</string>
     <string name="error_connecting_description">Could not connect to the selected XBee device: %1$s</string>
 
