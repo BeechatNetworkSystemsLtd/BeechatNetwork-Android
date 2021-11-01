@@ -8,10 +8,13 @@
     <string name="spin">Spinner</string>
 
     <string name="connecting_device_title">Connecting to device</string>
+    <string name="scanning_device_title">Scanning devices</string>
     <string name="connecting_device_description">Please wait while connecting to the selected XBee device...</string>
+    <string name="scanning_devices">Please wait while scanning of XBee devices...</string>
     <string name="error_connecting_title">Error connecting</string>
     <string name="error_connecting_description">Could not connect to the selected XBee device: %1$s</string>
 
     <string name="eula_agreement">I agree to the <u>End User License Agreement</u></string>
+	<string name="eula_text">EULA text</string>
 </resources>
 

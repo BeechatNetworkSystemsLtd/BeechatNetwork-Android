@@ -7,10 +7,16 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.DataSetObserver;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.RectShape;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -25,6 +31,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -79,20 +86,23 @@ public class NearbyDevicesScreen extends Fragment {
     public static List<String> xbee_names = new ArrayList<>();
     public static List<String> names = new ArrayList<>();
     ListView devicesListView;
-    Button refreshButton;
+    public static ImageButton refreshButton;
     TextView listDevicesText;
     View view;
+    int count = 0;
 
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.nearby_devices_screen, container, false);
         listDevicesText = (TextView) view.findViewById(R.id.textView);
-        refreshButton = (Button) view.findViewById(R.id.refreshButton);
+        refreshButton = (ImageButton) view.findViewById(R.id.refreshButton);
 
         devicesListView = (ListView) view.findViewById(R.id.devicesListView);
         remoteXBeeDeviceAdapter = new CustomDeviceAdapter(getActivity(), dmaDevices);
+
         devicesListView.setAdapter(remoteXBeeDeviceAdapter);
         db = new DatabaseHandler(getActivity());
+
 
         // Handling an event on clicking an item from the list of available devices.
         devicesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -136,6 +146,7 @@ public class NearbyDevicesScreen extends Fragment {
             public void onClick(View v) {
                 remoteXBeeDeviceAdapter.clear();
                 startScan();
+
             }
         });
 
@@ -216,8 +227,9 @@ public class NearbyDevicesScreen extends Fragment {
         permissionListener = new AndroidUSBPermissionListener() {
             @Override
             public void permissionReceived(boolean permissionGranted) {
-                if (permissionGranted)
+                if (permissionGranted) {
                     System.out.println("User granted USB permission.");
+                }
                 else
                     System.out.println("User rejected USB permission.");
             }
@@ -236,8 +248,31 @@ public class NearbyDevicesScreen extends Fragment {
      *  The function of starting scanning for available Xbee devices.
      ***/
     private void startScan() {
+        final ProgressDialog dialog = ProgressDialog.show(getActivity(), getResources().getString(R.string.scanning_device_title),
+                getResources().getString(R.string.scanning_devices), true);
         myDevice = new DigiMeshDevice(getActivity(), BAUD_RATE, permissionListener);
-        listnodes(myDevice);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    listnodes(myDevice);
+
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            dialog.dismiss();
+                            remoteXBeeDeviceAdapter.notifyDataSetChanged();
+                        }
+                    });
+
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
         remoteXBeeDeviceAdapter.notifyDataSetChanged();
     }
 
@@ -370,5 +405,6 @@ public class NearbyDevicesScreen extends Fragment {
         }
         return devices;
     }
+
 
 }
