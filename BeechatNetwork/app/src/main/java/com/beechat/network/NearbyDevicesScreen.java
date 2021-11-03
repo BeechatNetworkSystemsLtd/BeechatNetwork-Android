@@ -77,7 +77,7 @@ public class NearbyDevicesScreen extends Fragment {
     private static DigiMeshDevice myDevice;
     private static ArrayList<String> dmaDevices = new ArrayList<>();
 
-    public static DatabaseHandler db = null;
+    //public static DatabaseHandler db = null;
     public static Editable name = null;
 
     public static String senderId = null;
@@ -101,7 +101,7 @@ public class NearbyDevicesScreen extends Fragment {
         remoteXBeeDeviceAdapter = new CustomDeviceAdapter(getActivity(), dmaDevices);
 
         devicesListView.setAdapter(remoteXBeeDeviceAdapter);
-        db = new DatabaseHandler(getActivity());
+        //db = new DatabaseHandler(getActivity());
 
 
         // Handling an event on clicking an item from the list of available devices.
@@ -110,7 +110,7 @@ public class NearbyDevicesScreen extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 // Reading all users
                 System.out.println("Reading: " + "Reading all users..");
-                List<User> users = db.getAllUsers();
+                List<User> users = WelcomeScreen.db.getAllUsers();
 
 
                 for (User cn : users) {
