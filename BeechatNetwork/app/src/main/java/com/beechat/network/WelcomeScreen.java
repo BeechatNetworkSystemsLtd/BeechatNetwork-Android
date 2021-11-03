@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
@@ -38,8 +37,7 @@ public class WelcomeScreen extends AppCompatActivity {
     private AndroidUSBPermissionListener permissionListener;
     private static DigiMeshDevice myDevice;
     public static DatabaseHandler db = null;
-    public static List<String> xbee_names = new ArrayList<>();
-    public static List<String> names = new ArrayList<>();
+    public static List<String> xbee_devices = new ArrayList<>();
 
     Button finishButton;
     CheckBox agreementCheckBox;
@@ -70,7 +68,6 @@ public class WelcomeScreen extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(WelcomeScreen.this, MainScreen.class);
                 startActivity(intent);
-
             }
         });
 
@@ -105,26 +102,28 @@ public class WelcomeScreen extends AppCompatActivity {
                             if (myDevice != null) {
                                 idTextView.setText("My ID \n" + myDevice.get64BitAddress().toString());
                             }
-                            // Reading all users
-                            System.out.println("Reading: " + "Reading all users..");
-                            List<User> users = db.getAllUsers();
+                            // Reading all devices
+                            System.out.println("Reading: " + "Reading all devices..");
+                            List<Device> devices = db.getAllDevices();
 
-                            for (User cn : users) {
-                                xbee_names.add(cn.getXbeeDeviceNumber());
-                                names.add(cn.getName());
+                            for (Device cn : devices) {
+                                xbee_devices.add(cn.getXbeeDeviceNumber());
                             }
 
-                            if (xbee_names.isEmpty()) {
-                                System.out.println("Account receiverId " + myDevice.get64BitAddress().toString()+ " not exist!");
-                                db.addUser(new User(myDevice.get64BitAddress().toString(), myDevice.get64BitAddress().toString()));
+                            if (xbee_devices.isEmpty()) {
+                                System.out.println("Device " + myDevice.get64BitAddress().toString()+ " not exist!");
+                                db.addDevice(new Device(myDevice.get64BitAddress().toString()));
                             } else {
-                                if (xbee_names.contains(myDevice.get64BitAddress().toString())) {
-                                    System.out.println("Account receiverId " + myDevice.get64BitAddress().toString() + " exist!");
+                                if (xbee_devices.contains(myDevice.get64BitAddress().toString())) {
+                                    System.out.println("Device " + myDevice.get64BitAddress().toString() + " exist!");
+                                    eulaTextView.setVisibility(View.GONE);
+                                    agreementCheckBox.setVisibility(View.GONE);
+                                    finishButton.setVisibility(View.GONE);
                                     Intent intent = new Intent(WelcomeScreen.this, MainScreen.class);
                                     startActivity(intent);
                                 } else {
-                                    System.out.println("Account receiverId " + myDevice.get64BitAddress().toString() + " not exist!");
-                                    db.addUser(new User(myDevice.get64BitAddress().toString(), myDevice.get64BitAddress().toString()));
+                                    System.out.println("Device " + myDevice.get64BitAddress().toString() + " not exist!");
+                                    db.addDevice(new Device(myDevice.get64BitAddress().toString()));
                                 }
                             }
                         }

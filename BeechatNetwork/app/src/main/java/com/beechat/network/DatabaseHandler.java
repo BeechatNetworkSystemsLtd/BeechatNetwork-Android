@@ -7,16 +7,19 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.Settings;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class DatabaseHandler extends SQLiteOpenHelper {
-    private static final String DATABASE_NAME = "xbee_test.DB";
+    private static final String DATABASE_PATH = "//data/data/com.beechat.network/databases/";
+    private static final String DATABASE_NAME = "XBEE.DB";
     private static final int DATABASE_VERSION = 1;
 
     private static final String TABLE_USER = "user";
     private static final String TABLE_MESSAGE = "message";
+    private static final String TABLE_DEVICE = "device";
 
     private static final String USER_ID = "id";
     private static final String USER_XBEE_DEVICE_NUMBER = "xbee_device_number";
@@ -27,10 +30,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String MESSAGE_RECEIVER_ID = "receiverId";
     private static final String MESSAGE_CONTENT = "content";
 
+    private static final String DEVICE_ID = "id";
+    private static final String DEVICE_XBEE_DEVICE_NUMBER = "xbee_device_number";
+
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         //3rd argument to be passed is CursorFactory instance
     }
+
 
     // Creating Tables
     @Override
@@ -41,8 +48,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String CREATE_MESSAGE_TABLE = "CREATE TABLE " + TABLE_MESSAGE + "("
                 + MESSAGE_ID + " INTEGER PRIMARY KEY," + MESSAGE_SENDER_ID + " TEXT," + MESSAGE_RECEIVER_ID + " TEXT," + MESSAGE_CONTENT + " TEXT" + ")";
 
+        String CREATE_DEVICE_TABLE = "CREATE TABLE " + TABLE_DEVICE + "("
+                + DEVICE_ID + " INTEGER PRIMARY KEY," + DEVICE_XBEE_DEVICE_NUMBER + " TEXT" + ")";
+
         db.execSQL(CREATE_USER_TABLE);
         db.execSQL(CREATE_MESSAGE_TABLE);
+        db.execSQL(CREATE_DEVICE_TABLE);
     }
 
     // Upgrading database
@@ -51,11 +62,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         // Drop older table if existed
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_MESSAGE);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_DEVICE);
 
         // Create tables again
         onCreate(db);
     }
 
+    // delete DB
+    void deleteDB()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_USER, null, null);
+        db.delete(TABLE_MESSAGE, null, null);
+        db.delete(TABLE_DEVICE, null, null);
+        //String myPath = DATABASE_PATH + DATABASE_NAME;
+        //SQLiteDatabase.deleteDatabase(new File(myPath));
+    }
     // code to add the new user
     void addUser(User user) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -178,5 +200,42 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         // return contact list
         return messagesList;
+    }
+
+    // code to add the new device
+    void addDevice(Device device) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(DEVICE_XBEE_DEVICE_NUMBER, device.getXbeeDeviceNumber());
+
+        // Inserting Row
+        db.insert(TABLE_DEVICE, null, values);
+        //2nd argument is String containing nullColumnHack
+        db.close(); // Closing database connection
+    }
+
+    // code to get all devices in a list view
+    public List<Device> getAllDevices() {
+        List<Device> deviceList = new ArrayList<Device>();
+        // Select All Query
+        String selectQuery = "SELECT  * FROM " + TABLE_DEVICE;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                Device device = new Device();
+                device.setId(Integer.parseInt(cursor.getString(0)));
+                device.setXbeeDeviceNumber(cursor.getString(1));
+                // Adding device to list
+                deviceList.add(device);
+            } while (cursor.moveToNext());
+        }
+
+        // return contact list
+        return deviceList;
     }
 }
