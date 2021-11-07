@@ -75,7 +75,7 @@ public class DataScreen extends AppCompatActivity {
 
         okButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                WelcomeScreen.db.deleteDB();
+                SplashScreen.db.deleteDB();
                 finishAffinity();
                 System.exit(0);
             }
