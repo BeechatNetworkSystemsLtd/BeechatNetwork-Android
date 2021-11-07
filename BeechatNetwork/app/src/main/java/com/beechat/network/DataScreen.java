@@ -1,6 +1,7 @@
 package com.beechat.network;
 
-import android.content.Context;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
@@ -12,9 +13,9 @@ import android.widget.TextView;
 
 public class DataScreen extends AppCompatActivity {
 
-    Button backButton, wipeDataButton, yes, no;
-    PopupWindow popUp;
-    TextView tv;
+    Button backButton, wipeDataButton, yesButton, noButton, okButton;
+    PopupWindow popUp, popUpSuccess;
+    TextView tv, tvSuccess;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,31 +32,52 @@ public class DataScreen extends AppCompatActivity {
         popUp = new PopupWindow(this);
         final LinearLayout layout = new LinearLayout(this);
         tv = new TextView(this);
-        yes = new Button(this);
-        yes.setText("Yes");
-        no = new Button(this);
-        no.setText("No");
+        yesButton = new Button(this);
+        yesButton.setText("Yes");
+        noButton = new Button(this);
+        noButton.setText("No");
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT);
         layout.setOrientation(LinearLayout.VERTICAL);
         tv.setText("Are you sure?");
         layout.addView(tv, params);
-        layout.addView(yes, params);
-        layout.addView(no, params);
+        layout.addView(yesButton, params);
+        layout.addView(noButton, params);
         popUp.setContentView(layout);
 
-        yes.setOnClickListener(new View.OnClickListener() {
+        popUpSuccess = new PopupWindow(this);
+        final LinearLayout layoutSuccess = new LinearLayout(this);
+        tvSuccess = new TextView(this);
+        okButton = new Button(this);
+        okButton.setText("Ok");
+        LinearLayout.LayoutParams paramsSuccess = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        tvSuccess.setText("Success");
+        layoutSuccess.addView(tvSuccess, params);
+        layoutSuccess.addView(okButton, params);
+        popUpSuccess.setContentView(layoutSuccess);
+
+        yesButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                ToneGenerator toneG = new ToneGenerator(AudioManager.STREAM_ALARM, 100);
+                toneG.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 200);
+                popUp.dismiss();
+                popUpSuccess.showAtLocation(layoutSuccess, Gravity.BOTTOM, 10, 10);
+            }
+        });
+
+        noButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                popUp.dismiss();
+            }
+        });
+
+        okButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 WelcomeScreen.db.deleteDB();
                 finishAffinity();
                 System.exit(0);
-                //popUp.dismiss();
-            }
-        });
-
-        no.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                popUp.dismiss();
             }
         });
 
