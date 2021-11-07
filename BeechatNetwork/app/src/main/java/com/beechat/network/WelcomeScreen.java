@@ -1,6 +1,5 @@
 package com.beechat.network;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -13,32 +12,16 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
-import com.digi.xbee.api.android.DigiMeshDevice;
-import com.digi.xbee.api.android.connection.usb.AndroidUSBPermissionListener;
-import com.digi.xbee.api.exceptions.XBeeException;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
 
 /***
  *  --- WelcomeScreen ----
- *  The class that is responsible for the start application window.
+ *  The class that is responsible for the EULA application window.
  ***/
 public class WelcomeScreen extends AppCompatActivity {
-
-    // Constants.
-    private static final int BAUD_RATE = 57600;
-
-    // Variables.
-    private AndroidUSBPermissionListener permissionListener;
-    private static DigiMeshDevice myDevice;
-    public static DatabaseHandler db = null;
-    public static List<String> xbee_devices = new ArrayList<>();
-
     Button finishButton;
     CheckBox agreementCheckBox;
     TextView eulaTextView, idTextView;
@@ -48,12 +31,10 @@ public class WelcomeScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.welcome_screen);
 
-        db = new DatabaseHandler(this);
         eulaTextView = (TextView) findViewById(R.id.textViewEULA);
         String largeTextString = getStringFromRawRes(R.raw.eula);
 
         if(largeTextString != null) {
-            //null check is optional
             eulaTextView.setText(largeTextString);
         } else {
             eulaTextView.setText("EULA is empty!");
@@ -86,57 +67,8 @@ public class WelcomeScreen extends AppCompatActivity {
             }
         });
 
-        final ProgressDialog dialog = ProgressDialog.show(this, getResources().getString(R.string.startup_device_title),
-                getResources().getString(R.string.startup_device), true);
-        myDevice = new DigiMeshDevice(this, BAUD_RATE, permissionListener);
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    myDevice.open();
-                    WelcomeScreen.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            dialog.dismiss();
-                            if (myDevice != null) {
-                                idTextView.setText("My ID \n" + myDevice.get64BitAddress().toString());
-                            }
-                            // Reading all devices
-                            System.out.println("Reading: " + "Reading all devices..");
-                            List<Device> devices = db.getAllDevices();
-
-                            for (Device cn : devices) {
-                                xbee_devices.add(cn.getXbeeDeviceNumber());
-                            }
-
-                            if (xbee_devices.isEmpty()) {
-                                System.out.println("Device " + myDevice.get64BitAddress().toString()+ " not exist!");
-                                db.addDevice(new Device(myDevice.get64BitAddress().toString()));
-                            } else {
-                                if (xbee_devices.contains(myDevice.get64BitAddress().toString())) {
-                                    System.out.println("Device " + myDevice.get64BitAddress().toString() + " exist!");
-                                    eulaTextView.setVisibility(View.GONE);
-                                    agreementCheckBox.setVisibility(View.GONE);
-                                    finishButton.setVisibility(View.GONE);
-                                    Intent intent = new Intent(WelcomeScreen.this, MainScreen.class);
-                                    startActivity(intent);
-                                } else {
-                                    System.out.println("Device " + myDevice.get64BitAddress().toString() + " not exist!");
-                                    db.addDevice(new Device(myDevice.get64BitAddress().toString()));
-                                }
-                            }
-                        }
-                    });
-
-                } catch (XBeeException e) {
-                    e.printStackTrace();
-                    myDevice.close();
-                } finally {
-                    myDevice.close();
-                }
-            }
-        }).start();
+        Bundle extras = getIntent().getExtras();
+        idTextView.setText("My ID \n" + extras.getString("key_idDevice"));
     }
 
     /***

@@ -38,7 +38,7 @@ public class ContactsScreen extends Fragment {
 
         // Reading all users
         System.out.println("Reading: " + "Reading all users..");
-        List<User> users = WelcomeScreen.db.getAllUsers();
+        List<User> users = SplashScreen.db.getAllUsers();
         List<String> xbee_contacts = new ArrayList<>();
 
         for (User cn : users) {
