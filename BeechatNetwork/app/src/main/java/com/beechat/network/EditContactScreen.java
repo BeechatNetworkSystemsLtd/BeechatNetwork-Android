@@ -50,7 +50,7 @@ public class EditContactScreen extends AppCompatActivity {
         addContactButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 NearbyDevicesScreen.name = nameEditText.getText();
-                WelcomeScreen.db.addUser(new User(selectedDevice, nameEditText.getText().toString()));
+                SplashScreen.db.addUser(new User(selectedDevice, nameEditText.getText().toString()));
                 ContactsScreen.remoteXBeeDeviceAdapterName.notifyDataSetChanged();
                 finish();
             }
