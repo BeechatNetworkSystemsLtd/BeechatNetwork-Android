@@ -110,7 +110,7 @@ public class NearbyDevicesScreen extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 // Reading all users
                 System.out.println("Reading: " + "Reading all users..");
-                List<User> users = WelcomeScreen.db.getAllUsers();
+                List<User> users = SplashScreen.db.getAllUsers();
 
 
                 for (User cn : users) {
@@ -150,7 +150,7 @@ public class NearbyDevicesScreen extends Fragment {
             }
         });
 
-        // Request for permission to access  phone ports.
+        // Request for permission to access phone ports.
         requestPermission();
 
         // Checking the conditions for permission to create and write a file with a log to the phone.

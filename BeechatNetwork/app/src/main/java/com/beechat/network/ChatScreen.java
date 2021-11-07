@@ -66,7 +66,7 @@ public class ChatScreen extends AppCompatActivity {
         myKM = (KeyguardManager) ChatScreen.this.getSystemService(Context.KEYGUARD_SERVICE);
         setContentView(R.layout.chat_screen);
 
-        List<Message> messagesDB = WelcomeScreen.db.getAllMessages();
+        List<Message> messagesDB = SplashScreen.db.getAllMessages();
         for (Message mg : messagesDB)
         {
             messages.add(mg.getContent());
@@ -86,7 +86,7 @@ public class ChatScreen extends AppCompatActivity {
 
         // Reading all users
         System.out.println("Reading: " + "Reading all users..");
-        List<User> users = WelcomeScreen.db.getAllUsers();
+        List<User> users = SplashScreen.db.getAllUsers();
 
 
         if (NearbyDevicesScreen.name != null) {
@@ -123,7 +123,7 @@ public class ChatScreen extends AppCompatActivity {
                 } catch (XBeeException e) {
                     messages.add("Error transmitting message: " + e.getMessage());
                 }
-                WelcomeScreen.db.insertMessage(new Message(NearbyDevicesScreen.senderId, NearbyDevicesScreen.receiverId, message));
+                SplashScreen.db.insertMessage(new Message(NearbyDevicesScreen.senderId, NearbyDevicesScreen.receiverId, message));
                 chatDeviceAdapter.notifyDataSetChanged();
             }
         });
@@ -237,7 +237,7 @@ public class ChatScreen extends AppCompatActivity {
         @Override
         public void dataReceived(XBeeMessage xbeeMessage) {
             messages.add(new String(xbeeMessage.getData()) + "\nS");
-            WelcomeScreen.db.insertMessage(new Message(NearbyDevicesScreen.senderId, NearbyDevicesScreen.receiverId, new String(xbeeMessage.getData()) + "\nS"));
+            SplashScreen.db.insertMessage(new Message(NearbyDevicesScreen.senderId, NearbyDevicesScreen.receiverId, new String(xbeeMessage.getData()) + "\nS"));
             flagNotification = true;
         }
     }
