@@ -54,8 +54,8 @@ public class DataScreen extends AppCompatActivity {
                 LinearLayout.LayoutParams.WRAP_CONTENT);
         layout.setOrientation(LinearLayout.VERTICAL);
         tvSuccess.setText("Success");
-        layoutSuccess.addView(tvSuccess, params);
-        layoutSuccess.addView(okButton, params);
+        layoutSuccess.addView(tvSuccess, paramsSuccess);
+        layoutSuccess.addView(okButton, paramsSuccess);
         popUpSuccess.setContentView(layoutSuccess);
 
         yesButton.setOnClickListener(new View.OnClickListener() {
