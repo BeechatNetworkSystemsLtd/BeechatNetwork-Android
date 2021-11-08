@@ -5,23 +5,25 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 /***
  *  --- EditContactScreen ----
  *  The class is responsible for the adding and editing contacts.
  ***/
-public class EditContactScreen extends AppCompatActivity {
+public class AddContactScreen extends AppCompatActivity {
 
     private static String selectedDevice = null;
 
     TextView addressTextView;
     EditText nameEditText;
-    Button backButton, addContactButton, okButton;
+    Button addContactButton;
+    ImageButton backButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.edit_contact_screen);
+        setContentView(R.layout.add_contact_screen);
 
         addressTextView = (TextView)findViewById(R.id.addressTextView);
         nameEditText = (EditText) findViewById(R.id.nameEditText);
@@ -32,19 +34,12 @@ public class EditContactScreen extends AppCompatActivity {
             addressTextView.setText("Address " + selectedDevice);
         }
 
-        backButton = (Button)findViewById(R.id.backButton);
+        backButton = (ImageButton)findViewById(R.id.backButton);
         backButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 finish();
             }
         });
-
-        okButton = (Button)findViewById(R.id.okButton);
-        okButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-            }
-        });
-
 
         addContactButton = (Button)findViewById(R.id.addContactButton);
         addContactButton.setOnClickListener(new View.OnClickListener() {
