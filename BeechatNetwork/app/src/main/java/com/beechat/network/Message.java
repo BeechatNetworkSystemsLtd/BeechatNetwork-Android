@@ -31,20 +31,23 @@ public class Message {
     public String senderId;
     public String receiverId;
     public String content;
+    public String datetime;
 
     public Message() {}
 
-    public Message(String senderId, String receiverId, String content) {
+    public Message(String senderId, String receiverId, String content, String datetime) {
         this.senderId = senderId;
         this.receiverId = receiverId;
         this.content = content;
+        this.datetime = datetime;
     }
 
-    public Message(int id, String senderId, String receiverId, String content) {
+    public Message(int id, String senderId, String receiverId, String content, String datetime) {
         this.id = id;
         this.senderId = senderId;
         this.receiverId = receiverId;
         this.content = content;
+        this.datetime = datetime;
     }
 
     public int getId() {
@@ -77,5 +80,13 @@ public class Message {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getDatetime() {
+        return this.datetime;
+    }
+
+    public void setDatetime(String datetime) {
+        this.datetime = datetime;
     }
 }
