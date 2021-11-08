@@ -75,7 +75,7 @@ Features
 | UX | Saved conversations window | **(Added)** add a new window containing saved conversations & broadcasts. |
 | UX | Settings window | **(Added)** baud rate slider, language, dark mode, wipe database. |
 | UX | Refresh animation | **(Added)** show a loading animation when clicking on the refresh button. |
-| Misc. | Receipts | Sent & read receipts as well as timestamped  messages. |
+| Misc. | Receipts | **(Added)** Sent & read receipts as well as timestamped  messages. |
 |Security | kyber-JNI implementation | implementing asymmetric encryption of messages utilising our [kyber-JNI](https://github.com/BeechatNetworkSystemsLtd/kyber-JNI) repo. | 
 |Security | dilithium-JNI implementation | implementing digital signature scheme authenticated messages utilising our [dilithium-JNI](https://github.com/BeechatNetworkSystemsLtd/dilithium-JNI) repo. |
 
