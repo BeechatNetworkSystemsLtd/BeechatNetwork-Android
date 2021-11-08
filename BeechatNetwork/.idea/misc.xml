@@ -6,6 +6,8 @@
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.19739583333333333" />
         <entry key="app/src/main/res/drawable/client_message_box.xml" value="0.24722222222222223" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.19739583333333333" />
+        <entry key="app/src/main/res/drawable/round_attach_button.xml" value="0.19375" />
+        <entry key="app/src/main/res/drawable/round_button.xml" value="0.19375" />
         <entry key="app/src/main/res/drawable/server_message_box.xml" value="0.19739583333333333" />
         <entry key="app/src/main/res/drawable/tab_background.xml" value="0.24722222222222223" />
         <entry key="app/src/main/res/layout/activity_chat.xml" value="0.1" />
@@ -20,6 +22,7 @@
         <entry key="app/src/main/res/layout/main_screen.xml" value="0.10740740740740741" />
         <entry key="app/src/main/res/layout/nearby_devices_screen.xml" value="0.1" />
         <entry key="app/src/main/res/layout/popup_window.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/round_button.xml" value="0.12952898550724637" />
         <entry key="app/src/main/res/layout/settings_screen.xml" value="0.10740740740740741" />
         <entry key="app/src/main/res/layout/splash_screen.xml" value="0.1259259259259259" />
         <entry key="app/src/main/res/layout/welcome_screen.xml" value="0.12407407407407407" />
