@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -62,7 +63,8 @@ public class ChatScreen extends AppCompatActivity {
     private KeyguardManager myKM= null;
 
     public String test = "";
-    Button sendButton, backButton;
+    Button sendButton;
+    ImageButton backButton, attachButton;
     TextView nameTextView;
     ListView chatListView;
     EditText inputField;
@@ -83,6 +85,7 @@ public class ChatScreen extends AppCompatActivity {
         sendButton = findViewById(R.id.sendButton);
         nameTextView = findViewById(R.id.nameTextView);
         backButton = findViewById(R.id.backButton);
+        attachButton = findViewById(R.id.attachButton);
 
         inputField = findViewById(R.id.inputField);
 
@@ -102,7 +105,7 @@ public class ChatScreen extends AppCompatActivity {
         else  {
             test = NearbyDevicesScreen.names.get(0);
         }
-        nameTextView.setText("Chatting with " +  test);
+        nameTextView.setText(test);
 
         // Handling the event of returning to the main window.
         backButton.setOnClickListener(new View.OnClickListener() {
@@ -111,6 +114,14 @@ public class ChatScreen extends AppCompatActivity {
                 chatDeviceAdapter.clear();
                 device.close();
                 finish();
+            }
+        });
+
+        // Handling the event of attaching files.
+        attachButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
             }
         });
 
