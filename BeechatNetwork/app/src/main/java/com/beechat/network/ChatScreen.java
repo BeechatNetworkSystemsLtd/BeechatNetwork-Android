@@ -4,6 +4,7 @@ import android.app.KeyguardManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -11,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -31,8 +34,11 @@ import com.digi.xbee.api.listeners.IDataReceiveListener;
 import com.digi.xbee.api.models.XBee64BitAddress;
 import com.digi.xbee.api.models.XBeeMessage;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 
 /***
@@ -51,6 +57,7 @@ public class ChatScreen extends AppCompatActivity {
     private static ArrayList<String> messages = new ArrayList<>();
     private static RemoteDigiMeshDevice remote = null;
     private static String message = null;
+    private static String datetime = null;
     private static boolean flagNotification = false;
     private KeyguardManager myKM= null;
 
@@ -111,7 +118,11 @@ public class ChatScreen extends AppCompatActivity {
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
+                String currentDate = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date());
+                datetime = currentDate + " " + currentTime;
                 message = inputField.getText().toString();
+                message = message + "\n" + currentTime;
                 if (message.isEmpty())
                 {
                     message = "Empty input!";
@@ -123,7 +134,7 @@ public class ChatScreen extends AppCompatActivity {
                 } catch (XBeeException e) {
                     messages.add("Error transmitting message: " + e.getMessage());
                 }
-                SplashScreen.db.insertMessage(new Message(NearbyDevicesScreen.senderId, NearbyDevicesScreen.receiverId, message));
+                SplashScreen.db.insertMessage(new Message(NearbyDevicesScreen.senderId, NearbyDevicesScreen.receiverId, message, datetime));
                 chatDeviceAdapter.notifyDataSetChanged();
             }
         });
@@ -186,6 +197,7 @@ public class ChatScreen extends AppCompatActivity {
             this.context = context;
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.M)
         @NonNull
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -207,6 +219,7 @@ public class ChatScreen extends AppCompatActivity {
                 nameText.setBackground(drawable);
                 layout.addView(nameText);
 
+
                 return layout;
             }
             else {
@@ -215,14 +228,25 @@ public class ChatScreen extends AppCompatActivity {
                 layout.setPadding(40, 30, 40, 30);
 
                 TextView nameText = new TextView(context);
-
                 nameText.setGravity(Gravity.RIGHT);
                 nameText.setText(message);
                 nameText.setTypeface(nameText.getTypeface(), Typeface.BOLD);
                 nameText.setTextSize(15);
                 Drawable drawable = getResources().getDrawable(R.drawable.client_message_box);
                 nameText.setBackground(drawable);
+
+                LinearLayout layout2 = new LinearLayout(context);
+                Drawable iconTick = getResources().getDrawable(R.drawable.sent_tick);
+
+                ImageView imgView = new ImageView(context);
+                imgView.setImageDrawable(iconTick);
+                int color = Color.parseColor("#00FF00"); //The color u want
+                imgView.setColorFilter(color);
+                layout2.addView(imgView);
+                layout2.setGravity(Gravity.RIGHT);
+
                 layout.addView(nameText);
+                layout.addView(layout2);
 
                 return layout;
             }
@@ -236,8 +260,11 @@ public class ChatScreen extends AppCompatActivity {
     private static class DataReceiveListener implements IDataReceiveListener {
         @Override
         public void dataReceived(XBeeMessage xbeeMessage) {
+            String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
+            String currentDate = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date());
+            datetime = currentDate + " " + currentTime;
             messages.add(new String(xbeeMessage.getData()) + "\nS");
-            SplashScreen.db.insertMessage(new Message(NearbyDevicesScreen.senderId, NearbyDevicesScreen.receiverId, new String(xbeeMessage.getData()) + "\nS"));
+            SplashScreen.db.insertMessage(new Message(NearbyDevicesScreen.senderId, NearbyDevicesScreen.receiverId, new String(xbeeMessage.getData()) + "\nS", datetime));
             flagNotification = true;
         }
     }
