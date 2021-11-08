@@ -1,40 +1,27 @@
 package com.beechat.network;
 
-import static android.support.v4.content.ContextCompat.getSystemService;
-
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.DataSetObserver;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Typeface;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.RectShape;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
-import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.digi.xbee.api.DigiMeshNetwork;
@@ -124,7 +111,7 @@ public class NearbyDevicesScreen extends Fragment {
 
                 if (xbee_names.isEmpty()) {
                     System.out.println("Account receiverId " + receiverId + " not exist!");
-                    Intent intent = new Intent(getActivity(), EditContactScreen.class);
+                    Intent intent = new Intent(getActivity(), AddContactScreen.class);
                     intent.putExtra("key", receiverId);
                     startActivity(intent);
                 } else {
@@ -133,7 +120,7 @@ public class NearbyDevicesScreen extends Fragment {
                         connectToDevice(selectedDevice);
                     } else {
                         System.out.println("Account receiverId " + receiverId + " not exist!");
-                        Intent intent = new Intent(getActivity(), EditContactScreen.class);
+                        Intent intent = new Intent(getActivity(), AddContactScreen.class);
                         intent.putExtra("key", receiverId);
                         startActivity(intent);
                     }
