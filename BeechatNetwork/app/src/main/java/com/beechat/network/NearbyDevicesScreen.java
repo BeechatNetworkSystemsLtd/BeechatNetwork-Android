@@ -61,7 +61,7 @@ public class NearbyDevicesScreen extends Fragment {
     private AndroidUSBPermissionListener permissionListener;
     private CustomDeviceAdapter remoteXBeeDeviceAdapter;
     private static String selectedDevice = null;
-    private static DigiMeshDevice myDevice;
+    public static DigiMeshDevice myDevice;
     private static ArrayList<String> dmaDevices = new ArrayList<>();
 
     //public static DatabaseHandler db = null;
