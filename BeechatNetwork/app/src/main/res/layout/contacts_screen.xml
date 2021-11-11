@@ -4,27 +4,38 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ContactsScreen">
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="15dp">
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:background="@color/grey">
+            <TextView
+                android:id="@+id/textView"
+                android:text= "Conversations"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="40dp" />
+        </LinearLayout>
 
-        <TextView
-            android:id="@+id/textView"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Xbees with conversation already" />
-
-
-        <ListView
-            android:id="@+id/contactsListView"
-            android:layout_width="match_parent"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:transcriptMode="alwaysScroll"
-            >
-        </ListView>
+            android:orientation="vertical"
+            android:padding="15dp">
+            <ListView
+                android:id="@+id/contactsListView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:transcriptMode="alwaysScroll"
+                >
+            </ListView>
+        </LinearLayout>
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>
