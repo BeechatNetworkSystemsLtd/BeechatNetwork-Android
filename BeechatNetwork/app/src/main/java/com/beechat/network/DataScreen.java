@@ -63,7 +63,7 @@ public class DataScreen extends AppCompatActivity {
                 ToneGenerator toneG = new ToneGenerator(AudioManager.STREAM_ALARM, 100);
                 toneG.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 200);
                 popUp.dismiss();
-                popUpSuccess.showAtLocation(layoutSuccess, Gravity.BOTTOM, 10, 10);
+                popUpSuccess.showAtLocation(layoutSuccess, Gravity.CENTER, 10, 10);
             }
         });
 
@@ -84,7 +84,7 @@ public class DataScreen extends AppCompatActivity {
         wipeDataButton = (Button)findViewById(R.id.wipeDataButton);
         wipeDataButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                popUp.showAtLocation(layout, Gravity.BOTTOM, 10, 10);
+                popUp.showAtLocation(layout, Gravity.CENTER, 10, 10);
             }
         });
 
