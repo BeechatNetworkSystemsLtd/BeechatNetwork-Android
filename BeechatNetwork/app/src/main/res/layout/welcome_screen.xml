@@ -19,12 +19,14 @@
             android:lines="2"
             android:gravity="center"
             android:layout_weight="0"
+            android:paddingBottom="20dp"
             />
         <TextView
             android:id="@+id/textViewEULA"
             android:layout_width="match_parent"
             android:layout_height="400dp"
             android:scrollbars="horizontal"
+            android:fadeScrollbars="false"
             android:isScrollContainer="true"
         android:text="@string/eula_text" />
         <LinearLayout
