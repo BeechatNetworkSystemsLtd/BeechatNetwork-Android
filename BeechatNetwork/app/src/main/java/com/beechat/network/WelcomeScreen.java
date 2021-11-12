@@ -41,6 +41,9 @@ public class WelcomeScreen extends AppCompatActivity {
         }
 
         eulaTextView.setMovementMethod(new ScrollingMovementMethod());
+        //eulaTextView.setHorizontallyScrolling(true);
+        eulaTextView.setVerticalFadingEdgeEnabled(true);
+        eulaTextView.setVerticalScrollBarEnabled(true);
 
         idTextView = (TextView) findViewById(R.id.textViewMyID);
 

@@ -16,7 +16,7 @@
     <string name="error_connecting_title">Error connecting</string>
     <string name="error_connecting_description">Could not connect to the selected XBee device: %1$s</string>
 
-    <string name="eula_agreement">I agree to the <u>Privacy Policy and to the End User License Agreement</u></string>
+    <string name="eula_agreement">I agree <u>to the Privacy Policy and to the End User License Agreement</u></string>
 	<string name="eula_text">EULA text</string>
 </resources>
 

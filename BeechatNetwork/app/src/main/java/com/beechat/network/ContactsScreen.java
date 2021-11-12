@@ -80,18 +80,20 @@ public class ContactsScreen extends Fragment {
 
                 if (xbee_names.isEmpty()) {
                     System.out.println("Account receiverId " + receiverId + " not exist!");
-                    Intent intent = new Intent(getActivity(), AddContactScreen.class);
+                    /*Intent intent = new Intent(getActivity(), AddContactScreen.class);
                     intent.putExtra("key", receiverId);
-                    startActivity(intent);
+                    startActivity(intent);*/
+                    connectToDevice(selectedDevice);
                 } else {
                     if (xbee_names.contains(receiverId)) {
                         System.out.println("Account receiverId " + receiverId + " exist!");
                         connectToDevice(selectedDevice);
                     } else {
                         System.out.println("Account receiverId " + receiverId + " not exist!");
-                        Intent intent = new Intent(getActivity(), AddContactScreen.class);
+                        connectToDevice(selectedDevice);
+                        /*Intent intent = new Intent(getActivity(), AddContactScreen.class);
                         intent.putExtra("key", receiverId);
-                        startActivity(intent);
+                        startActivity(intent);*/
                     }
                 }
             }
