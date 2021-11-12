@@ -7,13 +7,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
 public class DataScreen extends AppCompatActivity {
 
-    Button backButton, wipeDataButton, yesButton, noButton, okButton;
+    Button wipeDataButton, yesButton, noButton, okButton;
+    ImageButton backButton;
     PopupWindow popUp, popUpSuccess;
     TextView tv, tvSuccess;
 
@@ -22,7 +24,7 @@ public class DataScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.data_screen);
 
-        backButton = (Button)findViewById(R.id.backButton);
+        backButton = (ImageButton)findViewById(R.id.backButton);
         backButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 finish();
