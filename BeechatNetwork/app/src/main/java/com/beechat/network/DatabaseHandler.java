@@ -139,10 +139,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         ContentValues values = new ContentValues();
         values.put(USER_XBEE_DEVICE_NUMBER, user.getXbeeDeviceNumber());
+        values.put(USER_NAME, user.getName());
 
         // updating row
-        return db.update(TABLE_USER, values, USER_ID + " = ?",
-                new String[]{String.valueOf(user.getId())});
+        return db.update(TABLE_USER, values, USER_XBEE_DEVICE_NUMBER + " = ?",
+                new String[]{String.valueOf(user.xbee_device_number)});
     }
 
     // Deleting single user

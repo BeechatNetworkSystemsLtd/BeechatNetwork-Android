@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.text.Editable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,13 +43,14 @@ public class ContactsScreen extends Fragment {
     ListView contactsListView;
     public static String senderId = null;
     public static String receiverId = null;
-
+    public static Editable nameContact = null;
     public static List<String> xbee_names = new ArrayList<>();
     public static List<String> names = new ArrayList<>();
     private static String selectedDevice = null;
 
     public static DigiMeshDevice myContactDevice;
     public static ArrayList<String> dmaContactDevices = new ArrayList<>();
+    public static Editable name = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -97,6 +99,7 @@ public class ContactsScreen extends Fragment {
         });
         return view;
     }
+
 
     /***
      *  --- getDMDevice() ----
@@ -148,6 +151,13 @@ public class ContactsScreen extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        List<User> users = SplashScreen.db.getAllUsers();
+        List<String> xbee_contacts = new ArrayList<>();
+
+        for (User cn : users) {
+            xbee_contacts.add(cn.getName());
+        }
+        contacts = xbee_contacts;
         remoteXBeeDeviceAdapterName.notifyDataSetChanged();
     }
 

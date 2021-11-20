@@ -4,6 +4,7 @@ import android.app.KeyguardManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -62,10 +63,10 @@ public class ChatScreen extends AppCompatActivity {
     private static boolean flagNotification = false;
     private KeyguardManager myKM= null;
 
-    public String test = "";
+    public static String test = "";
     Button sendButton;
     ImageButton backButton, attachButton;
-    TextView nameTextView;
+    public static TextView nameTextView;
     ListView chatListView;
     EditText inputField;
 
@@ -106,9 +107,17 @@ public class ChatScreen extends AppCompatActivity {
         }
         else  {
             test = NearbyDevicesScreen.names.get(0);
-        }} else*/ test = ContactsScreen.names.get(0);
+        }} else*/ test = ContactsScreen.contacts.get(0);
         nameTextView.setText(test);
 
+        nameTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ChatScreen.this, EditContactScreen.class);
+                intent.putExtra("key", ContactsScreen.xbee_names.get(0));
+                startActivity(intent);
+            }
+        });
         // Handling the event of returning to the main window.
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -123,7 +132,6 @@ public class ChatScreen extends AppCompatActivity {
         attachButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
             }
         });
 
@@ -203,11 +211,28 @@ public class ChatScreen extends AppCompatActivity {
         }, delay);
     }
 
+    public static void updateName(){
+        List<User> users = SplashScreen.db.getAllUsers();
+        ContactsScreen.names.clear();
+        ContactsScreen.xbee_names.clear();
+        for (User cn : users) {
+            ContactsScreen.xbee_names.add(cn.getXbeeDeviceNumber());
+            ContactsScreen.names.add(cn.getName());
+        }
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
+        updateName();
         chatDeviceAdapter.notifyDataSetChanged();
     }
+
+    /*public void onClick(View view) {
+        Intent intent = new Intent(ChatScreen.this, AddContactScreen.class);
+        intent.putExtra("key", ContactsScreen.xbee_names.get(0));
+        startActivity(intent);
+    }*/
 
     /***
      *  --- ChatDeviceAdapter ----
