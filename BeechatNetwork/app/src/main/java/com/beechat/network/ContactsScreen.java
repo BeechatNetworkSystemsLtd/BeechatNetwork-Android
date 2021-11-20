@@ -18,7 +18,10 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.digi.xbee.api.DigiMeshNetwork;
+import com.digi.xbee.api.RemoteXBeeDevice;
 import com.digi.xbee.api.android.DigiMeshDevice;
+import com.digi.xbee.api.android.connection.usb.AndroidUSBPermissionListener;
 import com.digi.xbee.api.exceptions.XBeeException;
 
 import java.util.ArrayList;
@@ -31,6 +34,8 @@ import java.util.List;
  ***/
 public class ContactsScreen extends Fragment {
 
+    private static final int BAUD_RATE = 57600;
+    private AndroidUSBPermissionListener permissionListener;
     public static CustomContactAdapter remoteXBeeDeviceAdapterName;
     public static List<String> contacts = new ArrayList<>();
     View view;
@@ -42,10 +47,13 @@ public class ContactsScreen extends Fragment {
     public static List<String> names = new ArrayList<>();
     private static String selectedDevice = null;
 
-    @Override
-    public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.contacts_screen, container, false);
+    public static DigiMeshDevice myContactDevice;
+    public static ArrayList<String> dmaContactDevices = new ArrayList<>();
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        view = inflater.inflate(R.layout.contacts_screen, container, false);
+        myContactDevice = new DigiMeshDevice(getActivity(), BAUD_RATE, permissionListener);
         // Reading all users
         System.out.println("Reading: " + "Reading all users..");
         List<User> users = SplashScreen.db.getAllUsers();
@@ -74,31 +82,36 @@ public class ContactsScreen extends Fragment {
                     names.add(cn.getName());
                 }
 
-                senderId = NearbyDevicesScreen.getDMDevice().toString();
-                selectedDevice = senderId;//remoteXBeeDeviceAdapter.getItem(i);
-                receiverId = selectedDevice;
-
-                if (xbee_names.isEmpty()) {
-                    System.out.println("Account receiverId " + receiverId + " not exist!");
-                    /*Intent intent = new Intent(getActivity(), AddContactScreen.class);
-                    intent.putExtra("key", receiverId);
-                    startActivity(intent);*/
+                /*if (!NearbyDevicesScreen.dmaDevices.isEmpty()) {
+                    senderId = NearbyDevicesScreen.getDMDevice().toString();
+                    selectedDevice = senderId;//remoteXBeeDeviceAdapter.getItem(i);
+                    receiverId = selectedDevice;
                     connectToDevice(selectedDevice);
-                } else {
-                    if (xbee_names.contains(receiverId)) {
-                        System.out.println("Account receiverId " + receiverId + " exist!");
-                        connectToDevice(selectedDevice);
-                    } else {
-                        System.out.println("Account receiverId " + receiverId + " not exist!");
-                        connectToDevice(selectedDevice);
-                        /*Intent intent = new Intent(getActivity(), AddContactScreen.class);
-                        intent.putExtra("key", receiverId);
-                        startActivity(intent);*/
-                    }
-                }
+                } else {*/
+                    senderId = getDMContactDevice().toString();
+                    selectedDevice = xbee_names.get(i);
+                    receiverId = selectedDevice;
+                    connectToContactDevice(selectedDevice);
+
             }
         });
         return view;
+    }
+
+    /***
+     *  --- getDMDevice() ----
+     *  The function of gaining access to your device..
+     ***/
+    public static DigiMeshDevice getDMContactDevice() {
+        return myContactDevice;
+    }
+
+    /***
+     *  --- getSelectedDevice() ----
+     *  The function of gaining access to the selected device
+     ***/
+    public static String getSelectedDevice() {
+        return selectedDevice;
     }
 
     /***
@@ -137,6 +150,7 @@ public class ContactsScreen extends Fragment {
         super.onResume();
         remoteXBeeDeviceAdapterName.notifyDataSetChanged();
     }
+
     /***
      *  --- connectToDevice(String) ----
      *  The function of establishing a connection with the selected device.
@@ -176,5 +190,92 @@ public class ContactsScreen extends Fragment {
                 }
             }
         }).start();
+    }
+
+    private void connectToContactDevice(final String device) {
+        final ProgressDialog dialog = ProgressDialog.show(getActivity(), getResources().getString(R.string.connecting_device_title),
+                getResources().getString(R.string.connecting_device_description), true);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    myContactDevice.open();
+
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            dialog.dismiss();
+                            Intent intent = new Intent(getActivity(), ChatScreen.class);
+                            startActivity(intent);
+                        }
+                    });
+                } catch (final XBeeException e) {
+                    e.printStackTrace();
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            dialog.dismiss();
+                            new AlertDialog.Builder(getActivity()).setTitle(getResources().getString(R.string.error_connecting_title))
+                                    .setMessage(getResources().getString(R.string.error_connecting_description, e.getMessage()))
+                                    .setPositiveButton(android.R.string.ok, null).show();
+                        }
+                    });
+                    myContactDevice.close();
+                }
+            }
+        }).start();
+        /*new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<RemoteXBeeDevice> devices = null;
+
+                if (myContactDevice.isOpen()) {
+                    myContactDevice.close();
+                }
+                try {
+                    myContactDevice.open();
+
+                    DigiMeshNetwork network = (DigiMeshNetwork) myContactDevice.getNetwork();
+                    network.startDiscoveryProcess();
+
+                    while (network.isDiscoveryRunning()) {
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    devices = network.getDevices();
+                    int i = 0;
+                    while (i<devices.size()) {
+                        dmaContactDevices.add(devices.get(i).get64BitAddress().toString());
+                        i=i+1;
+                    }
+
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            dialog.dismiss();
+                            Intent intent = new Intent(getActivity(), ChatScreen.class);
+                            startActivity(intent);
+                        }
+                    });
+                } catch (final XBeeException e) {
+                    e.printStackTrace();
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            dialog.dismiss();
+                            new AlertDialog.Builder(getActivity()).setTitle(getResources().getString(R.string.error_connecting_title))
+                                    .setMessage(getResources().getString(R.string.error_connecting_description, e.getMessage()))
+                                    .setPositiveButton(android.R.string.ok, null).show();
+                        }
+                    });
+                    myContactDevice.close();
+                }
+            }
+        }).start();*/
     }
 }

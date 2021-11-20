@@ -62,7 +62,7 @@ public class NearbyDevicesScreen extends Fragment {
     private CustomDeviceAdapter remoteXBeeDeviceAdapter;
     private static String selectedDevice = null;
     public static DigiMeshDevice myDevice;
-    private static ArrayList<String> dmaDevices = new ArrayList<>();
+    public static ArrayList<String> dmaDevices = new ArrayList<>();
 
     //public static DatabaseHandler db = null;
     public static Editable name = null;
@@ -117,7 +117,7 @@ public class NearbyDevicesScreen extends Fragment {
                 } else {
                     if (xbee_names.contains(receiverId)) {
                         System.out.println("Account receiverId " + receiverId + " exist!");
-                        connectToDevice(selectedDevice);
+                        //connectToDevice(selectedDevice);
                     } else {
                         System.out.println("Account receiverId " + receiverId + " not exist!");
                         Intent intent = new Intent(getActivity(), AddContactScreen.class);
