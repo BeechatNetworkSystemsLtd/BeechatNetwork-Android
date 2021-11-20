@@ -80,7 +80,9 @@ public class ChatScreen extends AppCompatActivity {
         {
             messages.add(mg.getContent());
         }
-        device = NearbyDevicesScreen.getDMDevice();
+        /*if (!NearbyDevicesScreen.dmaDevices.isEmpty()) {
+            device = NearbyDevicesScreen.getDMDevice();
+        } else*/ device = ContactsScreen.getDMContactDevice();
 
         sendButton = findViewById(R.id.sendButton);
         nameTextView = findViewById(R.id.nameTextView);
@@ -98,13 +100,13 @@ public class ChatScreen extends AppCompatActivity {
         System.out.println("Reading: " + "Reading all users..");
         List<User> users = SplashScreen.db.getAllUsers();
 
-
+        /*if (!NearbyDevicesScreen.dmaDevices.isEmpty()){
         if (NearbyDevicesScreen.name != null) {
             test = NearbyDevicesScreen.name.toString();
         }
         else  {
             test = NearbyDevicesScreen.names.get(0);
-        }
+        }} else*/ test = ContactsScreen.names.get(0);
         nameTextView.setText(test);
 
         // Handling the event of returning to the main window.
@@ -145,15 +147,22 @@ public class ChatScreen extends AppCompatActivity {
                 } catch (XBeeException e) {
                     messages.add("Error transmitting message: " + e.getMessage());
                 }
-                SplashScreen.db.insertMessage(new Message(NearbyDevicesScreen.senderId, NearbyDevicesScreen.receiverId, message, datetime));
+                /*if (!NearbyDevicesScreen.dmaDevices.isEmpty()) {
+                    SplashScreen.db.insertMessage(new Message(NearbyDevicesScreen.senderId, NearbyDevicesScreen.receiverId, message, datetime));
+                } else*/ SplashScreen.db.insertMessage(new Message(ContactsScreen.senderId, ContactsScreen.receiverId, message, datetime));
                 chatDeviceAdapter.notifyDataSetChanged();
             }
         });
 
         // Channel check events added to the device.
         device.addDataListener(listener);
+        String REMOTE_NODE_ID = ContactsScreen.getSelectedDevice();
+        /*if (!NearbyDevicesScreen.dmaDevices.isEmpty()) {
+            REMOTE_NODE_ID = NearbyDevicesScreen.getSelectedDevice();
+        } else {
+            REMOTE_NODE_ID = ContactsScreen.getSelectedDevice();
+        }*/
 
-        String REMOTE_NODE_ID = NearbyDevicesScreen.getSelectedDevice();
         XBee64BitAddress RemoteAddr = new XBee64BitAddress(REMOTE_NODE_ID);
 
         if (device.get64BitAddress().equals(REMOTE_NODE_ID)) {
@@ -179,7 +188,12 @@ public class ChatScreen extends AppCompatActivity {
             public void run() {
                 chatDeviceAdapter.notifyDataSetChanged();
                 if( myKM.inKeyguardRestrictedInputMode() && flagNotification) {
-                    String message = NearbyDevicesScreen.getSelectedDevice() + ":\n" + messages.get(messages.size() - 1);
+                    String message = ContactsScreen.getSelectedDevice() + ":\n" + messages.get(messages.size() - 1);
+                    /*if (!NearbyDevicesScreen.dmaDevices.isEmpty())
+                    {
+                        message = NearbyDevicesScreen.getSelectedDevice() + ":\n" + messages.get(messages.size() - 1);
+                    } else */
+
                     message = removeLastChar(message);
                     notifyThis("Beechat notification", message);
                     flagNotification = false;
@@ -275,7 +289,9 @@ public class ChatScreen extends AppCompatActivity {
             String currentDate = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date());
             datetime = currentDate + " " + currentTime;
             messages.add(new String(xbeeMessage.getData()) + "\nS");
-            SplashScreen.db.insertMessage(new Message(NearbyDevicesScreen.senderId, NearbyDevicesScreen.receiverId, new String(xbeeMessage.getData()) + "\nS", datetime));
+            /*if (!NearbyDevicesScreen.dmaDevices.isEmpty()) {
+                SplashScreen.db.insertMessage(new Message(NearbyDevicesScreen.senderId, NearbyDevicesScreen.receiverId, new String(xbeeMessage.getData()) + "\nS", datetime));
+            } else*/ SplashScreen.db.insertMessage(new Message(ContactsScreen.senderId, ContactsScreen.receiverId, new String(xbeeMessage.getData()) + "\nS", datetime));
             flagNotification = true;
         }
     }
