@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Beechat Clip</string>
+
+    <string name="select_device">Dispositivos radio cercanos</string>
+
+    <string name="back">Atrás</string>
+    <string name="send">Enviar</string>
+    <string name="spin">Spinner</string>
+
+    <string name="connecting_device_title">Conectando a dispositivo</string>
+    <string name="scanning_device_title">Escaneando dispositivos</string>
+    <string name="startup_device_title">Escaneando ID de tu Clip</string>
+    <string name="connecting_device_description">Por favor espere mientras se conecta al dispositivo seleccionado...</string>
+    <string name="scanning_devices">Por favor espere mientras escaneamos la lista de dispositivo...</string>
+    <string name="startup_device">Conectando al Clip...</string>
+    <string name="error_connecting_title">Error connectando</string>
+    <string name="error_connecting_description">No pudimos conectar con el dispositivo seleccionado: %1$s</string>
+
+    <string name="eula_agreement">Acepto <u>la Política de Privacidad y al Acuerdo de Licencia de Usuario Final (EULA)</u></string>
+	<string name="eula_text">Texto del EULA</string>
+    <string name="language">Spanish</string>
+</resources>
+

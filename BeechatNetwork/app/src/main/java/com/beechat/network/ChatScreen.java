@@ -5,6 +5,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -69,10 +70,13 @@ public class ChatScreen extends AppCompatActivity {
     public static TextView nameTextView;
     ListView chatListView;
     EditText inputField;
-
+    Context context;
+    Resources resources;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        context = LocaleHelper.setLocale(ChatScreen.this, SelectLanguageScreen.language);
+        resources = context.getResources();
         myKM = (KeyguardManager) ChatScreen.this.getSystemService(Context.KEYGUARD_SERVICE);
         setContentView(R.layout.chat_screen);
 

@@ -1,5 +1,7 @@
 package com.beechat.network;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Bundle;
@@ -13,7 +15,8 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 public class DataScreen extends AppCompatActivity {
-
+    Context context;
+    Resources resources;
     Button wipeDataButton, yesButton, noButton, okButton;
     ImageButton backButton;
     PopupWindow popUp, popUpSuccess;
@@ -22,6 +25,8 @@ public class DataScreen extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        context = LocaleHelper.setLocale(DataScreen.this, SelectLanguageScreen.language);
+        resources = context.getResources();
         setContentView(R.layout.data_screen);
 
         backButton = (ImageButton)findViewById(R.id.backButton);

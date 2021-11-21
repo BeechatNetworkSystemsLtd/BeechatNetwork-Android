@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
@@ -47,7 +48,8 @@ import android.view.LayoutInflater;
  *  The class is responsible for the search and display devices.
  ***/
 public class NearbyDevicesScreen extends Fragment {
-
+    Context context;
+    Resources resources;
     // Constants.
     //private static final int BAUD_RATE = 9600;
     private static final int BAUD_RATE = 57600;
@@ -81,6 +83,8 @@ public class NearbyDevicesScreen extends Fragment {
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.nearby_devices_screen, container, false);
+        context = LocaleHelper.setLocale(getActivity(), SelectLanguageScreen.language);
+        resources = context.getResources();
         listDevicesText = (TextView) view.findViewById(R.id.textView);
         refreshButton = (ImageButton) view.findViewById(R.id.refreshButton);
 
@@ -235,8 +239,8 @@ public class NearbyDevicesScreen extends Fragment {
      *  The function of starting scanning for available Xbee devices.
      ***/
     private void startScan() {
-        final ProgressDialog dialog = ProgressDialog.show(getActivity(), getResources().getString(R.string.scanning_device_title),
-                getResources().getString(R.string.scanning_devices), true);
+        final ProgressDialog dialog = ProgressDialog.show(getActivity(), resources.getString(R.string.scanning_device_title),
+                resources.getString(R.string.scanning_devices), true);
         myDevice = new DigiMeshDevice(getActivity(), BAUD_RATE, permissionListener);
 
         new Thread(new Runnable() {
@@ -286,8 +290,8 @@ public class NearbyDevicesScreen extends Fragment {
      *  @param device Selected device number.
      ***/
     private void connectToDevice(final String device) {
-        final ProgressDialog dialog = ProgressDialog.show(getActivity(), getResources().getString(R.string.connecting_device_title),
-                getResources().getString(R.string.connecting_device_description), true);
+        final ProgressDialog dialog = ProgressDialog.show(getActivity(), resources.getString(R.string.connecting_device_title),
+                resources.getString(R.string.connecting_device_description), true);
 
         new Thread(new Runnable() {
             @Override
@@ -309,8 +313,8 @@ public class NearbyDevicesScreen extends Fragment {
                         @Override
                         public void run() {
                             dialog.dismiss();
-                            new AlertDialog.Builder(getActivity()).setTitle(getResources().getString(R.string.error_connecting_title))
-                                    .setMessage(getResources().getString(R.string.error_connecting_description, e.getMessage()))
+                            new AlertDialog.Builder(getActivity()).setTitle(resources.getString(R.string.error_connecting_title))
+                                    .setMessage(resources.getString(R.string.error_connecting_description, e.getMessage()))
                                     .setPositiveButton(android.R.string.ok, null).show();
                         }
                     });

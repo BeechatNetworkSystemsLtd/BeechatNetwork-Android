@@ -1,5 +1,7 @@
 package com.beechat.network;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -13,7 +15,8 @@ import android.widget.TextView;
  *  The class is responsible for the adding and editing contacts.
  ***/
 public class EditContactScreen extends AppCompatActivity {
-
+    Context context;
+    Resources resources;
     private static String selectedDevice = null;
 
     TextView addressTextView;
@@ -24,6 +27,8 @@ public class EditContactScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.edit_contact_screen);
+        context = LocaleHelper.setLocale(EditContactScreen.this, SelectLanguageScreen.language);
+        resources = context.getResources();
 
         addressTextView = (TextView)findViewById(R.id.addressTextView);
         nameEditText = (EditText) findViewById(R.id.nameEditText);
