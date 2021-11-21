@@ -11,13 +11,15 @@
         android:theme="@style/AppTheme"
         android:requestLegacyExternalStorage="true"
         >
-        <activity android:name="com.beechat.network.SelectLanguageScreen">
+        <activity android:name="com.beechat.network.LoginScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="com.beechat.network.LoginFormScreen"></activity>
+        <activity android:name="com.beechat.network.SelectLanguageScreen"></activity>
         <activity android:name="com.beechat.network.SplashScreen"></activity>
         <activity android:name="com.beechat.network.WelcomeScreen"></activity>
         <activity android:name="com.beechat.network.MainScreen"></activity>

@@ -20,6 +20,8 @@
         <entry key="app/src/main/res/layout/edit_contact_screen.xml" value="0.10740740740740741" />
         <entry key="app/src/main/res/layout/home_fragment.xml" value="0.1" />
         <entry key="app/src/main/res/layout/item_list.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/login_form_screen.xml" value="0.15780141843971632" />
+        <entry key="app/src/main/res/layout/login_screen.xml" value="0.15780141843971632" />
         <entry key="app/src/main/res/layout/main_screen.xml" value="0.10740740740740741" />
         <entry key="app/src/main/res/layout/nearby_devices_screen.xml" value="0.1" />
         <entry key="app/src/main/res/layout/popup_window.xml" value="0.1" />
