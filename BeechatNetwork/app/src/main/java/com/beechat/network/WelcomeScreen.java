@@ -36,7 +36,10 @@ public class WelcomeScreen extends AppCompatActivity {
         context = LocaleHelper.setLocale(WelcomeScreen.this, SelectLanguageScreen.language);
         resources = context.getResources();
         eulaTextView = (TextView) findViewById(R.id.textViewEULA);
-        String largeTextString = getStringFromRawRes(R.raw.eula_en);
+        String largeTextString = null;
+        if (SelectLanguageScreen.language == "en") {
+            largeTextString=getStringFromRawRes(R.raw.eula_en);
+        } else largeTextString=getStringFromRawRes(R.raw.eula_es);
 
         if(largeTextString != null) {
             eulaTextView.setText(largeTextString);
