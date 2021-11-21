@@ -1,6 +1,8 @@
 package com.beechat.network;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -23,7 +25,8 @@ import java.util.List;
  *  The class that is responsible for the application settings.
  ***/
 public class SettingsScreen extends Fragment {
-
+    Context context;
+    Resources resources;
     private View view;
     private Spinner languageSpinner;
     public static SeekBar baudRateSeekBar;
@@ -35,6 +38,8 @@ public class SettingsScreen extends Fragment {
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.settings_screen, container, false);
+        context = LocaleHelper.setLocale(getActivity(), SelectLanguageScreen.language);
+        resources = context.getResources();
         //languageSpinner = (Spinner)  view.findViewById(R.id.languageSpinner);
         baudRateSeekBar = (SeekBar) view.findViewById(R.id.baudRateSeekBar);
 
