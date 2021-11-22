@@ -17,6 +17,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "XBEE.DB";
     private static final int DATABASE_VERSION = 1;
 
+    private static final String TABLE_USERS = "users";
+    private static final String USERNAME = "username";
+    private static final String PASSWORD = "password";
+
     private static final String TABLE_USER = "user";
     private static final String TABLE_MESSAGE = "message";
     private static final String TABLE_DEVICE = "device";
@@ -51,9 +55,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String CREATE_DEVICE_TABLE = "CREATE TABLE " + TABLE_DEVICE + "("
                 + DEVICE_ID + " INTEGER PRIMARY KEY," + DEVICE_XBEE_DEVICE_NUMBER + " TEXT" + ")";
 
+        String CREATE_USERS_TABLE = "CREATE TABLE " + TABLE_USERS + "("
+                + USERNAME + " TEXT PRIMARY KEY," + PASSWORD + " TEXT" + ")";
         db.execSQL(CREATE_USER_TABLE);
         db.execSQL(CREATE_MESSAGE_TABLE);
         db.execSQL(CREATE_DEVICE_TABLE);
+        db.execSQL(CREATE_USERS_TABLE);
     }
 
     // Upgrading database
@@ -63,6 +70,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_MESSAGE);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_DEVICE);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
 
         // Create tables again
         onCreate(db);
@@ -75,9 +83,40 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.delete(TABLE_USER, null, null);
         db.delete(TABLE_MESSAGE, null, null);
         db.delete(TABLE_DEVICE, null, null);
+        db.delete(TABLE_USERS, null, null);
         //String myPath = DATABASE_PATH + DATABASE_NAME;
         //SQLiteDatabase.deleteDatabase(new File(myPath));
     }
+
+    public Boolean insertData(String username, String password){
+        SQLiteDatabase MyDB = this.getWritableDatabase();
+        ContentValues contentValues= new ContentValues();
+        contentValues.put(USERNAME, username);
+        contentValues.put(PASSWORD, password);
+        long result = MyDB.insert(TABLE_USERS, null, contentValues);
+        if(result==-1) return false;
+        else
+            return true;
+    }
+
+    public Boolean checkusername(String username) {
+        SQLiteDatabase MyDB = this.getWritableDatabase();
+        Cursor cursor = MyDB.rawQuery("Select * from " + TABLE_USERS + " where username = ?", new String[]{username});
+        if (cursor.getCount() > 0)
+            return true;
+        else
+            return false;
+    }
+
+    public Boolean checkusernamepassword(String username, String password){
+        SQLiteDatabase MyDB = this.getWritableDatabase();
+        Cursor cursor = MyDB.rawQuery("Select * from " + TABLE_USERS + " where username = ? and password = ?", new String[] {username,password});
+        if(cursor.getCount()>0)
+            return true;
+        else
+            return false;
+    }
+
     // code to add the new user
     void addUser(User user) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -139,10 +178,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         ContentValues values = new ContentValues();
         values.put(USER_XBEE_DEVICE_NUMBER, user.getXbeeDeviceNumber());
+        values.put(USER_NAME, user.getName());
 
         // updating row
-        return db.update(TABLE_USER, values, USER_ID + " = ?",
-                new String[]{String.valueOf(user.getId())});
+        return db.update(TABLE_USER, values, USER_XBEE_DEVICE_NUMBER + " = ?",
+                new String[]{String.valueOf(user.xbee_device_number)});
     }
 
     // Deleting single user
