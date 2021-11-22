@@ -14,21 +14,20 @@ import android.widget.TextView;
  *  --- EditContactScreen ----
  *  The class is responsible for the adding and editing contacts.
  ***/
-public class AddContactScreen extends AppCompatActivity {
-
+public class EditContactScreen extends AppCompatActivity {
+    Context context;
+    Resources resources;
     private static String selectedDevice = null;
 
     TextView addressTextView;
     EditText nameEditText;
-    Button addContactButton;
+    Button updateContactButton;
     ImageButton backButton;
-    Context context;
-    Resources resources;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.add_contact_screen);
-        context = LocaleHelper.setLocale(getApplicationContext(), SelectLanguageScreen.language);
+        setContentView(R.layout.edit_contact_screen);
+        context = LocaleHelper.setLocale(EditContactScreen.this, SelectLanguageScreen.language);
         resources = context.getResources();
 
         addressTextView = (TextView)findViewById(R.id.addressTextView);
@@ -47,12 +46,12 @@ public class AddContactScreen extends AppCompatActivity {
             }
         });
 
-        addContactButton = (Button)findViewById(R.id.addContactButton);
-        addContactButton.setOnClickListener(new View.OnClickListener() {
+        updateContactButton = (Button)findViewById(R.id.updateContactButton);
+        updateContactButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                NearbyDevicesScreen.name = nameEditText.getText();
-                SplashScreen.db.addUser(new User(selectedDevice, nameEditText.getText().toString()));
+                SplashScreen.db.updateUser(new User(selectedDevice, nameEditText.getText().toString()));
                 ContactsScreen.remoteXBeeDeviceAdapterName.notifyDataSetChanged();
+                ChatScreen.nameTextView.setText(nameEditText.getText().toString());
                 finish();
             }
         });

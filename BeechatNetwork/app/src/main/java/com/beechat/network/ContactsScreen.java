@@ -3,12 +3,14 @@ package com.beechat.network;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.text.Editable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +35,8 @@ import java.util.List;
  *  The class that is responsible for the displaying contacts.
  ***/
 public class ContactsScreen extends Fragment {
-
+    Context context;
+    Resources resources;
     private static final int BAUD_RATE = 57600;
     private AndroidUSBPermissionListener permissionListener;
     public static CustomContactAdapter remoteXBeeDeviceAdapterName;
@@ -42,17 +45,20 @@ public class ContactsScreen extends Fragment {
     ListView contactsListView;
     public static String senderId = null;
     public static String receiverId = null;
-
+    public static Editable nameContact = null;
     public static List<String> xbee_names = new ArrayList<>();
     public static List<String> names = new ArrayList<>();
     private static String selectedDevice = null;
 
     public static DigiMeshDevice myContactDevice;
     public static ArrayList<String> dmaContactDevices = new ArrayList<>();
+    public static Editable name = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.contacts_screen, container, false);
+        context = LocaleHelper.setLocale(getActivity(), SelectLanguageScreen.language);
+        resources = context.getResources();
         myContactDevice = new DigiMeshDevice(getActivity(), BAUD_RATE, permissionListener);
         // Reading all users
         System.out.println("Reading: " + "Reading all users..");
@@ -97,6 +103,7 @@ public class ContactsScreen extends Fragment {
         });
         return view;
     }
+
 
     /***
      *  --- getDMDevice() ----
@@ -148,6 +155,13 @@ public class ContactsScreen extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        List<User> users = SplashScreen.db.getAllUsers();
+        List<String> xbee_contacts = new ArrayList<>();
+
+        for (User cn : users) {
+            xbee_contacts.add(cn.getName());
+        }
+        contacts = xbee_contacts;
         remoteXBeeDeviceAdapterName.notifyDataSetChanged();
     }
 
@@ -158,8 +172,8 @@ public class ContactsScreen extends Fragment {
      *  @param device Selected device number.
      ***/
     private void connectToDevice(final String device) {
-        final ProgressDialog dialog = ProgressDialog.show(getActivity(), getResources().getString(R.string.connecting_device_title),
-                getResources().getString(R.string.connecting_device_description), true);
+        final ProgressDialog dialog = ProgressDialog.show(getActivity(), resources.getString(R.string.connecting_device_title),
+                resources.getString(R.string.connecting_device_description), true);
 
         new Thread(new Runnable() {
             @Override
@@ -181,8 +195,8 @@ public class ContactsScreen extends Fragment {
                         @Override
                         public void run() {
                             dialog.dismiss();
-                            new AlertDialog.Builder(getActivity()).setTitle(getResources().getString(R.string.error_connecting_title))
-                                    .setMessage(getResources().getString(R.string.error_connecting_description, e.getMessage()))
+                            new AlertDialog.Builder(getActivity()).setTitle(resources.getString(R.string.error_connecting_title))
+                                    .setMessage(resources.getString(R.string.error_connecting_description, e.getMessage()))
                                     .setPositiveButton(android.R.string.ok, null).show();
                         }
                     });
@@ -193,8 +207,8 @@ public class ContactsScreen extends Fragment {
     }
 
     private void connectToContactDevice(final String device) {
-        final ProgressDialog dialog = ProgressDialog.show(getActivity(), getResources().getString(R.string.connecting_device_title),
-                getResources().getString(R.string.connecting_device_description), true);
+        final ProgressDialog dialog = ProgressDialog.show(getActivity(), resources.getString(R.string.connecting_device_title),
+                resources.getString(R.string.connecting_device_description), true);
 
         new Thread(new Runnable() {
             @Override
@@ -216,8 +230,8 @@ public class ContactsScreen extends Fragment {
                         @Override
                         public void run() {
                             dialog.dismiss();
-                            new AlertDialog.Builder(getActivity()).setTitle(getResources().getString(R.string.error_connecting_title))
-                                    .setMessage(getResources().getString(R.string.error_connecting_description, e.getMessage()))
+                            new AlertDialog.Builder(getActivity()).setTitle(resources.getString(R.string.error_connecting_title))
+                                    .setMessage(resources.getString(R.string.error_connecting_description, e.getMessage()))
                                     .setPositiveButton(android.R.string.ok, null).show();
                         }
                     });

@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Resources;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbEndpoint;
@@ -31,7 +32,8 @@ import java.util.List;
  *  The class that is responsible for the start application window.
  ***/
 public class SplashScreen extends AppCompatActivity {
-
+    Context context;
+    Resources resources;
     // Constants.
     private static final int BAUD_RATE = 57600;
 
@@ -58,7 +60,7 @@ public class SplashScreen extends AppCompatActivity {
     private boolean permissionsReceived = false;
     private boolean permissionsGranted = false;
 
-    private Context context;
+    //private Context context;
 
     private int baudRate;
 
@@ -76,11 +78,12 @@ public class SplashScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash_screen);
-
+        context = LocaleHelper.setLocale(SplashScreen.this, SelectLanguageScreen.language);
+        resources = context.getResources();
         db = new DatabaseHandler(this);
 
-        final ProgressDialog dialog = ProgressDialog.show(this, getResources().getString(R.string.startup_device_title),
-                getResources().getString(R.string.startup_device), true);
+        final ProgressDialog dialog = ProgressDialog.show(this, resources.getString(R.string.startup_device_title),
+                resources.getString(R.string.startup_device), true);
 
         myDevice = new DigiMeshDevice(this, BAUD_RATE, permissionListener);
 

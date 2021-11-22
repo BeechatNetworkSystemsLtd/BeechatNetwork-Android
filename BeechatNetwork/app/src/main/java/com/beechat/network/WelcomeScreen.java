@@ -1,5 +1,6 @@
 package com.beechat.network;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -22,6 +23,8 @@ import java.io.UnsupportedEncodingException;
  *  The class that is responsible for the EULA application window.
  ***/
 public class WelcomeScreen extends AppCompatActivity {
+    Context context;
+    Resources resources;
     Button finishButton;
     CheckBox agreementCheckBox;
     TextView eulaTextView, idTextView;
@@ -30,9 +33,13 @@ public class WelcomeScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.welcome_screen);
-
+        context = LocaleHelper.setLocale(WelcomeScreen.this, SelectLanguageScreen.language);
+        resources = context.getResources();
         eulaTextView = (TextView) findViewById(R.id.textViewEULA);
-        String largeTextString = getStringFromRawRes(R.raw.eula);
+        String largeTextString = null;
+        if (SelectLanguageScreen.language == "en") {
+            largeTextString=getStringFromRawRes(R.raw.eula_en);
+        } else largeTextString=getStringFromRawRes(R.raw.eula_es);
 
         if(largeTextString != null) {
             eulaTextView.setText(largeTextString);
