@@ -29,7 +29,9 @@ public class SelectLanguageScreen extends AppCompatActivity{
 
         // referencing the text and button views
         buttonContinue = findViewById(R.id.continueButton);
+
         languagesList = findViewById(R.id.languageSpinner);
+
         ArrayAdapter<String> adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, languages);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         languagesList.setAdapter(adapter);
@@ -46,9 +48,9 @@ public class SelectLanguageScreen extends AppCompatActivity{
             public void onNothingSelected(AdapterView<?> parent) {
             }
         };
+
         languagesList.setOnItemSelectedListener(itemSelectedListener);
         language = languagesList.getSelectedItem().toString();
-        System.out.println("52:" + language);
 
 
         context = LocaleHelper.setLocale(SelectLanguageScreen.this, language);

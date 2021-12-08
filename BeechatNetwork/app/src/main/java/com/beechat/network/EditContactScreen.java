@@ -18,6 +18,7 @@ public class EditContactScreen extends AppCompatActivity {
     Context context;
     Resources resources;
     private static String selectedDevice = null;
+    private static String selectedUserId = null;
 
     TextView addressTextView;
     EditText nameEditText;
@@ -27,16 +28,19 @@ public class EditContactScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.edit_contact_screen);
-        context = LocaleHelper.setLocale(EditContactScreen.this, SelectLanguageScreen.language);
+
+        context = LocaleHelper.setLocale(EditContactScreen.this, WelcomeScreen.language);
         resources = context.getResources();
 
         addressTextView = (TextView)findViewById(R.id.addressTextView);
         nameEditText = (EditText) findViewById(R.id.nameEditText);
 
         Bundle extras = getIntent().getExtras();
+
         if(extras !=null) {
-            selectedDevice = extras.getString("key");
-            addressTextView.setText("Address " + selectedDevice);
+            selectedDevice = extras.getString("key_device");
+            selectedUserId = extras.getString("key_user_id");
+            addressTextView.setText("Address " + selectedDevice+":"+selectedUserId);
         }
 
         backButton = (ImageButton)findViewById(R.id.backButton);
@@ -49,7 +53,7 @@ public class EditContactScreen extends AppCompatActivity {
         updateContactButton = (Button)findViewById(R.id.updateContactButton);
         updateContactButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                SplashScreen.db.updateUser(new User(selectedDevice, nameEditText.getText().toString()));
+                SplashScreen.db.updateContact(new Contact(selectedUserId, selectedDevice, nameEditText.getText().toString()));
                 ContactsScreen.remoteXBeeDeviceAdapterName.notifyDataSetChanged();
                 ChatScreen.nameTextView.setText(nameEditText.getText().toString());
                 finish();
