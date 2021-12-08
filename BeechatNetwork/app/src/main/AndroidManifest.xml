@@ -3,6 +3,9 @@
     package="com.beechat.network">
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_INTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <application
         android:allowBackup="true"
         android:icon="@drawable/digi_icon"
@@ -11,14 +14,14 @@
         android:theme="@style/AppTheme"
         android:requestLegacyExternalStorage="true"
         >
-        <activity android:name="com.beechat.network.LoginScreen">
+        <activity android:name="com.beechat.network.StartScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.beechat.network.LoginFormScreen"></activity>
+        <activity android:name="com.beechat.network.LogInScreen"></activity>
         <activity android:name="com.beechat.network.SelectLanguageScreen"></activity>
         <activity android:name="com.beechat.network.SplashScreen"></activity>
         <activity android:name="com.beechat.network.WelcomeScreen"></activity>

@@ -1,31 +1,25 @@
 package com.beechat.network;
-import android.arch.persistence.room.Entity;
+
 import android.arch.persistence.room.PrimaryKey;
 
-@Entity
 public class User {
 
     @PrimaryKey(autoGenerate = true)
     public int id;
-    public String xbee_device_number;
-    public String name;
+    public String username;
+    public String password;
 
     public User() {}
 
-    public User(String xbee_device_number, String name) {
-        this.xbee_device_number = xbee_device_number;
-        this.name = name;
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
     }
 
-    public User(String xbee_device_number) {
-        this.xbee_device_number = xbee_device_number;
-    }
-
-    public User(int id, String xbee_device_number, String name) {
+    public User(int id, String username, String password) {
         this.id = id;
-        this.xbee_device_number = xbee_device_number;
-        this.name = name;
-
+        this.username = username;
+        this.password = password;
     }
 
     public int getId() {
@@ -36,19 +30,19 @@ public class User {
         this.id = id;
     }
 
-    public String getXbeeDeviceNumber() {
-        return this.xbee_device_number;
+    public String getUsername() {
+        return this.username;
     }
 
-    public void setXbeeDeviceNumber(String xbee_device_number) {
-        this.xbee_device_number = xbee_device_number;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public String getName() {
-        return this.name;
+    public String getPassword() {
+        return this.password;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

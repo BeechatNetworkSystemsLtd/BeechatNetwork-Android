@@ -8,10 +8,15 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -25,60 +30,117 @@ import java.io.UnsupportedEncodingException;
 public class WelcomeScreen extends AppCompatActivity {
     Context context;
     Resources resources;
+    EditText passwordOne, passwordTwo;
     Button finishButton;
     CheckBox agreementCheckBox;
     TextView eulaTextView, idTextView;
+    Spinner languagesList;
+    public static String language = "en";
+    String[] languages = {"en", "es"};
+    String largeTextString = null;
+    DatabaseHandler DB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.welcome_screen);
-        context = LocaleHelper.setLocale(WelcomeScreen.this, SelectLanguageScreen.language);
-        resources = context.getResources();
-        eulaTextView = (TextView) findViewById(R.id.textViewEULA);
-        String largeTextString = null;
-        if (SelectLanguageScreen.language == "en") {
-            largeTextString=getStringFromRawRes(R.raw.eula_en);
-        } else largeTextString=getStringFromRawRes(R.raw.eula_es);
 
-        if(largeTextString != null) {
+        DB = new DatabaseHandler(this);
+        eulaTextView = (TextView) findViewById(R.id.textViewEULA);
+        languagesList = findViewById(R.id.languageSpinner);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, languages);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        languagesList.setAdapter(adapter);
+
+        AdapterView.OnItemSelectedListener itemSelectedListener = new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                language = (String) parent.getItemAtPosition(position);
+                if (language.equals("en")) {
+                    largeTextString = getStringFromRawRes(R.raw.eula_en);
+                } else largeTextString = getStringFromRawRes(R.raw.eula_es);
+
+                if (largeTextString != null) {
+                    eulaTextView.setText(largeTextString);
+                } else {
+                    eulaTextView.setText("EULA is empty!");
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        };
+
+        languagesList.setOnItemSelectedListener(itemSelectedListener);
+        language = languagesList.getSelectedItem().toString();
+
+        context = LocaleHelper.setLocale(WelcomeScreen.this, language);
+        resources = context.getResources();
+
+        if (language.equals("en")) {
+            largeTextString = getStringFromRawRes(R.raw.eula_en);
+        } else largeTextString = getStringFromRawRes(R.raw.eula_es);
+
+        if (largeTextString != null) {
             eulaTextView.setText(largeTextString);
         } else {
             eulaTextView.setText("EULA is empty!");
         }
 
         eulaTextView.setMovementMethod(new ScrollingMovementMethod());
-        //eulaTextView.setHorizontallyScrolling(true);
         eulaTextView.setVerticalFadingEdgeEnabled(true);
         eulaTextView.setVerticalScrollBarEnabled(true);
 
         idTextView = (TextView) findViewById(R.id.textViewMyID);
+        finishButton = (Button) findViewById(R.id.finishButton);
 
-        finishButton = (Button)findViewById(R.id.finishButton);
+        passwordOne = (EditText) findViewById(R.id.passwordOne);
+        passwordTwo = (EditText) findViewById(R.id.passwordTwo);
+
+        Bundle extras = getIntent().getExtras();
+
         finishButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(WelcomeScreen.this, MainScreen.class);
-                startActivity(intent);
-            }
-        });
+                String user = extras.getString("key_user_id");
+                String pass = passwordOne.getText().toString();
+                String passConfirm = passwordTwo.getText().toString();
+                if (user.equals("") || pass.equals(""))
+                    Toast.makeText(WelcomeScreen.this, "Please enter all the fields", Toast.LENGTH_SHORT).show();
+                else {
+                    if (pass.equals(passConfirm)) {
+                        Boolean checkuser = DB.checkUsername(user);
+                        if (!checkuser) {
+                            Boolean insert = DB.addUser(user, pass);
+                            if (insert) {
+                                Toast.makeText(WelcomeScreen.this, "Registered successfully", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(WelcomeScreen.this, SplashScreen.class);
+                                intent.putExtra("key_user_id", user);
+                                startActivity(intent);
 
-        agreementCheckBox = (CheckBox) findViewById(R.id.agreementCheckBox);
-        agreementCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
-        {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-            {
-                if (isChecked)
-                {
-                    finishButton.setEnabled(true);
-                } else {
-                    finishButton.setEnabled(false);
+                            } else {
+                                Toast.makeText(WelcomeScreen.this, "Registration failed", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(WelcomeScreen.this, "User already exists! Please Sign in", Toast.LENGTH_SHORT).show();
+                        }
+
+                    } else {
+                        Toast.makeText(WelcomeScreen.this, "Passwords not matching", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
 
-        Bundle extras = getIntent().getExtras();
-        idTextView.setText("My ID \n" + extras.getString("key_idDevice"));
+        agreementCheckBox = (CheckBox) findViewById(R.id.agreementCheckBox);
+        agreementCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                finishButton.setEnabled(isChecked);
+            }
+        });
+
+        idTextView.setText("My ID \n" + extras.getString("key_user_id"));
     }
 
     /***

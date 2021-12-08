@@ -27,17 +27,15 @@
             android:layout_weight="1"
             android:gravity="center|bottom"
             android:layout_gravity="bottom|center">
-
-            <TextView
-                android:id="@+id/textViewBroadcast"
+            <Button
+                android:id="@+id/buttonBroadcast"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:textSize="35dp"
                 android:layout_gravity="center_horizontal"
-                android:text="Broadcast \nmy public \ndata"
+                android:text="Broadcast my ID"
                 android:lines="3"
-                android:gravity="center"
-                />
+                android:gravity="center" />
             <ProgressBar
                 android:id="@+id/progressBarBroadcast"
                 style="?android:attr/progressBarStyleHorizontal"
@@ -45,6 +43,8 @@
                 android:layout_height="wrap_content"
                 android:minHeight="10dp"
                 android:maxHeight="20dp"/>
+
+
 
 
         </LinearLayout>

@@ -13,9 +13,11 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -24,10 +26,11 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.digi.xbee.api.DigiMeshNetwork;
 import com.digi.xbee.api.RemoteXBeeDevice;
-import com.digi.xbee.api.android.DigiMeshDevice;
+import com.digi.xbee.api.XBeeNetwork;
+import com.digi.xbee.api.android.XBeeDevice;
 import com.digi.xbee.api.android.connection.usb.AndroidUSBPermissionListener;
 import com.digi.xbee.api.exceptions.XBeeException;
 
@@ -39,9 +42,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-
 
 /***
  *  --- NearbyDevicesScreen ----
@@ -50,8 +50,8 @@ import android.view.LayoutInflater;
 public class NearbyDevicesScreen extends Fragment {
     Context context;
     Resources resources;
+
     // Constants.
-    //private static final int BAUD_RATE = 9600;
     private static final int BAUD_RATE = 57600;
     private static final File root = new File(String.valueOf(Environment.getExternalStorageDirectory()));
     private static final String sFileName = "log.txt";
@@ -63,17 +63,15 @@ public class NearbyDevicesScreen extends Fragment {
     private AndroidUSBPermissionListener permissionListener;
     private CustomDeviceAdapter remoteXBeeDeviceAdapter;
     private static String selectedDevice = null;
-    public static DigiMeshDevice myDevice;
-    public static ArrayList<String> dmaDevices = new ArrayList<>();
+    private static String selectedUserId = null;
 
-    //public static DatabaseHandler db = null;
+    public static XBeeDevice myDevice;
+    public static ArrayList<String> dmaDevices = new ArrayList<>();
+    public static ArrayList<String> dmaUserIds = new ArrayList<>();
+
     public static Editable name = null;
 
-    public static String senderId = null;
-    public static String receiverId = null;
-
-    public static List<String> xbee_names = new ArrayList<>();
-    public static List<String> names = new ArrayList<>();
+    public static List<String> xbee_contacts = new ArrayList<>();
 
     ListView devicesListView;
     ImageButton refreshButton;
@@ -83,7 +81,7 @@ public class NearbyDevicesScreen extends Fragment {
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.nearby_devices_screen, container, false);
-        context = LocaleHelper.setLocale(getActivity(), SelectLanguageScreen.language);
+        context = LocaleHelper.setLocale(getActivity(), WelcomeScreen.language);
         resources = context.getResources();
         listDevicesText = (TextView) view.findViewById(R.id.textView);
         refreshButton = (ImageButton) view.findViewById(R.id.refreshButton);
@@ -92,41 +90,35 @@ public class NearbyDevicesScreen extends Fragment {
         remoteXBeeDeviceAdapter = new CustomDeviceAdapter(getActivity(), dmaDevices);
 
         devicesListView.setAdapter(remoteXBeeDeviceAdapter);
-        //db = new DatabaseHandler(getActivity());
-
 
         // Handling an event on clicking an item from the list of available devices.
         devicesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                // Reading all users
-                System.out.println("Reading: " + "Reading all users..");
-                List<User> users = SplashScreen.db.getAllUsers();
+                // Reading all contacts
+                System.out.println("Reading: " + "Reading all contacts.");
+                List<Contact> contacts = SplashScreen.db.getAllContacts();
 
-
-                for (User cn : users) {
-                    xbee_names.add(cn.getXbeeDeviceNumber());
-                    names.add(cn.getName());
+                for (Contact cn : contacts) {
+                    xbee_contacts.add(cn.getXbeeDeviceNumber()+":"+cn.getUserId());
                 }
 
-                senderId = getDMDevice().toString();
                 selectedDevice = remoteXBeeDeviceAdapter.getItem(i);
-                receiverId = selectedDevice;
+                selectedUserId = dmaUserIds.get(i);
 
-                if (xbee_names.isEmpty()) {
-                    System.out.println("Account receiverId " + receiverId + " not exist!");
+                if (xbee_contacts.isEmpty()) {
                     Intent intent = new Intent(getActivity(), AddContactScreen.class);
-                    intent.putExtra("key", receiverId);
+                    intent.putExtra("key_xbee_id", selectedDevice);
+                    intent.putExtra("key_user_id", selectedUserId);
                     startActivity(intent);
                 } else {
-                    if (xbee_names.contains(receiverId)) {
-                        System.out.println("Account receiverId " + receiverId + " exist!");
-                        //connectToDevice(selectedDevice);
-                    } else {
-                        System.out.println("Account receiverId " + receiverId + " not exist!");
+                    if (!xbee_contacts.contains(selectedDevice+":"+selectedUserId)) {
                         Intent intent = new Intent(getActivity(), AddContactScreen.class);
-                        intent.putExtra("key", receiverId);
+                        intent.putExtra("key_xbee_id", selectedDevice);
+                        intent.putExtra("key_user_id", selectedUserId);
                         startActivity(intent);
+                    } else {
+                        Toast.makeText(getActivity(), "Contact is existing in DB!", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -137,7 +129,6 @@ public class NearbyDevicesScreen extends Fragment {
             public void onClick(View v) {
                 remoteXBeeDeviceAdapter.clear();
                 startScan();
-
             }
         });
 
@@ -241,8 +232,7 @@ public class NearbyDevicesScreen extends Fragment {
     private void startScan() {
         final ProgressDialog dialog = ProgressDialog.show(getActivity(), resources.getString(R.string.scanning_device_title),
                 resources.getString(R.string.scanning_devices), true);
-        myDevice = new DigiMeshDevice(getActivity(), BAUD_RATE, permissionListener);
-
+        myDevice = new XBeeDevice(getActivity(), BAUD_RATE, permissionListener);
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -271,7 +261,7 @@ public class NearbyDevicesScreen extends Fragment {
      *  --- getDMDevice() ----
      *  The function of gaining access to your device..
      ***/
-    public static DigiMeshDevice getDMDevice() {
+    public static XBeeDevice getDMDevice() {
         return myDevice;
     }
 
@@ -361,17 +351,17 @@ public class NearbyDevicesScreen extends Fragment {
      *
      *  @param myDevice Current device.
      ***/
-    public static List<RemoteXBeeDevice> listnodes(DigiMeshDevice myDevice) {
+    public static List<RemoteXBeeDevice> listnodes(XBeeDevice myDevice) {
         List<RemoteXBeeDevice> devices = null;
 
-        if (myDevice.isOpen() == true) {
+        if (myDevice.isOpen()) {
             myDevice.close();
         }
 
         try {
             myDevice.open();
 
-            DigiMeshNetwork network = (DigiMeshNetwork) myDevice.getNetwork();
+            XBeeNetwork network = (XBeeNetwork) myDevice.getNetwork();
             network.startDiscoveryProcess();
 
             while (network.isDiscoveryRunning()) {
@@ -386,6 +376,7 @@ public class NearbyDevicesScreen extends Fragment {
             int i = 0;
             while (i<devices.size()) {
                 dmaDevices.add(devices.get(i).get64BitAddress().toString());
+                dmaUserIds.add(devices.get(i).getNodeID());
                 i=i+1;
             }
         } catch (XBeeException e) {

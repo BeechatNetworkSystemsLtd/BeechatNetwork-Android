@@ -5,45 +5,43 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="10dp"
-    tools:context=".LoginScreen">
+    tools:context=".LogInScreen">
 
-    <EditText
-        android:id="@+id/username"
-        android:layout_width="match_parent"
+    <Spinner
+        android:id="@+id/accountSpinner"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:hint="User Name"
-        android:layout_marginTop="50dp"/>
-
+        android:drawSelectorOnTop="true"
+        android:prompt="@string/spin"
+        android:entries="@array/items_accounts"
+        />
     <EditText
-        android:id="@+id/password"
+        android:id="@+id/editTextPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Password"
-        android:layout_marginTop="50dp"
-        android:layout_below="@+id/username"/>
-
-    <EditText
-        android:id="@+id/repassword"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Retype Password"
-        android:layout_marginTop="50dp"
-        android:layout_below="@+id/password"/>
+        android:layout_marginTop="50dp" />
 
     <Button
-        android:id="@+id/btnsignup"
+        android:id="@+id/buttonLogIn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Register"
+        android:text="Log in"
         android:layout_marginTop="50dp"
-        android:layout_below="@+id/repassword"/>
+        android:layout_below="@+id/editTextPassword"/>
 
     <Button
-        android:id="@+id/btnsignin"
+        android:id="@+id/buttonImportAccount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Existing user! Go to Sign in page"
-        android:layout_marginTop="50dp"
-        android:layout_below="@+id/btnsignup"/>
-
+        android:text="Import Account"
+        android:layout_marginTop="5dp"
+        android:layout_below="@+id/buttonLogIn"/>
+    <Button
+        android:id="@+id/buttonCreateAccount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Create account"
+        android:layout_marginTop="5dp"
+        android:layout_below="@+id/buttonImportAccount"/>
 </RelativeLayout>
