@@ -59,8 +59,7 @@
                 android:scaleType="centerInside"
                 android:src="@drawable/attach_button"
                 android:tint="@color/colorAccent"
-                android:background="@drawable/round_attach_button"
-                />
+                android:background="@drawable/round_attach_button" />
             <EditText
                 android:id="@+id/inputField"
                 android:layout_width="wrap_content"
@@ -73,6 +72,10 @@
                 android:layout_height="wrap_content"
                 android:text="@string/send" />
         </LinearLayout>
+        <TextView
+            android:id="@+id/textViewAttachment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="" />
     </LinearLayout>
-
 </android.support.constraint.ConstraintLayout>

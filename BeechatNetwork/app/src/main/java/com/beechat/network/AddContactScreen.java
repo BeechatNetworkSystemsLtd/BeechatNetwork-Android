@@ -11,12 +11,13 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 /***
- *  --- EditContactScreen ----
+ *  --- AddContactScreen ----
  *  The class is responsible for the adding and editing contacts.
  ***/
 public class AddContactScreen extends AppCompatActivity {
 
     private static String selectedDevice = null;
+    private static String selectedUserId = null;
 
     TextView addressTextView;
     EditText nameEditText;
@@ -28,7 +29,7 @@ public class AddContactScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_contact_screen);
-        context = LocaleHelper.setLocale(getApplicationContext(), SelectLanguageScreen.language);
+        context = LocaleHelper.setLocale(getApplicationContext(), WelcomeScreen.language);
         resources = context.getResources();
 
         addressTextView = (TextView)findViewById(R.id.addressTextView);
@@ -36,8 +37,9 @@ public class AddContactScreen extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         if(extras !=null) {
-            selectedDevice = extras.getString("key");
-            addressTextView.setText("Address " + selectedDevice);
+            selectedDevice = extras.getString("key_xbee_id");
+            selectedUserId = extras.getString("key_user_id");
+            addressTextView.setText("Address " + selectedDevice+":"+selectedUserId);
         }
 
         backButton = (ImageButton)findViewById(R.id.backButton);
@@ -51,7 +53,7 @@ public class AddContactScreen extends AppCompatActivity {
         addContactButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 NearbyDevicesScreen.name = nameEditText.getText();
-                SplashScreen.db.addUser(new User(selectedDevice, nameEditText.getText().toString()));
+                SplashScreen.db.addContact(new Contact(selectedUserId, selectedDevice, nameEditText.getText().toString()));
                 ContactsScreen.remoteXBeeDeviceAdapterName.notifyDataSetChanged();
                 finish();
             }

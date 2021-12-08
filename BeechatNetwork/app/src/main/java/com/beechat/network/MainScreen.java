@@ -7,7 +7,6 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 
 import java.util.ArrayList;
 
@@ -26,7 +25,7 @@ public class MainScreen extends AppCompatActivity {
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_screen);
-        context = LocaleHelper.setLocale(MainScreen.this, SelectLanguageScreen.language);
+        context = LocaleHelper.setLocale(MainScreen.this, WelcomeScreen.language);
         resources = context.getResources();
 
         viewPager = (ViewPager) findViewById(R.id.pager);
