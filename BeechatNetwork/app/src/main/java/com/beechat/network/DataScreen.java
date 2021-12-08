@@ -25,7 +25,7 @@ public class DataScreen extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        context = LocaleHelper.setLocale(DataScreen.this, SelectLanguageScreen.language);
+        context = LocaleHelper.setLocale(DataScreen.this, WelcomeScreen.language);
         resources = context.getResources();
         setContentView(R.layout.data_screen);
 

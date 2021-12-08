@@ -1,53 +1,32 @@
 package com.beechat.network;
-
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.ForeignKey;
-import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
-
-/*@Entity(tableName = "message", foreignKeys = {
-        @ForeignKey(
-                entity = User.class,
-                parentColumns = "id",
-                childColumns = "senderId",
-                onDelete = ForeignKey.CASCADE,
-                onUpdate = ForeignKey.CASCADE
-        ),
-        @ForeignKey(
-                entity = User.class,
-                parentColumns = "id",
-                childColumns = "receiverId",
-                onDelete = ForeignKey.CASCADE,
-                onUpdate = ForeignKey.CASCADE
-        )
-}, indices = {
-        @Index("senderId"),
-        @Index("receiverId")
-})*/
 
 public class Message {
     @PrimaryKey(autoGenerate = true)
     public int id;
     public String senderId;
+    public String xbee_device_number_sender;
     public String receiverId;
+    public String xbee_device_number_receiver;
     public String content;
-    public String datetime;
 
     public Message() {}
 
-    public Message(String senderId, String receiverId, String content, String datetime) {
+    public Message(String senderId, String xbee_device_number_sender, String receiverId, String xbee_device_number_receiver, String content) {
         this.senderId = senderId;
+        this.xbee_device_number_sender = xbee_device_number_sender;
         this.receiverId = receiverId;
+        this.xbee_device_number_receiver = xbee_device_number_receiver;
         this.content = content;
-        this.datetime = datetime;
     }
 
-    public Message(int id, String senderId, String receiverId, String content, String datetime) {
+    public Message(int id, String senderId, String xbee_device_number_sender, String receiverId, String xbee_device_number_receiver, String content) {
         this.id = id;
         this.senderId = senderId;
+        this.xbee_device_number_sender = xbee_device_number_sender;
         this.receiverId = receiverId;
+        this.xbee_device_number_receiver = xbee_device_number_receiver;
         this.content = content;
-        this.datetime = datetime;
     }
 
     public int getId() {
@@ -66,6 +45,14 @@ public class Message {
         this.senderId = senderId;
     }
 
+    public String getXbeeSender() {
+        return this.xbee_device_number_sender;
+    }
+
+    public void setXbeeSender(String xbee_device_number_sender) {
+        this.xbee_device_number_sender = xbee_device_number_sender;
+    }
+
     public String getReceiverId() {
         return this.receiverId;
     }
@@ -74,19 +61,19 @@ public class Message {
         this.receiverId = receiverId;
     }
 
+    public String getXbeeReceiver() {
+        return this.xbee_device_number_receiver;
+    }
+
+    public void setXbeeReceiver(String xbee_device_number_receiver) {
+        this.xbee_device_number_receiver = xbee_device_number_receiver;
+    }
+
     public String getContent() {
         return this.content;
     }
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public String getDatetime() {
-        return this.datetime;
-    }
-
-    public void setDatetime(String datetime) {
-        this.datetime = datetime;
     }
 }

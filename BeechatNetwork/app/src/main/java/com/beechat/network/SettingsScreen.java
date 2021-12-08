@@ -38,7 +38,7 @@ public class SettingsScreen extends Fragment {
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.settings_screen, container, false);
-        context = LocaleHelper.setLocale(getActivity(), SelectLanguageScreen.language);
+        context = LocaleHelper.setLocale(getActivity(), WelcomeScreen.language);
         resources = context.getResources();
         //languageSpinner = (Spinner)  view.findViewById(R.id.languageSpinner);
         baudRateSeekBar = (SeekBar) view.findViewById(R.id.baudRateSeekBar);
