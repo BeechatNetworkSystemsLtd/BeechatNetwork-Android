@@ -41,4 +41,6 @@ dependencies {
     implementation "android.arch.persistence.room:runtime:$lifecycle_version"
     annotationProcessor "android.arch.lifecycle:compiler:$lifecycle_version"
     annotationProcessor "android.arch.persistence.room:compiler:$lifecycle_version"
+    implementation 'net.zetetic:android-database-sqlcipher:4.5.0@aar'
+    implementation "androidx.sqlite:sqlite:2.0.1"
 }

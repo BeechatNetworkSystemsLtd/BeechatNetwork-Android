@@ -19,12 +19,12 @@ import android.os.Handler;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
-import android.support.annotation.NonNull;
+/*import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatActivity;*/
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +37,13 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import com.digi.xbee.api.RemoteXBeeDevice;
 import com.digi.xbee.api.android.XBeeDevice;
