@@ -49,7 +49,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + CONTACTS_ID + " INTEGER PRIMARY KEY," + CONTACTS_USER_ID + " TEXT," + CONTACTS_XBEE_DEVICE_NUMBER + " TEXT," + CONTACTS_NAME + " TEXT" + ")";
 
         String CREATE_MESSAGES_TABLE = "CREATE TABLE " + TABLE_MESSAGES + "("
-                + MESSAGES_ID + " INTEGER PRIMARY KEY," + MESSAGES_SENDER_ID + " TEXT," + MESSAGES_XBEE_DEVICE_NUMBER_SENDER + " TEXT," + MESSAGES_RECEIVER_ID + " TEXT," + MESSAGES_XBEE_DEVICE_NUMBER_RECEIVER + " TEXT,"+ MESSAGES_CONTENT + " TEXT" + ")";
+                + MESSAGES_ID + " INTEGER PRIMARY KEY," + MESSAGES_SENDER_ID + " TEXT," + MESSAGES_XBEE_DEVICE_NUMBER_SENDER + " TEXT," + MESSAGES_RECEIVER_ID + " TEXT," + MESSAGES_XBEE_DEVICE_NUMBER_RECEIVER + " TEXT," + MESSAGES_CONTENT + " TEXT" + ")";
 
         db.execSQL(CREATE_USERS_TABLE);
         db.execSQL(CREATE_CONTACTS_TABLE);
@@ -68,8 +68,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     // Deleting database
-    void deleteDB()
-    {
+    void deleteDB() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_USERS, null, null);
         db.delete(TABLE_CONTACTS, null, null);
@@ -77,14 +76,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     // Add user to table Users
-    public Boolean addUser(String username, String password){
+    public Boolean addUser(String username, String password) {
         SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues contentValues= new ContentValues();
+        ContentValues contentValues = new ContentValues();
 
         contentValues.put(USERS_USERNAME, username);
         contentValues.put(USERS_PASSWORD, password);
         long result = db.insert(TABLE_USERS, null, contentValues);
-        if(result==-1) return false;
+        if (result == -1) return false;
         else
             return true;
     }
@@ -100,10 +99,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     // check username and password in table Users
-    public Boolean checkUsernamePassword(String username, String password){
+    public Boolean checkUsernamePassword(String username, String password) {
         SQLiteDatabase MyDB = this.getWritableDatabase();
-        Cursor cursor = MyDB.rawQuery("Select * from " + TABLE_USERS + " where username = ? and password = ?", new String[] {username,password});
-        if(cursor.getCount()>0)
+        Cursor cursor = MyDB.rawQuery("Select * from " + TABLE_USERS + " where username = ? and password = ?", new String[]{username, password});
+        if (cursor.getCount() > 0)
             return true;
         else
             return false;
@@ -166,7 +165,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         Cursor mcursor = db.rawQuery(count, null);
         mcursor.moveToFirst();
         int icount = mcursor.getInt(0);
-        if(icount>0) return true;
+        if (icount > 0) return true;
         else return false;
     }
 
@@ -224,17 +223,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     // Insert message to table Messages
-    public void insertMessage(Message message){
+    public void insertMessage(Message message) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(MESSAGES_SENDER_ID, message.getSenderId());
         values.put(MESSAGES_XBEE_DEVICE_NUMBER_SENDER, message.getXbeeSender());
         values.put(MESSAGES_RECEIVER_ID, message.getReceiverId());
-        values.put(MESSAGES_XBEE_DEVICE_NUMBER_SENDER, message.getXbeeReceiver());
-        values.put(MESSAGES_CONTENT,message.getContent());
+        values.put(MESSAGES_XBEE_DEVICE_NUMBER_RECEIVER, message.getXbeeReceiver());
+        values.put(MESSAGES_CONTENT, message.getContent());
 
-        db.insert(TABLE_MESSAGES,null, values);
+        db.insert(TABLE_MESSAGES, null, values);
         db.close();
     }
 
@@ -244,8 +243,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String selectQuery = "SELECT  * FROM " + TABLE_MESSAGES + " WHERE " + MESSAGES_SENDER_ID + " = " + chatSenderId + " and " +
                 MESSAGES_XBEE_DEVICE_NUMBER_SENDER + " = " + chatXbeeSender + " and " + MESSAGES_RECEIVER_ID + " = " + chatReceiverId + " and " +
                 MESSAGES_XBEE_DEVICE_NUMBER_RECEIVER + " = " + chatXbeeReceiver;
-
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         if (cursor.moveToFirst()) {
@@ -260,6 +258,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 messagesList.add(message);
             } while (cursor.moveToNext());
         }
+        cursor.close();
         return messagesList;
     }
 }

@@ -54,8 +54,8 @@ public class EditContactScreen extends AppCompatActivity {
         updateContactButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 SplashScreen.db.updateContact(new Contact(selectedUserId, selectedDevice, nameEditText.getText().toString()));
-                ContactsScreen.remoteXBeeDeviceAdapterName.notifyDataSetChanged();
                 ChatScreen.nameTextView.setText(nameEditText.getText().toString());
+                ContactsScreen.onRefresh();
                 finish();
             }
         });

@@ -41,7 +41,7 @@ public class ContactsScreen extends Fragment {
     public static CustomContactAdapter remoteXBeeDeviceAdapterName;
     public static List<String> contacts = new ArrayList<>();
     View view;
-    ListView contactsListView;
+    public static ListView contactsListView;
     public static List<String> xbee_names = new ArrayList<>();
     public static List<String> xbee_user_ids = new ArrayList<>();
     public static List<String> names = new ArrayList<>();
@@ -91,14 +91,12 @@ public class ContactsScreen extends Fragment {
                 selectedDevice = xbee_names.get(i);
                 selectedName = names.get(i);
 
-
                 connectToContactDevice();
 
             }
         });
         return view;
     }
-
 
     /***
      *  --- getDMDevice() ----
@@ -150,13 +148,10 @@ public class ContactsScreen extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        List<Contact> users = SplashScreen.db.getAllContacts();
-        List<String> xbee_contacts = new ArrayList<>();
+        onRefresh();
+    }
 
-        for (Contact cn : users) {
-            xbee_contacts.add(cn.getName());
-        }
-        contacts = xbee_contacts;
+    public static void onRefresh() {
         remoteXBeeDeviceAdapterName.notifyDataSetChanged();
     }
 
