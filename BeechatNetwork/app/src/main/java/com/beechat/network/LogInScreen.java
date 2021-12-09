@@ -17,7 +17,7 @@ import java.util.Random;
 public class LogInScreen extends AppCompatActivity {
 
     EditText password;
-    Button buttonLogin, buttonCreateAccount;
+    Button buttonLogin, buttonCreateAccount, buttonImportAccount;
     DatabaseHandler DB;
     String username_id;
     Spinner listUsernames;
@@ -37,7 +37,8 @@ public class LogInScreen extends AppCompatActivity {
         password = (EditText) findViewById(R.id.editTextPassword);
 
         buttonLogin = (Button) findViewById(R.id.buttonLogIn);
-        buttonCreateAccount = (Button) findViewById(R.id.buttonCreateAccount);
+        buttonCreateAccount = findViewById(R.id.buttonCreateAccount);
+        buttonImportAccount = findViewById(R.id.buttonImportAccount);
 
         listUsernames = findViewById(R.id.accountSpinner);
         ArrayAdapter<String> adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, usernames);
@@ -88,6 +89,9 @@ public class LogInScreen extends AppCompatActivity {
                 intent.putExtra("key_user_id", idSaltCreate);
                 startActivity(intent);
             }
+        });
+
+        buttonImportAccount.setOnClickListener(view -> {
         });
     }
 
