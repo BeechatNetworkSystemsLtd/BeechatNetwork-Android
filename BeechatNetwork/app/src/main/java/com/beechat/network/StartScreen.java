@@ -1,8 +1,12 @@
 package com.beechat.network;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+//import android.support.v7.app.AppCompatActivity;
+
+import androidx.appcompat.app.AppCompatActivity;
+
 import java.util.Random;
 
 
@@ -10,6 +14,7 @@ public class StartScreen extends AppCompatActivity {
 
     DatabaseHandler DB;
     String idSalt = null;
+    private Context mContext;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
