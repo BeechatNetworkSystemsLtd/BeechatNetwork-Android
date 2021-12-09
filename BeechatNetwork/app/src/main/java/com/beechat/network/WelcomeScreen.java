@@ -25,6 +25,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
 
 /***
  *  --- WelcomeScreen ----
@@ -42,6 +50,8 @@ public class WelcomeScreen extends AppCompatActivity {
     String[] languages = {"en", "es"};
     String largeTextString = null;
     DatabaseHandler DB;
+    private Cipher cipher, decipher;
+    private SecretKeySpec secretKeySpec;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +113,18 @@ public class WelcomeScreen extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
 
+        try {
+            cipher = Cipher.getInstance("AES");
+            decipher = Cipher.getInstance("AES");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (NoSuchPaddingException e) {
+            e.printStackTrace();
+        }
+
+        byte[] bytes = extras.getString("key_user_id").getBytes();
+        secretKeySpec = new SecretKeySpec(bytes, "AES");
+
         finishButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 String user = extras.getString("key_user_id");
@@ -114,7 +136,8 @@ public class WelcomeScreen extends AppCompatActivity {
                     if (pass.equals(passConfirm)) {
                         Boolean checkuser = DB.checkUsername(user);
                         if (!checkuser) {
-                            Boolean insert = DB.addUser(user, pass);
+                            Boolean insert = null;
+                            insert = DB.addUser(user, AESEncryptionMethod(pass));
                             if (insert) {
                                 Toast.makeText(WelcomeScreen.this, "Registered successfully", Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(WelcomeScreen.this, SplashScreen.class);
@@ -144,6 +167,52 @@ public class WelcomeScreen extends AppCompatActivity {
         });
 
         idTextView.setText("My ID \n" + extras.getString("key_user_id"));
+    }
+
+    private String AESEncryptionMethod(String string){
+
+        byte[] stringByte = string.getBytes();
+        byte[] encryptedByte = new byte[stringByte.length];
+
+        try {
+            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+            encryptedByte = cipher.doFinal(stringByte);
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (BadPaddingException e) {
+            e.printStackTrace();
+        } catch (IllegalBlockSizeException e) {
+            e.printStackTrace();
+        }
+
+        String returnString = null;
+
+        try {
+            returnString = new String(encryptedByte, "ISO-8859-1");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return returnString;
+    }
+
+    private String AESDecryptionMethod(String string) throws UnsupportedEncodingException {
+        byte[] EncryptedByte = string.getBytes("ISO-8859-1");
+        String decryptedString = string;
+
+        byte[] decryption;
+
+        try {
+            decipher.init(cipher.DECRYPT_MODE, secretKeySpec);
+            decryption = decipher.doFinal(EncryptedByte);
+            decryptedString = new String(decryption);
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (BadPaddingException e) {
+            e.printStackTrace();
+        } catch (IllegalBlockSizeException e) {
+            e.printStackTrace();
+        }
+        return decryptedString;
     }
 
     /***
