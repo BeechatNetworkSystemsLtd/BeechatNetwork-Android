@@ -1,5 +1,7 @@
 package com.beechat.network;
-import android.arch.persistence.room.PrimaryKey;
+//import android.arch.persistence.room.PrimaryKey;
+
+import androidx.room.PrimaryKey;
 
 public class Message {
     @PrimaryKey(autoGenerate = true)

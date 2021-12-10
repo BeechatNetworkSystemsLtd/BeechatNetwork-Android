@@ -10,12 +10,12 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.annotation.NonNull;
+/*import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AlertDialog;*/
 import android.text.Editable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +27,13 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 
 import com.digi.xbee.api.RemoteXBeeDevice;
 import com.digi.xbee.api.XBeeNetwork;
@@ -52,7 +59,7 @@ public class NearbyDevicesScreen extends Fragment {
     Resources resources;
 
     // Constants.
-    private static final int BAUD_RATE = 57600;
+    private static final int BAUD_RATE = StartScreen.BAUD_RATE;
     private static final File root = new File(String.valueOf(Environment.getExternalStorageDirectory()));
     private static final String sFileName = "log.txt";
     private static final File gpxfile = new File(root, sFileName);
