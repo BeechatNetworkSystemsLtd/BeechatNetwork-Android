@@ -3,12 +3,14 @@ package com.beechat.network;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+//import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 /***
  *  --- AddContactScreen ----
@@ -54,7 +56,8 @@ public class AddContactScreen extends AppCompatActivity {
             public void onClick(View v) {
                 NearbyDevicesScreen.name = nameEditText.getText();
                 SplashScreen.db.addContact(new Contact(selectedUserId, selectedDevice, nameEditText.getText().toString()));
-                ContactsScreen.remoteXBeeDeviceAdapterName.notifyDataSetChanged();
+                ContactsScreen.contacts.add(nameEditText.getText().toString());
+                ContactsScreen.onRefresh();
                 finish();
             }
         });
