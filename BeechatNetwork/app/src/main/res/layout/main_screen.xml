@@ -7,9 +7,6 @@
     android:layout_height="match_parent"
     tools:context=".MainScreen">
 
-
-
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -25,6 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:layout_alignParentBottom="true"
+            app:tabIconTint="@color/white"
             app:tabIndicatorHeight="0dp"
             app:tabBackground="@drawable/tab_background"
             app:tabGravity="fill"

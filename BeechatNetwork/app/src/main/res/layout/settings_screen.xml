@@ -19,6 +19,9 @@
                 android:id="@+id/languageTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/nunito_regular"
+                android:textColor="@android:color/black"
+                android:textSize="30sp"
                 android:text="Language" />
             <Spinner
                 android:id="@+id/languageSpinner"
@@ -38,6 +41,9 @@
                 android:id="@+id/darkModeSwitch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/nunito_regular"
+                android:textColor="@android:color/black"
+                android:textSize="30sp"
                 android:text="Dark mode" />
 
         </LinearLayout>
@@ -51,6 +57,11 @@
                 android:id="@+id/savedDataButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="@drawable/rounded_corner_for_button"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:padding="10dp"
+                android:fontFamily="@font/nunito_regular"
                 android:text="Saved Data" />
 
         </LinearLayout>
@@ -59,6 +70,9 @@
             android:id="@+id/baudRateTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/nunito_regular"
+            android:textColor="@android:color/black"
+            android:textSize="30sp"
             android:text="Baud rate" />
         <SeekBar
             android:id="@+id/baudRateSeekBar"
@@ -69,15 +83,23 @@
             android:progress="0" />
         <TextView
             android:id="@+id/labelBaudRateTextView"
+            android:fontFamily="@font/nunito_regular"
+            android:textColor="@android:color/black"
+            android:textSize="30sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="20dp"
             android:textStyle="bold"/>
 
         <Button
             android:id="@+id/buttonApply"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/rounded_corner_for_button"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:padding="10dp"
+            android:fontFamily="@font/nunito_regular"
             android:text="Apply" />
 
 
