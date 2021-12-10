@@ -59,7 +59,7 @@ public class NearbyDevicesScreen extends Fragment {
     Resources resources;
 
     // Constants.
-    private static final int BAUD_RATE = 57600;
+    private static final int BAUD_RATE = StartScreen.BAUD_RATE;
     private static final File root = new File(String.valueOf(Environment.getExternalStorageDirectory()));
     private static final String sFileName = "log.txt";
     private static final File gpxfile = new File(root, sFileName);

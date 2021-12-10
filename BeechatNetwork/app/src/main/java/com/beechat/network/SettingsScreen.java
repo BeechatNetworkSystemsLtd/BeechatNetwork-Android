@@ -15,10 +15,12 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -33,9 +35,8 @@ public class SettingsScreen extends Fragment {
     private Spinner languageSpinner;
     public static SeekBar baudRateSeekBar;
     private TextView labelBaudRateTextView;
-    private Button savedDataButton;
-
-
+    private Button savedDataButton, applyButton;
+    int valueBaudRate = 0;
 
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -46,32 +47,37 @@ public class SettingsScreen extends Fragment {
         baudRateSeekBar = (SeekBar) view.findViewById(R.id.baudRateSeekBar);
 
         labelBaudRateTextView = (TextView) view.findViewById(R.id.labelBaudRateTextView);
-        labelBaudRateTextView.setText(baudRateSeekBar.getProgress() + "/" + baudRateSeekBar.getMax());
+        List<Integer> listValues = Arrays.asList(1200, 2400, 4800, 9600, 19200, 39400, 57600);
+        labelBaudRateTextView.setText(listValues.get(0) + "/" + listValues.get(6));
+
         baudRateSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            int pval = 0;
+
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                pval = progress;
+                valueBaudRate = progress;
             }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                //write custom code to on start progress
             }
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                labelBaudRateTextView.setText(pval + "/" + seekBar.getMax());
+                labelBaudRateTextView.setText(listValues.get(valueBaudRate) + "/" + listValues.get(6));
             }
         });
-        //if (baudRateSeekBar.getProgress() == 1) NearbyDevicesScreen.valueBaudRate = 57600;
-
-
-
 
         savedDataButton = (Button) view.findViewById(R.id.savedDataButton);
         savedDataButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), DataScreen.class);
                 startActivity(intent);
+            }
+        });
+
+        applyButton = (Button) view.findViewById(R.id.buttonApply);
+        applyButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                StartScreen.BAUD_RATE = listValues.get(valueBaudRate);
+                Toast.makeText(getContext(), "The BAUD RATE was change to " + StartScreen.BAUD_RATE, Toast.LENGTH_SHORT).show();
             }
         });
 
