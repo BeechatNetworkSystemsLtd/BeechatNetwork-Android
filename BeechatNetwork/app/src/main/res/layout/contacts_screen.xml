@@ -14,14 +14,16 @@
             android:layout_marginBottom="10dp"
             android:orientation="horizontal"
             android:gravity="center"
-            android:background="@color/grey">
+            android:background="@color/blueDark">
             <TextView
                 android:id="@+id/textView"
                 android:text= "Conversations"
+                android:textColor="@color/white"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:textSize="40dp" />
+                android:fontFamily="@font/nunito_regular"
+                android:textSize="30sp"/>
         </LinearLayout>
 
         <LinearLayout

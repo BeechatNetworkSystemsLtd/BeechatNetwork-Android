@@ -15,6 +15,9 @@
             android:id="@+id/textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/nunito_regular"
+            android:textColor="@android:color/black"
+            android:textSize="30sp"
             android:text="@string/select_device" />
         <ImageButton
             android:id="@+id/refreshButton"
@@ -23,6 +26,8 @@
             android:layout_gravity="right"
             android:scaleType="fitCenter"
             android:adjustViewBounds="true"
+            android:background="@drawable/round_refresh_button"
+            android:tint="@color/white"
             android:src="@drawable/refresh_black"
            />
 

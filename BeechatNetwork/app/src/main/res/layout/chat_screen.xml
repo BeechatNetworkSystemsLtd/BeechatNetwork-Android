@@ -16,7 +16,7 @@
             android:layout_marginBottom="20dp"
             android:orientation="horizontal"
             android:gravity="center"
-            android:background="@color/grey">
+            android:background="@color/blueDark">
 
             <ImageButton
                 android:id="@+id/backButton"
@@ -33,6 +33,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
+                android:textColor="@color/white"
                 android:textSize="40dp"
                 android:clickable="true"
               />
@@ -70,6 +71,11 @@
                 android:id="@+id/sendButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="@drawable/rounded_corner_for_button"
+                android:fontFamily="@font/nunito_regular"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:padding="10dp"
                 android:text="@string/send" />
         </LinearLayout>
         <TextView
