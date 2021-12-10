@@ -12,9 +12,10 @@ import java.util.Random;
 
 public class StartScreen extends AppCompatActivity {
 
+    public static int BAUD_RATE = 57600;
+
     DatabaseHandler DB;
     String idSalt = null;
-    private Context mContext;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

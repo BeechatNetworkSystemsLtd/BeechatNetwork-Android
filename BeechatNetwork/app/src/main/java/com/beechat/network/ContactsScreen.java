@@ -41,7 +41,7 @@ public class ContactsScreen extends Fragment {
     Context context;
     Resources resources;
 
-    private static final int BAUD_RATE = 57600;
+    private static final int BAUD_RATE = StartScreen.BAUD_RATE;
     private AndroidUSBPermissionListener permissionListener;
     public static CustomContactAdapter remoteXBeeDeviceAdapterName;
     public static List<String> contacts = new ArrayList<>();
