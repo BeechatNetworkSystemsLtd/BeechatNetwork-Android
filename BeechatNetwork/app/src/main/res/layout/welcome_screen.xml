@@ -13,6 +13,9 @@
             android:id="@+id/SelectLanguageTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/nunito_regular"
+            android:textColor="@android:color/black"
+            android:textSize="30sp"
             android:text="Select Language" />
         <LinearLayout
             android:layout_width="match_parent"
@@ -23,26 +26,40 @@
                 android:id="@+id/languageTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/nunito_regular"
+                android:textColor="@android:color/black"
+                android:textSize="30sp"
                 android:text="Language" />
             <Spinner
                 android:id="@+id/languageSpinner"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:drawSelectorOnTop="true"
+                android:fontFamily="@font/nunito_regular"
+                android:textColor="@android:color/black"
+                android:textSize="30sp"
                 android:prompt="@string/spin"
                 android:entries="@array/items_language"
                 />
         </LinearLayout>
         <Button
             android:id="@+id/buttonImport"
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/rounded_corner_for_button"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:padding="10dp"
+            android:fontFamily="@font/nunito_regular"
             android:text="Import" />
         <TextView
             android:id="@+id/textViewMyID"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textSize="15dp"
+            android:fontFamily="@font/nunito_regular"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
             android:layout_gravity="center_horizontal"
             android:text="My ID \nempty"
             android:lines="2"
@@ -54,16 +71,25 @@
             android:id="@+id/passwordOne"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/nunito_regular"
+            android:textColor="@android:color/black"
+            android:textSize="30sp"
             android:hint="Password" />
         <EditText
             android:id="@+id/passwordTwo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/nunito_regular"
+            android:textColor="@android:color/black"
+            android:textSize="30sp"
             android:hint="Confirm Password" />
         <TextView
             android:id="@+id/textViewEULA"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:fontFamily="@font/nunito_regular"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:layout_height="150dp"
             android:scrollbars="horizontal"
             android:isScrollContainer="true"
             android:paddingHorizontal="20dp"
@@ -81,7 +107,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:textStyle="italic"
-                android:textSize="18dp"
+                android:fontFamily="@font/nunito_regular"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
                 android:text="@string/eula_agreement"/>
             <Button
                 android:id="@+id/finishButton"
@@ -89,6 +117,11 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:enabled="false"
+                android:background="@drawable/rounded_corner_for_button"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:padding="10dp"
+                android:fontFamily="@font/nunito_regular"
                 android:text="Finish" />
 
 

@@ -40,7 +40,7 @@ public class SplashScreen extends AppCompatActivity {
     Resources resources;
 
     // Constants.
-    private static final int BAUD_RATE = 57600;
+    private static final int BAUD_RATE = StartScreen.BAUD_RATE;
 
     // Variables.
     private UsbDevice usbDevice;

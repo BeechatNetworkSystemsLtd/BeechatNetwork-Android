@@ -3,7 +3,9 @@
     <color name="colorPrimaryDark">#ff0000</color>
     <color name="colorAccent">#ffffff</color>
     <color name="black">#000000</color>
-    <color name="active">#F0EFF4</color>
-    <color name="inActive">#FFFAD6</color>
+    <color name="active">#010523</color>
+    <color name="inActive">#FFD60A</color>
     <color name="grey">#BEBDB8</color>
+    <color name="blueDark">#010523</color>
+    <color name="white">#FFFFFF</color>
 </resources>

@@ -8,6 +8,8 @@
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.19739583333333333" />
         <entry key="app/src/main/res/drawable/round_attach_button.xml" value="0.19375" />
         <entry key="app/src/main/res/drawable/round_button.xml" value="0.19375" />
+        <entry key="app/src/main/res/drawable/round_refresh_button.xml" value="0.18611111111111112" />
+        <entry key="app/src/main/res/drawable/rounded_corner_for_button.xml" value="0.30185185185185187" />
         <entry key="app/src/main/res/drawable/server_message_box.xml" value="0.19739583333333333" />
         <entry key="app/src/main/res/drawable/tab_background.xml" value="0.24722222222222223" />
         <entry key="app/src/main/res/layout/activity_chat.xml" value="0.1" />

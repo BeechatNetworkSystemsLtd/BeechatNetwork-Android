@@ -16,7 +16,7 @@
             android:layout_marginBottom="20dp"
             android:orientation="horizontal"
             android:gravity="center"
-            android:background="@color/grey">
+            android:background="@color/blueDark">
             <ImageButton
                 android:id="@+id/backButton"
                 android:layout_width="50dp"
@@ -30,6 +30,7 @@
             <TextView
                 android:id="@+id/labelTextView"
                 android:text= "Add contact"
+                android:textColor="@color/white"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -71,8 +72,14 @@
 
             <Button
                 android:id="@+id/addContactButton"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@drawable/rounded_corner_for_button"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:padding="10dp"
+                android:fontFamily="@font/nunito_regular"
                 android:text= "Add contact"/>
         </LinearLayout>
 
