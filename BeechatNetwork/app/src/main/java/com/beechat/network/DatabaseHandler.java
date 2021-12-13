@@ -3,9 +3,6 @@ package com.beechat.network;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-//import android.database.sqlite.SQLiteDatabase;
-//import android.database.sqlite.SQLiteOpenHelper;
-import androidx.appcompat.app.AppCompatActivity;
 
 import net.sqlcipher.database.SQLiteDatabase;
 import net.sqlcipher.database.SQLiteOpenHelper;
@@ -13,10 +10,16 @@ import net.sqlcipher.database.SQLiteOpenHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/***
+ *  --- DatabaseHandler ---
+ *  The class that is responsible for the data processing functions in the database.
+ ***/
 public class DatabaseHandler extends SQLiteOpenHelper {
-    //private static final String DATABASE_PATH = "//data/data/com.beechat.network/databases/";
-    private Context mContext;
+    // Variables
+    private final Context mContext;
+
+    // Constants
+    private static final String SECRET_KEY = "secret";
     private static final String DATABASE_NAME = "XBEE.DB";
     private static final int DATABASE_VERSION = 1;
 
@@ -41,7 +44,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        mContext=context;
+        mContext = context;
         //3rd argument to be passed is CursorFactory instance
     }
 
@@ -73,49 +76,61 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    // Deleting database
+    /***
+     *  --- deleteDB() ---
+     *  The function of the deleting database.
+     ***/
     void deleteDB() {
         SQLiteDatabase.loadLibs(mContext);
-        SQLiteDatabase db = this.getWritableDatabase("secret");
+        SQLiteDatabase db = this.getWritableDatabase(SECRET_KEY);
         db.delete(TABLE_USERS, null, null);
         db.delete(TABLE_CONTACTS, null, null);
         db.delete(TABLE_MESSAGES, null, null);
     }
 
-    // Add user to table Users
+    /***
+     *  --- addUser(String, String) ---
+     *  The function of adding a new user in 'Users' table.
+     *
+     *  @param username The generated username.
+     *  @param password The password.
+     ***/
     public Boolean addUser(String username, String password) {
         SQLiteDatabase.loadLibs(mContext.getApplicationContext());
-        SQLiteDatabase db = this.getWritableDatabase("secret");
-        ContentValues contentValues = new ContentValues();
+        SQLiteDatabase db = this.getWritableDatabase(SECRET_KEY);
 
+        ContentValues contentValues = new ContentValues();
         contentValues.put(USERS_USERNAME, username);
         contentValues.put(USERS_PASSWORD, password);
         long result = db.insert(TABLE_USERS, null, contentValues);
-        if (result == -1) return false;
-        else
-            return true;
+        return result != -1;
     }
 
-    // check username in table Users
+    /***
+     *  --- checkUsername(String) ---
+     *  The function of checking username in 'Users' table.
+     *
+     *  @param username The generated username.
+     ***/
     public Boolean checkUsername(String username) {
         SQLiteDatabase.loadLibs(mContext.getApplicationContext());
-        SQLiteDatabase db = this.getWritableDatabase("secret");
+        SQLiteDatabase db = this.getReadableDatabase(SECRET_KEY);
         Cursor cursor = db.rawQuery("Select * from " + TABLE_USERS + " where username = ?", new String[]{username});
-        if (cursor.getCount() > 0)
-            return true;
-        else
-            return false;
+        return cursor.getCount() > 0;
     }
 
-    // check username and password in table Users
+    /***
+     *  --- checkUsernamePassword(String, String) ---
+     *  The function of checking username and password in 'Users' table.
+     *
+     *  @param username The generated username.
+     *  @param password The password.
+     ***/
     public Boolean checkUsernamePassword(String username, String password) {
         SQLiteDatabase.loadLibs(mContext.getApplicationContext());
-        SQLiteDatabase db = this.getWritableDatabase("secret");
-        Cursor cursor = db.rawQuery("Select * from " + TABLE_USERS + " where username = ? and password = ?", new String[]{username, password});
-        if (cursor.getCount() > 0)
-            return true;
-        else
-            return false;
+        SQLiteDatabase db = this.getReadableDatabase(SECRET_KEY);
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_USERS + " WHERE USERNAME = ? AND PASSWORD = ?", new String[]{username, password});
+        return cursor.getCount() > 0;
     }
 
     // Get list of usernames from table Users
@@ -124,7 +139,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String selectQuery = "SELECT  * FROM " + TABLE_USERS;
 
         SQLiteDatabase.loadLibs(mContext.getApplicationContext());
-        SQLiteDatabase db = this.getWritableDatabase("secret");
+        SQLiteDatabase db = this.getWritableDatabase(SECRET_KEY);
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         if (cursor.moveToFirst()) {
@@ -140,7 +155,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     // Adding new contact to table Contacts
     void addContact(Contact contact) {
         SQLiteDatabase.loadLibs(mContext.getApplicationContext());
-        SQLiteDatabase db = this.getWritableDatabase("secret");
+        SQLiteDatabase db = this.getWritableDatabase(SECRET_KEY);
 
         ContentValues values = new ContentValues();
         values.put(CONTACTS_USER_ID, contact.getUserId());
@@ -156,7 +171,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     // Code to get the single contact
     Contact getContact(Integer id) {
         SQLiteDatabase.loadLibs(mContext.getApplicationContext());
-        SQLiteDatabase db = this.getReadableDatabase("secret");
+        SQLiteDatabase db = this.getReadableDatabase(SECRET_KEY);
 
         Cursor cursor = db.query(TABLE_CONTACTS, new String[]{CONTACTS_ID, CONTACTS_USER_ID, CONTACTS_XBEE_DEVICE_NUMBER, CONTACTS_NAME}, CONTACTS_ID + "=?",
                 new String[]{String.valueOf(id)}, null, null, null, null);
@@ -171,26 +186,32 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return user;
     }
 
-    // Check count of users in table Users
+    /***
+     *  --- checkCountUsers() ---
+     *  The function of checking count of users in 'Users' table.
+     ***/
     public boolean checkCountUsers() {
         SQLiteDatabase.loadLibs(mContext.getApplicationContext());
-        SQLiteDatabase db = this.getWritableDatabase("secret");
-        String count = "SELECT count(*) FROM " + TABLE_USERS;
-        Cursor mcursor = db.rawQuery(count, null);
-        mcursor.moveToFirst();
-        int icount = mcursor.getInt(0);
-        if (icount > 0) return true;
-        else return false;
+        SQLiteDatabase db = this.getWritableDatabase(SECRET_KEY);
+        String queryCount = "SELECT count(*) FROM " + TABLE_USERS;
+        Cursor cursor = db.rawQuery(queryCount, null);
+        cursor.moveToFirst();
+        int count = cursor.getInt(0);
+        return count > 0;
     }
 
-    // Code to get all contacts in a list view
+    /***
+     *  --- getAllContacts() ---
+     *  The function of getting all contacts from the 'Contacts' table.
+     ***/
     public List<Contact> getAllContacts() {
         List<Contact> contactList = new ArrayList<>();
 
         String selectQuery = "SELECT  * FROM " + TABLE_CONTACTS;
 
         SQLiteDatabase.loadLibs(mContext.getApplicationContext());
-        SQLiteDatabase db = this.getWritableDatabase("secret");
+        SQLiteDatabase db = this.getReadableDatabase(SECRET_KEY);
+
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         if (cursor.moveToFirst()) {
@@ -206,24 +227,29 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return contactList;
     }
 
-    // Code to update the single contact
+    /***
+     *  --- updateContact(Contact) ---
+     *  The function of updating current contact in 'Contacts' table.
+     *
+     *  @param contact The current contact.
+     ***/
     public int updateContact(Contact contact) {
         SQLiteDatabase.loadLibs(mContext.getApplicationContext());
-        SQLiteDatabase db = this.getWritableDatabase("secret");
+        SQLiteDatabase db = this.getWritableDatabase(SECRET_KEY);
 
         ContentValues values = new ContentValues();
         values.put(CONTACTS_USER_ID, contact.getXbeeDeviceNumber());
         values.put(CONTACTS_XBEE_DEVICE_NUMBER, contact.getXbeeDeviceNumber());
         values.put(CONTACTS_NAME, contact.getName());
 
-        return db.update(TABLE_CONTACTS, values, CONTACTS_XBEE_DEVICE_NUMBER + " = ?",
-                new String[]{String.valueOf(contact.xbee_device_number)});
+        return db.update(TABLE_CONTACTS, values, CONTACTS_USER_ID + " = ?",
+                new String[]{String.valueOf(contact.user_id)});
     }
 
     // Deleting single contact
     public void deleteContact(Contact contact) {
         SQLiteDatabase.loadLibs(mContext.getApplicationContext());
-        SQLiteDatabase db = this.getWritableDatabase("secret");
+        SQLiteDatabase db = this.getWritableDatabase(SECRET_KEY);
         db.delete(TABLE_CONTACTS, CONTACTS_ID + " = ?",
                 new String[]{String.valueOf(contact.getId())});
         db.close();
@@ -233,7 +259,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public int getContactsCount() {
         String countQuery = "SELECT  * FROM " + TABLE_CONTACTS;
         SQLiteDatabase.loadLibs(mContext.getApplicationContext());
-        SQLiteDatabase db = this.getReadableDatabase("secret");
+        SQLiteDatabase db = this.getReadableDatabase(SECRET_KEY);
         Cursor cursor = db.rawQuery(countQuery, null);
         cursor.close();
 
@@ -243,7 +269,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     // Insert message to table Messages
     public void insertMessage(Message message) {
         SQLiteDatabase.loadLibs(mContext.getApplicationContext());
-        SQLiteDatabase db = this.getWritableDatabase("secret");
+        SQLiteDatabase db = this.getWritableDatabase(SECRET_KEY);
 
         ContentValues values = new ContentValues();
         values.put(MESSAGES_SENDER_ID, message.getSenderId());
@@ -263,7 +289,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 MESSAGES_XBEE_DEVICE_NUMBER_SENDER + " = " + chatXbeeSender + " and " + MESSAGES_RECEIVER_ID + " = " + chatReceiverId + " and " +
                 MESSAGES_XBEE_DEVICE_NUMBER_RECEIVER + " = " + chatXbeeReceiver;
         SQLiteDatabase.loadLibs(mContext.getApplicationContext());
-        SQLiteDatabase db = this.getReadableDatabase("secret");
+        SQLiteDatabase db = this.getReadableDatabase(SECRET_KEY);
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         if (cursor.moveToFirst()) {

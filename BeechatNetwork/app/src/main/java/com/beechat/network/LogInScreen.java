@@ -2,7 +2,6 @@ package com.beechat.network;
 
 import android.content.Intent;
 import android.os.Bundle;
-//import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -17,7 +16,6 @@ import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Random;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -25,43 +23,49 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
+/***
+ *  --- LogInScreen ---
+ *  The class that is responsible for authenticating existing users.
+ ***/
 public class LogInScreen extends AppCompatActivity {
 
+    // Variables
     EditText password;
     Button buttonLogin, buttonCreateAccount, buttonImportAccount;
     DatabaseHandler DB;
-    String username_id;
-    Spinner listUsernames;
-    ArrayList<String> usernames = new ArrayList<>();
-    String idSaltCreate = null;
+    String usernameId;
+    Spinner spinnerUsernames;
+    ArrayList<String> listUsernames = new ArrayList<>();
     private Cipher cipher, decipher;
     private SecretKeySpec secretKeySpec;
+
+    // Constants
+    String algorithm = "AES";
+    String charsetNameISO = "ISO-8859-1";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.log_in_screen);
 
-        idSaltCreate = getSaltString();
-
         DB = new DatabaseHandler(this);
 
-        usernames = (ArrayList<String>) DB.getNames();
-        password = (EditText) findViewById(R.id.editTextPassword);
+        listUsernames = (ArrayList<String>) DB.getNames();
+        password = findViewById(R.id.editTextPassword);
 
-        buttonLogin = (Button) findViewById(R.id.buttonLogIn);
+        buttonLogin = findViewById(R.id.buttonLogIn);
         buttonCreateAccount = findViewById(R.id.buttonCreateAccount);
         buttonImportAccount = findViewById(R.id.buttonImportAccount);
 
-        listUsernames = findViewById(R.id.accountSpinner);
-        ArrayAdapter<String> adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, usernames);
+        spinnerUsernames = findViewById(R.id.accountSpinner);
+        ArrayAdapter<String> adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, listUsernames);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        listUsernames.setAdapter(adapter);
+        spinnerUsernames.setAdapter(adapter);
 
         AdapterView.OnItemSelectedListener itemSelectedListener = new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                username_id = (String)parent.getItemAtPosition(position);
+                usernameId = (String) parent.getItemAtPosition(position);
             }
 
             @Override
@@ -69,58 +73,59 @@ public class LogInScreen extends AppCompatActivity {
             }
         };
 
-        listUsernames.setOnItemSelectedListener(itemSelectedListener);
-        username_id = listUsernames.getSelectedItem().toString();
+        spinnerUsernames.setOnItemSelectedListener(itemSelectedListener);
+        usernameId = spinnerUsernames.getSelectedItem().toString();
 
         try {
-            cipher = Cipher.getInstance("AES");
-            decipher = Cipher.getInstance("AES");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (NoSuchPaddingException e) {
+            cipher = Cipher.getInstance(algorithm);
+            decipher = Cipher.getInstance(algorithm);
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
             e.printStackTrace();
         }
 
-        byte[] bytes = username_id.getBytes();
-        secretKeySpec = new SecretKeySpec(bytes, "AES");
+        byte[] bytes = usernameId.getBytes();
+        secretKeySpec = new SecretKeySpec(bytes, algorithm);
 
-        buttonLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        buttonLogin.setOnClickListener(view -> logInChat());
 
-                String pass = password.getText().toString();
-
-                if(pass.equals(""))
-                    Toast.makeText(LogInScreen.this, "Please enter password", Toast.LENGTH_SHORT).show();
-                else{
-                    Boolean checkuserpass = DB.checkUsernamePassword(username_id, AESEncryptionMethod(pass));
-                    if(checkuserpass){
-                        Toast.makeText(LogInScreen.this, "Sign in successful", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(LogInScreen.this, SplashScreen.class);
-                        intent.putExtra("key_user_id", username_id);
-                        startActivity(intent);
-                    }else{
-                        Toast.makeText(LogInScreen.this, "Invalid Credentials", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }
-        });
-
-        buttonCreateAccount.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Intent intent = new Intent(getApplicationContext(), WelcomeScreen.class);
-                intent.putExtra("key_user_id", idSaltCreate);
-                startActivity(intent);
-            }
+        buttonCreateAccount.setOnClickListener(view -> {
+            Intent intent = new Intent(getApplicationContext(), WelcomeScreen.class);
+            startActivity(intent);
         });
 
         buttonImportAccount.setOnClickListener(view -> {
         });
     }
 
-    private String AESEncryptionMethod(String string){
+    /***
+     *  --- logInChat() ---
+     *  The function of connecting to chat with an existing account.
+     ***/
+    private void logInChat() {
+        String pass = password.getText().toString();
+
+        if (pass.equals(""))
+            Toast.makeText(LogInScreen.this, "Please enter password!", Toast.LENGTH_SHORT).show();
+        else {
+            Boolean checkUserPass = DB.checkUsernamePassword(usernameId, AESEncryptionMethod(pass));
+            if (checkUserPass) {
+                Toast.makeText(LogInScreen.this, "Sign in successful!", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(LogInScreen.this, SplashScreen.class);
+                intent.putExtra("key_usernameId", usernameId);
+                startActivity(intent);
+            } else {
+                Toast.makeText(LogInScreen.this, "Invalid Credentials!", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    /***
+     *  --- AESEncryptionMethod(String) ---
+     *  The password encryption function.
+     *
+     *  @param string The user password.
+     ***/
+    private String AESEncryptionMethod(String string) {
 
         byte[] stringByte = string.getBytes();
         byte[] encryptedByte = new byte[stringByte.length];
@@ -128,26 +133,27 @@ public class LogInScreen extends AppCompatActivity {
         try {
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
             encryptedByte = cipher.doFinal(stringByte);
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
+        } catch (InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
             e.printStackTrace();
         }
 
         String returnString = null;
-
         try {
-            returnString = new String(encryptedByte, "ISO-8859-1");
+            returnString = new String(encryptedByte, charsetNameISO);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         return returnString;
     }
 
+    /***
+     *  --- AESDecryptionMethod(String) ---
+     *  The password decryption function.
+     *
+     *  @param string The user password.
+     ***/
     private String AESDecryptionMethod(String string) throws UnsupportedEncodingException {
-        byte[] EncryptedByte = string.getBytes("ISO-8859-1");
+        byte[] EncryptedByte = string.getBytes(charsetNameISO);
         String decryptedString = string;
 
         byte[] decryption;
@@ -156,24 +162,9 @@ public class LogInScreen extends AppCompatActivity {
             decipher.init(cipher.DECRYPT_MODE, secretKeySpec);
             decryption = decipher.doFinal(EncryptedByte);
             decryptedString = new String(decryption);
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
+        } catch (InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
             e.printStackTrace();
         }
         return decryptedString;
-    }
-
-    protected String getSaltString() {
-        String SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-        StringBuilder salt = new StringBuilder();
-        Random rnd = new Random();
-        while (salt.length() < 12) { // length of the random string.
-            int index = (int) (rnd.nextFloat() * SALTCHARS.length());
-            salt.append(SALTCHARS.charAt(index));
-        }
-        return salt.toString();
     }
 }

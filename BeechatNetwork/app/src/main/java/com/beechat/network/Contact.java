@@ -1,11 +1,11 @@
 package com.beechat.network;
-//import android.arch.persistence.room.Entity;
-//import android.arch.persistence.room.PrimaryKey;
 
-import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-@Entity
+/***
+ *  --- Contact ---
+ *  The Contact class in DB.
+ ***/
 public class Contact {
 
     @PrimaryKey(autoGenerate = true)
@@ -14,7 +14,8 @@ public class Contact {
     public String xbee_device_number;
     public String name;
 
-    public Contact() {}
+    public Contact() {
+    }
 
     public Contact(String user_id, String xbee_device_number, String name) {
         this.user_id = user_id;
@@ -22,7 +23,7 @@ public class Contact {
         this.name = name;
     }
 
-    public Contact(int id,String user_id, String xbee_device_number, String name) {
+    public Contact(int id, String user_id, String xbee_device_number, String name) {
         this.id = id;
         this.user_id = user_id;
         this.xbee_device_number = xbee_device_number;
