@@ -19,12 +19,6 @@ import android.os.Handler;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
-/*import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
-import android.support.v7.app.AppCompatActivity;*/
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,7 +40,6 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.digi.xbee.api.RemoteXBeeDevice;
-import com.digi.xbee.api.android.XBeeDevice;
 import com.digi.xbee.api.exceptions.XBeeException;
 import com.digi.xbee.api.listeners.IDataReceiveListener;
 import com.digi.xbee.api.models.XBee64BitAddress;
@@ -65,73 +58,51 @@ import java.util.List;
 import java.util.Locale;
 
 /***
- *  --- ChatScreen ----
+ *  --- ChatScreen ---
  *  The class that is responsible for the chat window.
  ***/
 public class ChatScreen extends AppCompatActivity {
 
-    // Constants.
-    private static final String REMOTE_NODE_ID = "XBEE_B";
-
     // Variables.
-    private static XBeeDevice device;
-    private static DataReceiveListener listener = new DataReceiveListener();
-    private static ChatDeviceAdapter chatDeviceAdapter;
-    private static ArrayList<String> messages = new ArrayList<>();
-    private static RemoteXBeeDevice remote = null;
-    private static String message = null;
-    private static String datetime = null;
-    private static boolean flagNotification = false;
-    private KeyguardManager myKM= null;
-
-    public static String test = "";
-    Button sendButton;
-    ImageButton backButton, attachButton;
-    public static TextView nameTextView;
-    ListView chatListView;
-    EditText inputField;
     Context context;
     Resources resources;
-
+    Button sendButton;
+    ImageButton backButton, attachButton;
+    ListView chatListView;
+    EditText inputField;
     TextView textViewAttachment;
-
-    String filename;
-    public static String tempTest;
-    String sizeFile;
-    private static final int FILE_SELECT_CODE = 101;
-
-    byte[] array;
-    boolean fileFlag = false;
+    KeyguardManager myKM;
+    DataReceiveListener listener = new DataReceiveListener();
+    ChatDeviceAdapter chatDeviceAdapter;
+    RemoteXBeeDevice remote;
+    String message, filename, sizeFile;
+    Boolean fileFlag = false;
     int numberOfPackage;
+    byte[] array;
+
+    static DatabaseHandler db;
+    static ArrayList<String> messages = new ArrayList<>();
+    static boolean flagNotification = false;
+    static String myUserId, myXbeeAddress, selectedName, selectedUserId, selectedXbeeAddress;
+    static TextView nameTextView;
+
+    // Constants
+    int FILE_SELECT_CODE = 101;
     int sizeOfPackage = 73;
 
-    public static String chatSenderId = null;
-    public static String chatReceiverId = null;
-    public static String chatXbeeSender = null;
-    public static String chatXbeeReceiver = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.chat_screen);
 
-        Bundle extras = getIntent().getExtras();
-        chatSenderId = extras.getString("sender_id");
-        chatReceiverId = extras.getString("receiver_id");
-        chatXbeeSender = extras.getString("xbee_sender");
-        chatXbeeReceiver = extras.getString("xbee_receiver");
-
-
-        textViewAttachment = (TextView)findViewById(R.id.textViewAttachment);
+        myKM = (KeyguardManager) ChatScreen.this.getSystemService(Context.KEYGUARD_SERVICE);
         context = LocaleHelper.setLocale(ChatScreen.this, WelcomeScreen.language);
         resources = context.getResources();
-        myKM = (KeyguardManager) ChatScreen.this.getSystemService(Context.KEYGUARD_SERVICE);
 
-        List<Message> messagesDB = SplashScreen.db.getAllMessages(chatSenderId, chatXbeeSender, chatReceiverId, chatXbeeReceiver);
-        for (Message mg : messagesDB)
-        {
-            messages.add(mg.getContent());
-        }
-        device = ContactsScreen.getDMContactDevice();
+        db = new DatabaseHandler(this);
+        Bundle extras = getIntent().getExtras();
+
+        textViewAttachment = findViewById(R.id.textViewAttachment);
 
         sendButton = findViewById(R.id.sendButton);
         nameTextView = findViewById(R.id.nameTextView);
@@ -142,20 +113,28 @@ public class ChatScreen extends AppCompatActivity {
 
         chatListView = findViewById(R.id.chatListView);
         chatListView.setDivider(null);
+
+        List<Message> messagesDB = db.getAllMessages(myUserId, myXbeeAddress, selectedUserId, selectedXbeeAddress);
+        for (Message mg : messagesDB) {
+            messages.add(mg.getContent());
+        }
+
         chatDeviceAdapter = new ChatDeviceAdapter(this, messages);
         chatListView.setAdapter(chatDeviceAdapter);
 
+        myUserId = extras.getString("key_myUserId");
+        myXbeeAddress = extras.getString("key_myXbeeAddress");
+        selectedName = extras.getString("key_selectedName");
+        selectedUserId = extras.getString("key_selectedUserId");
+        selectedXbeeAddress = extras.getString("key_selectedXbeeAddress");
 
-        nameTextView.setText(extras.getString("key_name"));
+        nameTextView.setText(myUserId);
 
-        nameTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ChatScreen.this, EditContactScreen.class);
-                intent.putExtra("key_device", chatXbeeReceiver);
-                intent.putExtra("key_user_id", chatReceiverId);
-                startActivity(intent);
-            }
+        nameTextView.setOnClickListener(v -> {
+            Intent intent = new Intent(ChatScreen.this, EditContactScreen.class);
+            intent.putExtra("key_selectedXbeeAddress", selectedXbeeAddress);
+            intent.putExtra("key_selectedUserId", selectedUserId);
+            startActivity(intent);
         });
 
         // Handling the event of returning to the main window.
@@ -163,7 +142,7 @@ public class ChatScreen extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 chatDeviceAdapter.clear();
-                device.close();
+                SplashScreen.myXbeeDevice.close();
                 finish();
             }
         });
@@ -182,20 +161,16 @@ public class ChatScreen extends AppCompatActivity {
             public void onClick(View view) {
                 String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
                 String currentDate = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date());
-                datetime = currentDate + " " + currentTime;
+                String datetime = currentDate + " " + currentTime;
                 message = inputField.getText().toString();
                 message = message + "\n" + currentTime;
-                if (message.isEmpty())
-                {
-                    message = "Empty input!";
-                }
                 try {
                     if (!fileFlag) {
-                        device.sendData(remote, message.getBytes());
+                        SplashScreen.myXbeeDevice.sendData(remote, message.getBytes());
                         messages.add(message + "\n");
                         inputField.setText("");
                     } else {
-                        device.sendData(remote, textViewAttachment.getText().toString().getBytes());
+                        SplashScreen.myXbeeDevice.sendData(remote, textViewAttachment.getText().toString().getBytes());
                         messages.add(message + "\n");
                         inputField.setText("");
                         textViewAttachment.setText("");
@@ -213,24 +188,22 @@ public class ChatScreen extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
                     messages.add("Error transmitting message: " + e.getMessage());
                 }
-                SplashScreen.db.insertMessage(new Message(extras.getString("sender_id"), extras.getString("xbee_sender"), extras.getString("receiver_id"), extras.getString("xbee_receiver"),message));
+                db.insertMessage(new Message(extras.getString("sender_id"), extras.getString("xbee_sender"), extras.getString("receiver_id"), extras.getString("xbee_receiver"), message));
                 chatDeviceAdapter.notifyDataSetChanged();
             }
         });
 
         // Channel check events added to the device.
-        device.addDataListener(listener);
-        String REMOTE_NODE_ID = ContactsScreen.getSelectedDevice();
+        SplashScreen.myXbeeDevice.addDataListener(listener);
+        String REMOTE_NODE_ID = selectedXbeeAddress;
 
         XBee64BitAddress RemoteAddr = new XBee64BitAddress(REMOTE_NODE_ID);
 
-        if (device.get64BitAddress().equals(REMOTE_NODE_ID)) {
+        if (SplashScreen.myXbeeDevice.get64BitAddress().equals(REMOTE_NODE_ID)) {
             messages.add("Error: the value of the REMOTE_NODE_ID must be "
                     + "the Node Identifier (NI) of the OTHER module.");
-        }
-        else {
-            //remote = new RemoteDigiMeshDevice(device,RemoteAddr);
-            remote = new RemoteXBeeDevice(device,RemoteAddr);
+        } else {
+            remote = new RemoteXBeeDevice(SplashScreen.myXbeeDevice, RemoteAddr);
             if (remote != null) {
             } else {
                 messages.add("Could not find the module! " + REMOTE_NODE_ID + " in the network.");
@@ -247,13 +220,8 @@ public class ChatScreen extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             public void run() {
                 chatDeviceAdapter.notifyDataSetChanged();
-                if( myKM.inKeyguardRestrictedInputMode() && flagNotification) {
-                    String message = ContactsScreen.getSelectedDevice() + ":\n" + messages.get(messages.size() - 1);
-                    /*if (!NearbyDevicesScreen.dmaDevices.isEmpty())
-                    {
-                        message = NearbyDevicesScreen.getSelectedDevice() + ":\n" + messages.get(messages.size() - 1);
-                    } else */
-
+                if (myKM.inKeyguardRestrictedInputMode() && flagNotification) {
+                    String message = selectedName + ":\n" + messages.get(messages.size() - 1);
                     message = removeLastChar(message);
                     notifyThis("Beechat notification", message);
                     flagNotification = false;
@@ -263,18 +231,24 @@ public class ChatScreen extends AppCompatActivity {
         }, delay);
     }
 
-    public static void updateName(){
-        List<Contact> users = SplashScreen.db.getAllContacts();
-        ContactsScreen.names.clear();
-        ContactsScreen.xbee_user_ids.clear();
-        ContactsScreen.xbee_names.clear();
-        for (Contact cn : users) {
-            ContactsScreen.xbee_names.add(cn.getXbeeDeviceNumber());
-            ContactsScreen.xbee_user_ids.add(cn.getUserId());
-            ContactsScreen.names.add(cn.getName());
+    /***
+     *  --- updateName() ---
+     *  The function of updating the current contact name in database.
+     ***/
+    public static void updateName() {
+        List<Contact> contactsFromDb = db.getAllContacts();
+
+        ContactsScreen.contactNames.clear();
+        ContactsScreen.contactXbeeAddress.clear();
+        ContactsScreen.contactUserIds.clear();
+        for (Contact cn : contactsFromDb) {
+            ContactsScreen.contactNames.add(cn.getName());
+            ContactsScreen.contactXbeeAddress.add(cn.getXbeeDeviceNumber());
+            ContactsScreen.contactUserIds.add(cn.getUserId());
         }
     }
 
+    // Additional functions--->
     public void browseClick() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("*/*");
@@ -288,55 +262,42 @@ public class ChatScreen extends AppCompatActivity {
 
     public static String getPath(Context context, Uri uri) {
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            // DocumentProvider
-            if (DocumentsContract.isDocumentUri(context, uri)) {
-                // ExternalStorageProvider
-                if (isExternalStorageDocument(uri)) {
-                    final String docId = DocumentsContract.getDocumentId(uri);
-                    final String[] split = docId.split(":");
-                    final String type = split[0];
+        // DocumentProvider
+        if (DocumentsContract.isDocumentUri(context, uri)) {
+            // ExternalStorageProvider
+            if (isExternalStorageDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
 
-                    if ("primary".equalsIgnoreCase(type)) {
-                        return Environment.getExternalStorageDirectory() + "/" + split[1];
-                    }
-                    // TODO handle non-primary volumes
+                if ("primary".equalsIgnoreCase(type)) {
+                    return Environment.getExternalStorageDirectory() + "/" + split[1];
                 }
-                // DownloadsProvider
-                else if (isDownloadsDocument(uri)) {
-                    final String id = DocumentsContract.getDocumentId(uri);
-                    final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
-                    return getDataColumn(context, contentUri, null, null);
-                }
-                // MediaProvider
-                else if (isMediaDocument(uri)) {
-                    final String docId = DocumentsContract.getDocumentId(uri);
-                    final String[] split = docId.split(":");
-                    final String type = split[0];
-                    Uri contentUri = null;
-                    if ("image".equals(type)) {
-                        contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-                    } else if ("video".equals(type)) {
-                        contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-                    } else if ("audio".equals(type)) {
-                        contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-                    }
-                    final String selection = "_id=?";
-                    final String[] selectionArgs = new String[]{split[1]};
-                    return getDataColumn(context, contentUri, selection, selectionArgs);
-                }
+                // TODO handle non-primary volumes
             }
-        }
-        // MediaStore (and general)
-        else if ("content".equalsIgnoreCase(uri.getScheme())) {
-            // Return the remote address
-            if (isGooglePhotosUri(uri))
-                return uri.getLastPathSegment();
-            return getDataColumn(context, uri, null, null);
-        }
-        // File
-        else if ("file".equalsIgnoreCase(uri.getScheme())) {
-            return uri.getPath();
+            // DownloadsProvider
+            else if (isDownloadsDocument(uri)) {
+                final String id = DocumentsContract.getDocumentId(uri);
+                final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+                return getDataColumn(context, contentUri, null, null);
+            }
+            // MediaProvider
+            else if (isMediaDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+                Uri contentUri = null;
+                if ("image".equals(type)) {
+                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                } else if ("video".equals(type)) {
+                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                } else if ("audio".equals(type)) {
+                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                }
+                final String selection = "_id=?";
+                final String[] selectionArgs = new String[]{split[1]};
+                return getDataColumn(context, contentUri, selection, selectionArgs);
+            }
         }
         return null;
     }
@@ -419,8 +380,7 @@ public class ChatScreen extends AppCompatActivity {
 
                     }
 
-                    textViewAttachment.setText(filename + " ("+sizeFile+")");
-                    tempTest = filename;
+                    textViewAttachment.setText(filename + " (" + sizeFile + ")");
                     File fileSave = getExternalFilesDir(null);
                     String sourcePath = getExternalFilesDir(null).toString();
                     /*array = method(new File(sourcePath + "/" + filename));
@@ -439,20 +399,15 @@ public class ChatScreen extends AppCompatActivity {
         }
     }
 
-    public void sendFile() {
-
-    }
-
     public static byte[] method(File file)
-            throws IOException
-    {
+            throws IOException {
 
         // Creating an object of FileInputStream to
         // read from a file
         FileInputStream fl = new FileInputStream(file);
 
         // Now creating byte array of same length as file
-        byte[] arr = new byte[(int)file.length()];
+        byte[] arr = new byte[(int) file.length()];
 
         // Reading file content to byte array
         // using standard read() method
@@ -502,7 +457,7 @@ public class ChatScreen extends AppCompatActivity {
      ***/
     private class ChatDeviceAdapter extends ArrayAdapter<String> {
 
-        private Context context;
+        private final Context context;
 
         ChatDeviceAdapter(@NonNull Context context, ArrayList<String> messages) {
             super(context, -1, messages);
@@ -515,7 +470,7 @@ public class ChatScreen extends AppCompatActivity {
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             String message = messages.get(position);
 
-            if (message.endsWith("S")){
+            if (message.endsWith("S")) {
                 message = removeLastChar(message);
 
                 LinearLayout layout = new LinearLayout(context);
@@ -533,8 +488,7 @@ public class ChatScreen extends AppCompatActivity {
 
 
                 return layout;
-            }
-            else {
+            } else {
                 LinearLayout layout = new LinearLayout(context);
                 layout.setOrientation(LinearLayout.VERTICAL);
                 layout.setPadding(40, 30, 40, 30);
@@ -574,10 +528,10 @@ public class ChatScreen extends AppCompatActivity {
         public void dataReceived(XBeeMessage xbeeMessage) {
             String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
             String currentDate = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date());
-            datetime = currentDate + " " + currentTime;
+            String datetime = currentDate + " " + currentTime;
             messages.add(new String(xbeeMessage.getData()) + "\nS");
 
-            SplashScreen.db.insertMessage(new Message(chatSenderId, chatXbeeSender,chatReceiverId,chatXbeeReceiver, new String(xbeeMessage.getData()) + "\nS"));
+            db.insertMessage(new Message(myUserId, myXbeeAddress, selectedUserId, selectedXbeeAddress, new String(xbeeMessage.getData()) + "\nS"));
             flagNotification = true;
         }
     }

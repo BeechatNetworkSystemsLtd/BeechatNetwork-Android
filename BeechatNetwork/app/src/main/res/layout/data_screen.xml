@@ -5,49 +5,49 @@
     android:layout_height="match_parent"
     tools:context=".DataScreen">
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="70dp"
             android:layout_marginBottom="20dp"
-            android:orientation="horizontal"
+            android:background="@color/active"
             android:gravity="center"
-            android:background="@color/blueDark">
+            android:orientation="horizontal">
 
             <ImageButton
                 android:id="@+id/backButton"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/round_button"
                 android:scaleType="centerInside"
                 android:src="@drawable/back_button"
-                android:tint="@color/colorAccent"
-                android:background="@drawable/round_button"
-                android:layout_marginLeft="10dp"
-                />
+                android:tint="@color/colorAccent" />
+
             <TextView
                 android:id="@+id/nameTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
+                android:text="@string/data_settingsLabel"
                 android:textColor="@color/white"
-                android:text="Data Settings"
-                android:textSize="40dp"/>
+                android:textSize="40sp" />
         </LinearLayout>
+
         <Button
             android:id="@+id/wipeDataButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:background="@drawable/rounded_corner_for_button"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
-            android:padding="10dp"
             android:fontFamily="@font/nunito_regular"
-            android:text="Wipe data"
-/>
+            android:padding="10dp"
+            android:text="@string/wipe_dataButtonLabel"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

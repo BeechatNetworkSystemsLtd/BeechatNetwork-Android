@@ -4,26 +4,29 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ContactsScreen">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="70dp"
             android:layout_marginBottom="10dp"
-            android:orientation="horizontal"
+            android:background="@color/active"
             android:gravity="center"
-            android:background="@color/blueDark">
+            android:orientation="horizontal">
+
             <TextView
                 android:id="@+id/textView"
-                android:text= "Conversations"
-                android:textColor="@color/white"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:fontFamily="@font/nunito_regular"
-                android:textSize="30sp"/>
+                android:gravity="center"
+                android:text="@string/conversationsLabel"
+                android:textColor="@color/white"
+                android:textSize="30sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -31,13 +34,12 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="15dp">
+
             <ListView
                 android:id="@+id/contactsListView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:transcriptMode="alwaysScroll"
-                >
-            </ListView>
+                android:transcriptMode="alwaysScroll" />
         </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

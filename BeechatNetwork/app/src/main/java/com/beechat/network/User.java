@@ -1,9 +1,11 @@
 package com.beechat.network;
 
-//import android.arch.persistence.room.PrimaryKey;
-
 import androidx.room.PrimaryKey;
 
+/***
+ *  --- User ---
+ *  The User class in DB.
+ ***/
 public class User {
 
     @PrimaryKey(autoGenerate = true)
@@ -11,7 +13,8 @@ public class User {
     public String username;
     public String password;
 
-    public User() {}
+    public User() {
+    }
 
     public User(String username, String password) {
         this.username = username;
