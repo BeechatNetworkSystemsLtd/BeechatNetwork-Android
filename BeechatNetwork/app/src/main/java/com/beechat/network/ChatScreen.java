@@ -188,7 +188,7 @@ public class ChatScreen extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
                     messages.add("Error transmitting message: " + e.getMessage());
                 }
-                db.insertMessage(new Message(extras.getString("sender_id"), extras.getString("xbee_sender"), extras.getString("receiver_id"), extras.getString("xbee_receiver"), message));
+                db.insertMessage(new Message(myUserId, myXbeeAddress, selectedUserId, selectedXbeeAddress, message));
                 chatDeviceAdapter.notifyDataSetChanged();
             }
         });
@@ -452,7 +452,7 @@ public class ChatScreen extends AppCompatActivity {
 
 
     /***
-     *  --- ChatDeviceAdapter ----
+     *  --- ChatDeviceAdapter ---
      *  The class that is responsible for initializing the message list.
      ***/
     private class ChatDeviceAdapter extends ArrayAdapter<String> {
@@ -520,7 +520,7 @@ public class ChatScreen extends AppCompatActivity {
     }
 
     /***
-     *  --- DataReceiveListener ----
+     *  --- DataReceiveListener ---
      *  The class that is responsible for listening to the message channel.
      ***/
     private static class DataReceiveListener implements IDataReceiveListener {
@@ -537,7 +537,7 @@ public class ChatScreen extends AppCompatActivity {
     }
 
     /***
-     *  --- removeLastChar(String) ----
+     *  --- removeLastChar(String) ---
      *  The function to remove the last character in a string.
      *
      *  @param s Transmitted message.
@@ -549,7 +549,7 @@ public class ChatScreen extends AppCompatActivity {
     }
 
     /***
-     *  --- createNotificationChannel() ----
+     *  --- createNotificationChannel() ---
      *  The function of creating a notification channel.
      ***/
     private void createNotificationChannel() {
@@ -569,7 +569,7 @@ public class ChatScreen extends AppCompatActivity {
     }
 
     /***
-     *  --- notifyThis(String, String) ----
+     *  --- notifyThis(String, String) ---
      *  The function of sending a message to the notification channel.
      *
      *  @param title Notification header.

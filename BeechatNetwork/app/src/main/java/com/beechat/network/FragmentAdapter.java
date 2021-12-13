@@ -9,7 +9,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import java.util.ArrayList;
 
 /***
- *  --- FragmentAdapter ----
+ *  --- FragmentAdapter ---
  *  The class that is responsible for the for adapting screens in the MainScreen class.
  ***/
 public class FragmentAdapter extends FragmentPagerAdapter {

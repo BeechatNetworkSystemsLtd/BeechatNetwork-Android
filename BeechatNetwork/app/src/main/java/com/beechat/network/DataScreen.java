@@ -15,7 +15,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 /***
- *  --- DataScreen ----
+ *  --- DataScreen ---
  *  The class that is responsible for the removing all data from database.
  ***/
 public class DataScreen extends AppCompatActivity {
