@@ -143,7 +143,7 @@ public class NearbyDevicesScreen extends Fragment {
     }
 
     /***
-     *  --- logOnSd(String) ----
+     *  --- logOnSd(String) ---
      *  The function of writing information to a log file on the phone.
      *
      *  @param sBody Logged message text.
@@ -165,7 +165,7 @@ public class NearbyDevicesScreen extends Fragment {
     }
 
     /***
-     *  --- shouldAskPermissions() ----
+     *  --- shouldAskPermissions() ---
      *  The function of checking for permission to create and write information to the phone.
      ***/
     protected boolean shouldAskPermissions() {
@@ -177,7 +177,7 @@ public class NearbyDevicesScreen extends Fragment {
     }
 
     /***
-     *  --- askPermissions() ----
+     *  --- askPermissions() ---
      *  The function of requesting permission to access the internal storage of the phone.
      ***/
     protected void askPermissions() {
@@ -194,7 +194,7 @@ public class NearbyDevicesScreen extends Fragment {
     }
 
     /***
-     *  --- requestPermission() ----
+     *  --- requestPermission() ---
      *  The function of requesting permission to access the ports of the phone.
      ***/
     private void requestPermission() {
@@ -207,7 +207,7 @@ public class NearbyDevicesScreen extends Fragment {
     }
 
     /***
-     *  --- startScan() ----
+     *  --- startScan() ---
      *  The function of starting scanning for available Xbee devices.
      ***/
     private void startScan() {
@@ -232,7 +232,7 @@ public class NearbyDevicesScreen extends Fragment {
     }
 
     /***
-     *  --- CustomDeviceAdapter ----
+     *  --- CustomDeviceAdapter ---
      *  The class that initializes the list of available devices.
      ***/
     class CustomDeviceAdapter extends ArrayAdapter<String> {
@@ -263,7 +263,7 @@ public class NearbyDevicesScreen extends Fragment {
     }
 
     /***
-     *  --- listNodes(XBeeDevice) ----
+     *  --- listNodes(XBeeDevice) ---
      *  The function searches for available devices in network.
      *
      *  @param myDevice Current device.

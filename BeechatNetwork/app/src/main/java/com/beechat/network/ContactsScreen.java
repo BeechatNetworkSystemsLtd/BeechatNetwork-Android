@@ -80,7 +80,7 @@ public class ContactsScreen extends Fragment {
     }
 
     /***
-     *  --- CustomContactAdapter ----
+     *  --- CustomContactAdapter ---
      *  The class that initializes the list of available devices.
      ***/
     static class CustomContactAdapter extends ArrayAdapter<String> {

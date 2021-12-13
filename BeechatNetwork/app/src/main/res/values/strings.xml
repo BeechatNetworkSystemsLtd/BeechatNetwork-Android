@@ -1,13 +1,9 @@
 <resources>
     //en locale
     <string name="app_name">Beechat Clip</string>
-
     <string name="select_device">Nearby radio devices</string>
-
     <string name="back">Back</string>
     <string name="send">Send</string>
-    <string name="spin">Spinner</string>
-
     <string name="connecting_device_title">Connecting to device</string>
     <string name="scanning_device_title">Scanning devices</string>
     <string name="startup_device_title">Scanning ID XBEE device</string>
@@ -16,7 +12,6 @@
     <string name="startup_device">Please wait while scanning ID your device...</string>
     <string name="error_connecting_title">Error connecting</string>
     <string name="error_connecting_description">Could not connect to the selected XBee device: %1$s</string>
-
     <string name="eula_agreement">I agree <u>to the Privacy Policy and to the End User License Agreement</u></string>
     <string name="eula_text">EULA text</string>
     <string name="language">ENGLISH</string>

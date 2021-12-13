@@ -48,7 +48,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         //3rd argument to be passed is CursorFactory instance
     }
 
-    // Creating Tables
+    /***
+     *  --- onCreate(SQLiteDatabase) ---
+     *  The function of the creating tables database.
+     *
+     * @param db The current database.
+     ***/
     @Override
     public void onCreate(SQLiteDatabase db) {
         String CREATE_USERS_TABLE = "CREATE TABLE " + TABLE_USERS + "("
@@ -65,7 +70,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(CREATE_MESSAGES_TABLE);
     }
 
-    // Upgrading database
+    /***
+     *  --- onUpgrade(SQLiteDatabase, int, int) ---
+     *  The function of the upgrading database.
+     *
+     * @param db The current database.
+     * @param oldVersion The number old version DB.
+     * @param newVersion The number new version DB..
+     ***/
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Drop older table if existed
@@ -133,26 +145,33 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return cursor.getCount() > 0;
     }
 
-    // Get list of usernames from table Users
+    /***
+     *  --- getNames() ---
+     *  The function of getting all usernames from the 'Users' table.
+     ***/
     public List<String> getNames() {
         List<String> names = new ArrayList<>();
         String selectQuery = "SELECT  * FROM " + TABLE_USERS;
 
         SQLiteDatabase.loadLibs(mContext.getApplicationContext());
-        SQLiteDatabase db = this.getWritableDatabase(SECRET_KEY);
+        SQLiteDatabase db = this.getReadableDatabase(SECRET_KEY);
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         if (cursor.moveToFirst()) {
             do {
-                String name = new String();
-                name = cursor.getString(1);
+                String name = cursor.getString(1);
                 names.add(name);
             } while (cursor.moveToNext());
         }
         return names;
     }
 
-    // Adding new contact to table Contacts
+    /***
+     *  --- addContact(Contact) ---
+     *  The function of adding new contact to the 'Contacts' table.
+     *
+     * @param contact The new contact.
+     ***/
     void addContact(Contact contact) {
         SQLiteDatabase.loadLibs(mContext.getApplicationContext());
         SQLiteDatabase db = this.getWritableDatabase(SECRET_KEY);
@@ -168,24 +187,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close(); // Closing database connection
     }
 
-    // Code to get the single contact
-    Contact getContact(Integer id) {
-        SQLiteDatabase.loadLibs(mContext.getApplicationContext());
-        SQLiteDatabase db = this.getReadableDatabase(SECRET_KEY);
-
-        Cursor cursor = db.query(TABLE_CONTACTS, new String[]{CONTACTS_ID, CONTACTS_USER_ID, CONTACTS_XBEE_DEVICE_NUMBER, CONTACTS_NAME}, CONTACTS_ID + "=?",
-                new String[]{String.valueOf(id)}, null, null, null, null);
-        if (cursor != null)
-            cursor.moveToFirst();
-
-        Contact user = new Contact(Integer.parseInt(cursor.getString(0)),
-                cursor.getString(1),
-                cursor.getString(2),
-                cursor.getString(3));
-        // return user
-        return user;
-    }
-
     /***
      *  --- checkCountUsers() ---
      *  The function of checking count of users in 'Users' table.
@@ -193,7 +194,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public boolean checkCountUsers() {
         SQLiteDatabase.loadLibs(mContext.getApplicationContext());
         SQLiteDatabase db = this.getWritableDatabase(SECRET_KEY);
-        String queryCount = "SELECT count(*) FROM " + TABLE_USERS;
+        String queryCount = "SELECT COUNT(*) FROM " + TABLE_USERS;
         Cursor cursor = db.rawQuery(queryCount, null);
         cursor.moveToFirst();
         int count = cursor.getInt(0);
@@ -207,7 +208,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public List<Contact> getAllContacts() {
         List<Contact> contactList = new ArrayList<>();
 
-        String selectQuery = "SELECT  * FROM " + TABLE_CONTACTS;
+        String selectQuery = "SELECT * FROM " + TABLE_CONTACTS;
 
         SQLiteDatabase.loadLibs(mContext.getApplicationContext());
         SQLiteDatabase db = this.getReadableDatabase(SECRET_KEY);
@@ -246,27 +247,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 new String[]{String.valueOf(contact.user_id)});
     }
 
-    // Deleting single contact
-    public void deleteContact(Contact contact) {
-        SQLiteDatabase.loadLibs(mContext.getApplicationContext());
-        SQLiteDatabase db = this.getWritableDatabase(SECRET_KEY);
-        db.delete(TABLE_CONTACTS, CONTACTS_ID + " = ?",
-                new String[]{String.valueOf(contact.getId())});
-        db.close();
-    }
-
-    // Getting count of contacts
-    public int getContactsCount() {
-        String countQuery = "SELECT  * FROM " + TABLE_CONTACTS;
-        SQLiteDatabase.loadLibs(mContext.getApplicationContext());
-        SQLiteDatabase db = this.getReadableDatabase(SECRET_KEY);
-        Cursor cursor = db.rawQuery(countQuery, null);
-        cursor.close();
-
-        return cursor.getCount();
-    }
-
-    // Insert message to table Messages
+    /***
+     *  --- insertMessage(Message) ---
+     *  The function to insert message to the 'Messages' table.
+     *
+     *  @param message Transmitted message.
+     ***/
     public void insertMessage(Message message) {
         SQLiteDatabase.loadLibs(mContext.getApplicationContext());
         SQLiteDatabase db = this.getWritableDatabase(SECRET_KEY);
@@ -282,7 +268,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
     }
 
-    // Code to get all messages in a list view
+    /***
+     *  --- getAllMessages(String, String, String, String) ---
+     *  The function for retrieving all messages from 'Messages' table.
+     *
+     *  @param chatSenderId My user id.
+     *  @param chatXbeeSender My Xbee address.
+     *  @param chatReceiverId Selected user id.
+     *  @param chatXbeeReceiver Selected Xbee address.
+     ***/
     public List<Message> getAllMessages(String chatSenderId, String chatXbeeSender, String chatReceiverId, String chatXbeeReceiver) {
         List<Message> messagesList = new ArrayList<>();
         String selectQuery = "SELECT  * FROM " + TABLE_MESSAGES + " WHERE " + MESSAGES_SENDER_ID + " = " + chatSenderId + " and " +
@@ -304,7 +298,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 messagesList.add(message);
             } while (cursor.moveToNext());
         }
-        cursor.close();
         return messagesList;
     }
 }

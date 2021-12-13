@@ -12,7 +12,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 /***
- *  --- EditContactScreen ----
+ *  --- EditContactScreen ---
  *  The class is responsible for the editing contacts.
  ***/
 public class EditContactScreen extends AppCompatActivity {

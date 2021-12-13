@@ -32,7 +32,7 @@ public class LogInScreen extends AppCompatActivity {
     // Variables
     EditText password;
     Button buttonLogin, buttonCreateAccount, buttonImportAccount;
-    DatabaseHandler DB;
+    DatabaseHandler db;
     String usernameId;
     Spinner spinnerUsernames;
     ArrayList<String> listUsernames = new ArrayList<>();
@@ -48,9 +48,9 @@ public class LogInScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.log_in_screen);
 
-        DB = new DatabaseHandler(this);
+        db = new DatabaseHandler(this);
 
-        listUsernames = (ArrayList<String>) DB.getNames();
+        listUsernames = (ArrayList<String>) db.getNames();
         password = findViewById(R.id.editTextPassword);
 
         buttonLogin = findViewById(R.id.buttonLogIn);
@@ -107,7 +107,7 @@ public class LogInScreen extends AppCompatActivity {
         if (pass.equals(""))
             Toast.makeText(LogInScreen.this, "Please enter password!", Toast.LENGTH_SHORT).show();
         else {
-            Boolean checkUserPass = DB.checkUsernamePassword(usernameId, AESEncryptionMethod(pass));
+            Boolean checkUserPass = db.checkUsernamePassword(usernameId, AESEncryptionMethod(pass));
             if (checkUserPass) {
                 Toast.makeText(LogInScreen.this, "Sign in successful!", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(LogInScreen.this, SplashScreen.class);
