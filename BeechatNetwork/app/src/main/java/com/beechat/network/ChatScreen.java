@@ -128,7 +128,7 @@ public class ChatScreen extends AppCompatActivity {
         selectedUserId = extras.getString("key_selectedUserId");
         selectedXbeeAddress = extras.getString("key_selectedXbeeAddress");
 
-        nameTextView.setText(myUserId);
+        nameTextView.setText(selectedName);
 
         nameTextView.setOnClickListener(v -> {
             Intent intent = new Intent(ChatScreen.this, EditContactScreen.class);
@@ -236,7 +236,7 @@ public class ChatScreen extends AppCompatActivity {
      *  The function of updating the current contact name in database.
      ***/
     public static void updateName() {
-        List<Contact> contactsFromDb = db.getAllContacts();
+        List<Contact> contactsFromDb = db.getAllContacts(SplashScreen.myGeneratedUserId);
 
         ContactsScreen.contactNames.clear();
         ContactsScreen.contactXbeeAddress.clear();
