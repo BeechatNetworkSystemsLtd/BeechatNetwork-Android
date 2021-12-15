@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment;
 
 /***
  *  --- BroadcastScreen ---
- *  The class that is responsible for the broadcasting data.
+ *  This class is responsible for data broadcasts.
  ***/
 public class BroadcastScreen extends Fragment {
 
