@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 /***
  *  --- AddContactScreen ---
- *  The class is responsible for the adding new contacts.
+ *  The class is responsible for adding new contacts.
  ***/
 public class AddContactScreen extends AppCompatActivity {
 
