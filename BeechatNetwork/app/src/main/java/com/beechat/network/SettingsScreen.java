@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 
 /***
@@ -79,7 +80,7 @@ public class SettingsScreen extends Fragment {
         logoutButton.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), StartScreen.class);
             startActivity(intent);
-            getActivity().finish();
+            Objects.requireNonNull(getActivity()).finish();
         });
 
         applyButton.setOnClickListener(v -> {
