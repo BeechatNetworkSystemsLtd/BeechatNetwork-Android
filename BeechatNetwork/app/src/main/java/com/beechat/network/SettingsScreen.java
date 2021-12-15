@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 
 /***
@@ -32,7 +33,7 @@ public class SettingsScreen extends Fragment {
     Spinner languageSpinner;
     SeekBar baudRateSeekBar;
     TextView labelBaudRateTextView;
-    Button savedDataButton, applyButton;
+    Button savedDataButton, applyButton, logoutButton;
 
     // Constants
     List<Integer> listValues = Arrays.asList(1200, 2400, 4800, 9600, 19200, 39400, 57600);
@@ -49,6 +50,7 @@ public class SettingsScreen extends Fragment {
         baudRateSeekBar = view.findViewById(R.id.baudRateSeekBar);
         savedDataButton = view.findViewById(R.id.savedDataButton);
         applyButton = view.findViewById(R.id.buttonApply);
+        logoutButton = view.findViewById(R.id.buttonLogOut);
         labelBaudRateTextView = view.findViewById(R.id.labelBaudRateTextView);
 
         labelBaudRateTextView.setText(listValues.get(0) + "/" + listValues.get(6));
@@ -73,6 +75,12 @@ public class SettingsScreen extends Fragment {
         savedDataButton.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), DataScreen.class);
             startActivity(intent);
+        });
+
+        logoutButton.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), StartScreen.class);
+            startActivity(intent);
+            Objects.requireNonNull(getActivity()).finish();
         });
 
         applyButton.setOnClickListener(v -> {

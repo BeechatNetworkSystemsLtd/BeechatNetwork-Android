@@ -25,7 +25,7 @@ public class AddContactScreen extends AppCompatActivity {
     Resources resources;
     DatabaseHandler db;
 
-    String selectedXbeeDevice, selectedUserId, name = null;
+    String selectedXbeeDevice, selectedUserId, name, ownerContact;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,11 +50,13 @@ public class AddContactScreen extends AppCompatActivity {
             addressTextView.setText("Address " + selectedXbeeDevice + "(" + selectedUserId + ")");
         }
 
+        ownerContact = SplashScreen.myGeneratedUserId;
+
         backButton.setOnClickListener(v -> finish());
 
         addContactButton.setOnClickListener(v -> {
             name = nameEditText.getText().toString();
-            db.addContact(new Contact(selectedUserId, selectedXbeeDevice, name));
+            db.addContact(new Contact(selectedUserId, selectedXbeeDevice, name, ownerContact));
             ContactsScreen.contactNames.add(name);
             ContactsScreen.contactUserIds.add(selectedUserId);
             ContactsScreen.contactXbeeAddress.add(selectedXbeeDevice);

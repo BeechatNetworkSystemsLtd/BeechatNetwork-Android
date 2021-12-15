@@ -25,7 +25,7 @@ public class SplashScreen extends AppCompatActivity {
 
     // Variables.
     DatabaseHandler db;
-    String addressMyXbeeDevice;
+    public static String addressMyXbeeDevice;
     public static XBeeDevice myXbeeDevice;
     public static String myGeneratedUserId;
 
