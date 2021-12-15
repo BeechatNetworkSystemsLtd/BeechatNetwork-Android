@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     tools:context=".EditContactScreen">
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -16,7 +15,7 @@
             android:layout_marginBottom="20dp"
             android:orientation="horizontal"
             android:gravity="center"
-            android:background="@color/blueDark">
+            android:background="@color/active">
             <ImageButton
                 android:id="@+id/backButton"
                 android:layout_width="50dp"

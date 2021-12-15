@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -16,17 +15,18 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@id/tabLayout"
-            app:layout_behavior="Test"/>
+            app:layout_behavior="Test" />
+
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabLayout"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:layout_alignParentBottom="true"
-            app:tabIconTint="@color/white"
-            app:tabIndicatorHeight="0dp"
             app:tabBackground="@drawable/tab_background"
             app:tabGravity="fill"
-            app:tabMode="fixed"/>
+            app:tabIconTint="@color/white"
+            app:tabIndicatorHeight="0dp"
+            app:tabMode="fixed" />
 
     </RelativeLayout>
 

@@ -6,15 +6,9 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.os.Bundle;
-/*import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;*/
-import android.text.Editable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -25,38 +19,31 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
-import com.digi.xbee.api.android.XBeeDevice;
-import com.digi.xbee.api.android.connection.usb.AndroidUSBPermissionListener;
 import com.digi.xbee.api.exceptions.XBeeException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 /***
- *  --- ContactsScreen ----
+ *  --- ContactsScreen ---
  *  The class that is responsible for the displaying contacts.
  ***/
 public class ContactsScreen extends Fragment {
     Context context;
     Resources resources;
 
-    private static final int BAUD_RATE = StartScreen.BAUD_RATE;
-    private AndroidUSBPermissionListener permissionListener;
-    public static CustomContactAdapter remoteXBeeDeviceAdapterName;
-    public static List<String> contacts = new ArrayList<>();
     View view;
-    public static ListView contactsListView;
-    public static List<String> xbee_names = new ArrayList<>();
-    public static List<String> xbee_user_ids = new ArrayList<>();
-    public static List<String> names = new ArrayList<>();
-    private static String selectedDevice = null;
-    private static String selectedUserId = null;
-    private static String selectedName= null;
+    ListView contactsListView;
+    DatabaseHandler db;
+    List<Contact> contactsFromDb;
+    String selectedXbeeAddress, selectedUserId, selectedName;
 
-    public static XBeeDevice myContactDevice;
-    public static ArrayList<String> dmaContactDevices = new ArrayList<>();
-    public static Editable name = null;
+    static CustomContactAdapter remoteXBeeDeviceAdapterName;
+    static ArrayList<String> contactNames = new ArrayList<>();
+    static ArrayList<String> contactXbeeAddress = new ArrayList<>();
+    static ArrayList<String> contactUserIds = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -65,66 +52,39 @@ public class ContactsScreen extends Fragment {
         context = LocaleHelper.setLocale(getActivity(), WelcomeScreen.language);
         resources = context.getResources();
 
-        myContactDevice = new XBeeDevice(getActivity(), BAUD_RATE, permissionListener);
+        db = new DatabaseHandler(getActivity());
 
-        List<Contact> users = SplashScreen.db.getAllContacts();
-        List<String> xbee_contacts = new ArrayList<>();
+        contactsFromDb = db.getAllContacts();
 
-        for (Contact cn : users) {
-            xbee_contacts.add(cn.getName());
+        for (Contact cn : contactsFromDb) {
+            contactNames.add(cn.getName());
+            contactXbeeAddress.add(cn.getXbeeDeviceNumber());
+            contactUserIds.add(cn.getUserId());
         }
-        contacts = xbee_contacts;
 
-        contactsListView = (ListView) view.findViewById(R.id.contactsListView);
-        remoteXBeeDeviceAdapterName = new CustomContactAdapter(getActivity(), contacts);
+        contactsListView = view.findViewById(R.id.contactsListView);
+        remoteXBeeDeviceAdapterName = new CustomContactAdapter(Objects.requireNonNull(getActivity()), contactNames);
         contactsListView.setAdapter(remoteXBeeDeviceAdapterName);
 
         // Handling an event on clicking an item from the list of available devices.
-        contactsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        contactsListView.setOnItemClickListener((adapterView, view, i, l) -> {
 
-                List<Contact> users = SplashScreen.db.getAllContacts();
+            selectedXbeeAddress = contactXbeeAddress.get(i);
+            selectedUserId = contactUserIds.get(i);
+            selectedName = contactNames.get(i);
 
-                for (Contact cn : users) {
-                    xbee_user_ids.add(cn.getUserId());
-                    xbee_names.add(cn.getXbeeDeviceNumber());
-                    names.add(cn.getName());
-                }
+            connectToContactDevice();
 
-                selectedUserId = xbee_user_ids.get(i);
-                selectedDevice = xbee_names.get(i);
-                selectedName = names.get(i);
-
-                connectToContactDevice();
-
-            }
         });
         return view;
     }
 
     /***
-     *  --- getDMDevice() ----
-     *  The function of gaining access to your device..
-     ***/
-    public static XBeeDevice getDMContactDevice() {
-        return myContactDevice;
-    }
-
-    /***
-     *  --- getSelectedDevice() ----
-     *  The function of gaining access to the selected device
-     ***/
-    public static String getSelectedDevice() {
-        return selectedDevice;
-    }
-
-    /***
-     *  --- CustomContactAdapter ----
+     *  --- CustomContactAdapter ---
      *  The class that initializes the list of available devices.
      ***/
-    class CustomContactAdapter extends ArrayAdapter<String> {
-        private Context context;
+    static class CustomContactAdapter extends ArrayAdapter<String> {
+        private final Context context;
 
         CustomContactAdapter(@NonNull Context context, List<String> contacts) {
             super(context, -1, contacts);
@@ -134,7 +94,7 @@ public class ContactsScreen extends Fragment {
         @NonNull
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-            String contact = contacts.get(position);
+            String contact = contactNames.get(position);
 
             LinearLayout layout = new LinearLayout(context);
             layout.setOrientation(LinearLayout.VERTICAL);
@@ -150,12 +110,6 @@ public class ContactsScreen extends Fragment {
         }
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        onRefresh();
-    }
-
     public static void onRefresh() {
         remoteXBeeDeviceAdapterName.notifyDataSetChanged();
     }
@@ -164,39 +118,32 @@ public class ContactsScreen extends Fragment {
         final ProgressDialog dialog = ProgressDialog.show(getActivity(), resources.getString(R.string.connecting_device_title),
                 resources.getString(R.string.connecting_device_description), true);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    myContactDevice.open();
+        new Thread(() -> {
+            try {
+                SplashScreen.myXbeeDevice.open();
 
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            dialog.dismiss();
-                            Intent intent = new Intent(getActivity(), ChatScreen.class);
-                            intent.putExtra("key_name",selectedName);
-                            intent.putExtra("sender_id",myContactDevice.getNodeID());
-                            intent.putExtra("xbee_sender",myContactDevice.get64BitAddress().toString());
-                            intent.putExtra("receiver_id",selectedUserId);
-                            intent.putExtra("xbee_receiver",selectedDevice);
-                            startActivity(intent);
-                        }
-                    });
-                } catch (final XBeeException e) {
-                    e.printStackTrace();
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            dialog.dismiss();
-                            new AlertDialog.Builder(getActivity()).setTitle(resources.getString(R.string.error_connecting_title))
-                                    .setMessage(resources.getString(R.string.error_connecting_description, e.getMessage()))
-                                    .setPositiveButton(android.R.string.ok, null).show();
-                        }
-                    });
-                    myContactDevice.close();
-                }
+                Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
+                    dialog.dismiss();
+                    Intent intent = new Intent(getActivity(), ChatScreen.class);
+                    intent.putExtra("key_myUserId", SplashScreen.myXbeeDevice.getNodeID());
+                    intent.putExtra("key_myXbeeAddress", SplashScreen.myXbeeDevice.get64BitAddress().toString());
+                    intent.putExtra("key_selectedName", selectedName);
+                    intent.putExtra("key_selectedUserId", selectedUserId);
+                    intent.putExtra("key_selectedXbeeAddress", selectedXbeeAddress);
+                    startActivity(intent);
+                });
+            } catch (final XBeeException e) {
+                e.printStackTrace();
+                Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
+                    dialog.dismiss();
+                    new AlertDialog.Builder(getActivity()).setTitle(resources.getString(R.string.error_connecting_title))
+                            .setMessage(resources.getString(R.string.error_connecting_description, e.getMessage()))
+                            .setPositiveButton(android.R.string.ok, null).show();
+                });
+                SplashScreen.myXbeeDevice.close();
             }
         }).start();
     }
+
+
 }

@@ -3,8 +3,6 @@ package com.beechat.network;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
-//import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -13,53 +11,55 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 /***
- *  --- AddContactScreen ----
- *  The class is responsible for the adding and editing contacts.
+ *  --- AddContactScreen ---
+ *  The class is responsible for the adding new contacts.
  ***/
 public class AddContactScreen extends AppCompatActivity {
 
-    private static String selectedDevice = null;
-    private static String selectedUserId = null;
-
+    // Variables.
     TextView addressTextView;
     EditText nameEditText;
     Button addContactButton;
     ImageButton backButton;
     Context context;
     Resources resources;
+    DatabaseHandler db;
+
+    String selectedXbeeDevice, selectedUserId, name = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_contact_screen);
+
         context = LocaleHelper.setLocale(getApplicationContext(), WelcomeScreen.language);
         resources = context.getResources();
 
-        addressTextView = (TextView)findViewById(R.id.addressTextView);
-        nameEditText = (EditText) findViewById(R.id.nameEditText);
-
         Bundle extras = getIntent().getExtras();
-        if(extras !=null) {
-            selectedDevice = extras.getString("key_xbee_id");
-            selectedUserId = extras.getString("key_user_id");
-            addressTextView.setText("Address " + selectedDevice+":"+selectedUserId);
+
+        db = new DatabaseHandler(this);
+
+        addressTextView = findViewById(R.id.addressTextView);
+        nameEditText = findViewById(R.id.nameEditText);
+        backButton = findViewById(R.id.backButton);
+        addContactButton = findViewById(R.id.addContactButton);
+
+        if (extras != null) {
+            selectedXbeeDevice = extras.getString("key_selectedXbeeDevice");
+            selectedUserId = extras.getString("key_selectedUserId");
+            addressTextView.setText("Address " + selectedXbeeDevice + "(" + selectedUserId + ")");
         }
 
-        backButton = (ImageButton)findViewById(R.id.backButton);
-        backButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        backButton.setOnClickListener(v -> finish());
 
-        addContactButton = (Button)findViewById(R.id.addContactButton);
-        addContactButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                NearbyDevicesScreen.name = nameEditText.getText();
-                SplashScreen.db.addContact(new Contact(selectedUserId, selectedDevice, nameEditText.getText().toString()));
-                ContactsScreen.contacts.add(nameEditText.getText().toString());
-                ContactsScreen.onRefresh();
-                finish();
-            }
+        addContactButton.setOnClickListener(v -> {
+            name = nameEditText.getText().toString();
+            db.addContact(new Contact(selectedUserId, selectedXbeeDevice, name));
+            ContactsScreen.contactNames.add(name);
+            ContactsScreen.contactUserIds.add(selectedUserId);
+            ContactsScreen.contactXbeeAddress.add(selectedXbeeDevice);
+            ContactsScreen.onRefresh();
+            finish();
         });
 
 

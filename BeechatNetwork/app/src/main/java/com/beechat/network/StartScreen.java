@@ -1,48 +1,32 @@
 package com.beechat.network;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-//import android.support.v7.app.AppCompatActivity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.Random;
-
-
+/***
+ *  --- StartScreen ---
+ *  The class that is responsible for the entry point to the application.
+ ***/
 public class StartScreen extends AppCompatActivity {
 
-    public static int BAUD_RATE = 57600;
-
+    // Variables
     DatabaseHandler DB;
-    String idSalt = null;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.start_screen);
 
         DB = new DatabaseHandler(this);
-        idSalt = getSaltString();
 
-       if (DB.checkCountUsers()) {
-           Intent intent = new Intent(getApplicationContext(), LogInScreen.class);
-           startActivity(intent);
+        if (DB.checkCountUsers()) {
+            Intent intent = new Intent(getApplicationContext(), LogInScreen.class);
+            startActivity(intent);
         } else {
-           Intent intent = new Intent(getApplicationContext(), WelcomeScreen.class);
-           intent.putExtra("key_user_id", idSalt);
-           startActivity(intent);
+            Intent intent = new Intent(getApplicationContext(), WelcomeScreen.class);
+            startActivity(intent);
         }
-    }
-
-    protected String getSaltString() {
-        String SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-        StringBuilder salt = new StringBuilder();
-        Random rnd = new Random();
-        while (salt.length() < 12) {
-            int index = (int) (rnd.nextFloat() * SALTCHARS.length());
-            salt.append(SALTCHARS.charAt(index));
-        }
-        return salt.toString();
     }
 }
 
