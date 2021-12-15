@@ -1,12 +1,8 @@
 <resources>
     <string name="app_name">Beechat Clip</string>
-
     <string name="select_device">Dispositivos radio cercanos</string>
-
     <string name="back">Atrás</string>
     <string name="send">Enviar</string>
-    <string name="spin">Spinner</string>
-
     <string name="connecting_device_title">Conectando a dispositivo</string>
     <string name="scanning_device_title">Escaneando dispositivos</string>
     <string name="startup_device_title">Escaneando ID de tu Clip</string>
@@ -15,9 +11,36 @@
     <string name="startup_device">Conectando al Clip...</string>
     <string name="error_connecting_title">Error connectando</string>
     <string name="error_connecting_description">No pudimos conectar con el dispositivo seleccionado: %1$s</string>
-
     <string name="eula_agreement">Acepto <u>la Política de Privacidad y al Acuerdo de Licencia de Usuario Final (EULA)</u></string>
 	<string name="eula_text">Texto del EULA</string>
     <string name="language">Spanish</string>
+    <string name="eulaEmpty">EULA is empty!</string>
+    <string name="selectLanguageLabel">Select Language</string>
+    <string name="languageLabel">Language</string>
+    <string name="importLabelButton">Import</string>
+    <string name="my_id_nempty">My ID \nempty</string>
+    <string name="passwordLabel">Password</string>
+    <string name="confirm_passwordLabel">Confirm Password</string>
+    <string name="finishLabelButton">Finish</string>
+    <string name="log_inLabel">Log in</string>
+    <string name="import_accountButtonLabel">Import Account</string>
+    <string name="create_accountButtonLabel">Create account</string>
+    <string name="add_contactLabel">Add contact</string>
+    <string name="addressLabelContact">Address</string>
+    <string name="nameLabelContact">Name</string>
+    <string name="add_contactButtonLabel">Add contact</string>
+    <string name="conversationsLabel">Conversations</string>
+    <string name="broadcast_my_idButtonLabel">Broadcast my ID</string>
+    <string name="baud_rateLabel">Baud rate</string>
+    <string name="applyButtonLabel">Apply</string>
+    <string name="data_settingsLabel">Data Settings</string>
+    <string name="wipe_dataButtonLabel">Wipe data</string>
+    <string name="yesButtonLabel">Yes</string>
+    <string name="noButtonLabel">No</string>
+    <string name="areYouSureLabel">Are you sure?</string>
+    <string name="okButtonLabel">Ok</string>
+    <string name="successLabel">Success</string>
+    <string name="backLabel">Back</string>
+    <string name="edit_contactLabel">Edit contact</string>
 </resources>
 

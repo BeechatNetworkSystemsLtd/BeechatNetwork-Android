@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.beechat.network">
+
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_INTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/digi_icon"
         android:label="@string/app_name"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme"
         android:requestLegacyExternalStorage="true"
-        >
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
         <activity android:name="com.beechat.network.StartScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,16 +22,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.beechat.network.LogInScreen"></activity>
-        <activity android:name="com.beechat.network.SelectLanguageScreen"></activity>
-        <activity android:name="com.beechat.network.SplashScreen"></activity>
-        <activity android:name="com.beechat.network.WelcomeScreen"></activity>
-        <activity android:name="com.beechat.network.MainScreen"></activity>
-        <activity android:name="com.beechat.network.ChatScreen"></activity>
-        <activity android:name="com.beechat.network.AddContactScreen"></activity>
-        <activity android:name="com.beechat.network.EditContactScreen"></activity>
-        <activity android:name="com.beechat.network.DataScreen"></activity>
-
+        <activity android:name="com.beechat.network.LogInScreen" />
+        <activity android:name="com.beechat.network.SplashScreen" />
+        <activity android:name="com.beechat.network.WelcomeScreen" />
+        <activity android:name="com.beechat.network.MainScreen" />
+        <activity android:name="com.beechat.network.ChatScreen" />
+        <activity android:name="com.beechat.network.AddContactScreen" />
+        <activity android:name="com.beechat.network.EditContactScreen" />
+        <activity android:name="com.beechat.network.DataScreen" />
 
     </application>
 

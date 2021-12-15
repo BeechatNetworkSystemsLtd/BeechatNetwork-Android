@@ -1,8 +1,11 @@
 package com.beechat.network;
-//import android.arch.persistence.room.PrimaryKey;
 
 import androidx.room.PrimaryKey;
 
+/***
+ *  --- Message ---
+ *  The Message class in DB.
+ ***/
 public class Message {
     @PrimaryKey(autoGenerate = true)
     public int id;

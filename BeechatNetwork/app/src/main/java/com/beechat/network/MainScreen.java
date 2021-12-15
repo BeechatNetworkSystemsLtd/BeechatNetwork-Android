@@ -2,17 +2,9 @@ package com.beechat.network;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-//import android.support.design.widget.TabLayout;
-//import android.support.v4.app.Fragment;
-//import android.support.v4.view.ViewPager;
-//import android.support.v7.app.AppCompatActivity;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.content.res.AppCompatResources;
-import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
@@ -21,7 +13,7 @@ import com.google.android.material.tabs.TabLayout;
 import java.util.ArrayList;
 
 /***
- *  --- MainScreen ----
+ *  --- MainScreen ---
  *  The class that is responsible for the main application window.
  ***/
 public class MainScreen extends AppCompatActivity {
@@ -32,16 +24,17 @@ public class MainScreen extends AppCompatActivity {
     ArrayList<Fragment> fragments;
 
     @Override
-    protected void onCreate (Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_screen);
+
         context = LocaleHelper.setLocale(MainScreen.this, WelcomeScreen.language);
         resources = context.getResources();
 
-        viewPager = (ViewPager) findViewById(R.id.pager);
-        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
+        viewPager = findViewById(R.id.pager);
+        tabLayout = findViewById(R.id.tabLayout);
 
-        fragments = new ArrayList<Fragment>();
+        fragments = new ArrayList<>();
 
         fragments.add(new NearbyDevicesScreen());
         fragments.add(new ContactsScreen());

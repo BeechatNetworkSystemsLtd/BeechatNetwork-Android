@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     tools:context=".SettingsScreen">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -15,36 +16,38 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             android:orientation="horizontal">
+
             <TextView
                 android:id="@+id/languageTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/nunito_regular"
+                android:text="@string/languageLabel"
                 android:textColor="@android:color/black"
-                android:textSize="30sp"
-                android:text="Language" />
+                android:textSize="30sp" />
+
             <Spinner
                 android:id="@+id/languageSpinner"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:drawSelectorOnTop="true"
-                android:prompt="@string/spin"
-                android:entries="@array/items"
-            />
+                android:entries="@array/items" />
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             android:orientation="horizontal">
+
             <Switch
                 android:id="@+id/darkModeSwitch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/nunito_regular"
+                android:text="Dark mode"
                 android:textColor="@android:color/black"
-                android:textSize="30sp"
-                android:text="Dark mode" />
+                android:textSize="30sp" />
 
         </LinearLayout>
 
@@ -53,16 +56,17 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             android:orientation="horizontal">
+
             <Button
                 android:id="@+id/savedDataButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_corner_for_button"
-                android:textColor="@android:color/white"
-                android:textSize="16sp"
-                android:padding="10dp"
                 android:fontFamily="@font/nunito_regular"
-                android:text="Saved Data" />
+                android:padding="10dp"
+                android:text="Saved Data"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
 
         </LinearLayout>
 
@@ -71,9 +75,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/nunito_regular"
+            android:text="@string/baud_rateLabel"
             android:textColor="@android:color/black"
-            android:textSize="30sp"
-            android:text="Baud rate" />
+            android:textSize="30sp" />
+
         <SeekBar
             android:id="@+id/baudRateSeekBar"
             style="@style/Widget.AppCompat.SeekBar.Discrete"
@@ -81,14 +86,15 @@
             android:layout_height="wrap_content"
             android:max="6"
             android:progress="0" />
+
         <TextView
             android:id="@+id/labelBaudRateTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:fontFamily="@font/nunito_regular"
             android:textColor="@android:color/black"
             android:textSize="30sp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/buttonApply"
@@ -96,12 +102,11 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:background="@drawable/rounded_corner_for_button"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
-            android:padding="10dp"
             android:fontFamily="@font/nunito_regular"
-            android:text="Apply" />
-
+            android:padding="10dp"
+            android:text="@string/applyButtonLabel"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

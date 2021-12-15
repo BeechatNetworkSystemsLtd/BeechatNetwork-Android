@@ -1,9 +1,6 @@
 package com.beechat.network;
 
 import android.content.Context;
-//import android.support.v4.app.Fragment;
-//import android.support.v4.app.FragmentManager;
-//import android.support.v4.app.FragmentPagerAdapter;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -11,6 +8,10 @@ import androidx.fragment.app.FragmentPagerAdapter;
 
 import java.util.ArrayList;
 
+/***
+ *  --- FragmentAdapter ---
+ *  The class that is responsible for the for adapting screens in the MainScreen class.
+ ***/
 public class FragmentAdapter extends FragmentPagerAdapter {
 
     Context context;

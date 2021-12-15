@@ -12,33 +12,30 @@
         android:padding="15dp">
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/devicesLabelTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/nunito_regular"
+            android:text="@string/select_device"
             android:textColor="@android:color/black"
-            android:textSize="30sp"
-            android:text="@string/select_device" />
+            android:textSize="30sp" />
+
         <ImageButton
             android:id="@+id/refreshButton"
             android:layout_width="70dp"
             android:layout_height="70dp"
-            android:layout_gravity="right"
-            android:scaleType="fitCenter"
+            android:layout_gravity="end"
             android:adjustViewBounds="true"
             android:background="@drawable/round_refresh_button"
-            android:tint="@color/white"
+            android:scaleType="fitCenter"
             android:src="@drawable/refresh_black"
-           />
-
+            android:tint="@color/white" />
 
         <ListView
             android:id="@+id/devicesListView"
             android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:transcriptMode="alwaysScroll"
-            >
-        </ListView>
+            android:transcriptMode="alwaysScroll" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

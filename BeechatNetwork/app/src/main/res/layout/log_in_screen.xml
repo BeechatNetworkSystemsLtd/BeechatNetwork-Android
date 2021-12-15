@@ -15,9 +15,7 @@
             android:layout_height="wrap_content"
             android:drawSelectorOnTop="true"
             android:fontFamily="@font/nunito_regular"
-            android:textSize="30sp"
-            android:entries="@array/item_accounts"
-            android:prompt="@string/spin" />
+            android:textSize="30sp" />
 
         <EditText
             android:id="@+id/editTextPassword"
@@ -25,47 +23,47 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:fontFamily="@font/nunito_regular"
+            android:hint="@string/passwordLabel"
             android:textColor="@android:color/black"
-            android:textSize="30sp"
-            android:hint="Password" />
+            android:textSize="30sp" />
 
         <Button
             android:id="@+id/buttonLogIn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_marginTop="30dp"
             android:background="@drawable/rounded_corner_for_button"
             android:fontFamily="@font/nunito_regular"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
             android:padding="10dp"
-            android:text="Log in"
-            android:layout_marginTop="30dp"/>
+            android:text="@string/log_inLabel"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
 
         <Button
             android:id="@+id/buttonImportAccount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_marginTop="5dp"
             android:background="@drawable/rounded_corner_for_button"
             android:fontFamily="@font/nunito_regular"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
             android:padding="10dp"
-            android:layout_marginTop="5dp"
-            android:text="Import Account" />
+            android:text="@string/import_accountButtonLabel"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
 
         <Button
             android:id="@+id/buttonCreateAccount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_marginTop="5dp"
             android:background="@drawable/rounded_corner_for_button"
             android:fontFamily="@font/nunito_regular"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
             android:padding="10dp"
-            android:layout_marginTop="5dp"
-            android:text="Create account" />
+            android:text="@string/create_accountButtonLabel"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
