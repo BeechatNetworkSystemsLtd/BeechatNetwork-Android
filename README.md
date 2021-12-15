@@ -48,14 +48,15 @@ Timeline
 Threat model
 -------------------
 * __MITM Attacks__: we assume an intermediary node could spoof the 64 bit hardware address (HWAddr) of both Alice’s and Bob’s radios. The bad actor can then conduct a man in the middle attack.
-__Solution__: By having Alice and Bob encrypt their messages, and share their public keys through QR codes in person, even if the bad actor spoofs the HWAddr, they will not be able to see contents of the message.
+__Solution__: By having Alice and Bob sign & encrypt their messages, and share their usernames via QR codes in person, even if the bad actor spoofs the HWAddr, they will not be able to see contents of the message as they do not have the private key to decrypt the message.
 
 * __DoS attack__: an attacker can spam the network and flood it with packets by modifying the open source app and creating an infinite loop sending packets. 
 Attack limits: the bad actor’s packets will only reach 20 hops or less in case the network has fewer nodes. 
 __Solution__: unknown. One possibility would be automatic agreement on channel switching based on high congestion. 
 
 * __Harvest and decrypt attack__: encrypted messages exchanged between Alice and Bob could be harvested and decrypted with a sufficiently powerful quantum computer through Shor’s Algorithm. 
-__Solution__: by implementing post-quantum cryptography, not even a quantum computer can decrypt the messages as a discrete logarithm attack is not possible. In addition, the attacker would need to have the intended recipient’s public key, which is unlikely due to the QR codes being shared in person. 
+__Solution__: by implementing post-quantum cryptography, not even a quantum computer can decrypt the messages as a discrete logarithm attack is not possible. 
+
 
 Features
 -------------------
