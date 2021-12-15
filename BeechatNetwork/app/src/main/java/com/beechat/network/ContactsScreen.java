@@ -54,7 +54,11 @@ public class ContactsScreen extends Fragment {
 
         db = new DatabaseHandler(getActivity());
 
-        contactsFromDb = db.getAllContacts();
+        contactNames.clear();
+        contactXbeeAddress.clear();
+        contactUserIds.clear();
+
+        contactsFromDb = db.getAllContacts(SplashScreen.myGeneratedUserId);
 
         for (Contact cn : contactsFromDb) {
             contactNames.add(cn.getName());
