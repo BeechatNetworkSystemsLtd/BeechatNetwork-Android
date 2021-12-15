@@ -114,6 +114,12 @@ public class ChatScreen extends AppCompatActivity {
         chatListView = findViewById(R.id.chatListView);
         chatListView.setDivider(null);
 
+        myUserId = extras.getString("key_myUserId");
+        myXbeeAddress = extras.getString("key_myXbeeAddress");
+        selectedName = extras.getString("key_selectedName");
+        selectedUserId = extras.getString("key_selectedUserId");
+        selectedXbeeAddress = extras.getString("key_selectedXbeeAddress");
+
         List<Message> messagesDB = db.getAllMessages(myUserId, myXbeeAddress, selectedUserId, selectedXbeeAddress);
         for (Message mg : messagesDB) {
             messages.add(mg.getContent());
@@ -121,12 +127,6 @@ public class ChatScreen extends AppCompatActivity {
 
         chatDeviceAdapter = new ChatDeviceAdapter(this, messages);
         chatListView.setAdapter(chatDeviceAdapter);
-
-        myUserId = extras.getString("key_myUserId");
-        myXbeeAddress = extras.getString("key_myXbeeAddress");
-        selectedName = extras.getString("key_selectedName");
-        selectedUserId = extras.getString("key_selectedUserId");
-        selectedXbeeAddress = extras.getString("key_selectedXbeeAddress");
 
         nameTextView.setText(selectedName);
 
