@@ -81,7 +81,10 @@ public class NearbyDevicesScreen extends Fragment {
 
         db = new DatabaseHandler(getActivity());
 
-        contacts = db.getAllContacts();
+        contactsFromDb.clear();
+
+        contacts = db.getAllContacts(SplashScreen.myGeneratedUserId);
+
         for (Contact cn : contacts) {
             contactsFromDb.add(cn.getXbeeDeviceNumber() + "(" + cn.getUserId() + ")");
         }
@@ -246,7 +249,7 @@ public class NearbyDevicesScreen extends Fragment {
         @NonNull
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-            String device = devicesAddress.get(position);
+            String device = devicesAN.get(position);
 
             LinearLayout layout = new LinearLayout(context);
             layout.setOrientation(LinearLayout.VERTICAL);

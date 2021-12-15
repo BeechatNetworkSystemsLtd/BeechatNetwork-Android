@@ -33,6 +33,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String CONTACTS_USER_ID = "user_id";
     private static final String CONTACTS_XBEE_DEVICE_NUMBER = "xbee_device_number";
     private static final String CONTACTS_NAME = "name";
+    private static final String CONTACTS_OWNER_CONTACT = "owner_contact";
 
     private static final String TABLE_MESSAGES = "messages";
     private static final String MESSAGES_ID = "id";
@@ -60,7 +61,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + USERS_ID + " INTEGER PRIMARY KEY," + USERS_USERNAME + " TEXT," + USERS_PASSWORD + " TEXT" + ")";
 
         String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_CONTACTS + "("
-                + CONTACTS_ID + " INTEGER PRIMARY KEY," + CONTACTS_USER_ID + " TEXT," + CONTACTS_XBEE_DEVICE_NUMBER + " TEXT," + CONTACTS_NAME + " TEXT" + ")";
+                + CONTACTS_ID + " INTEGER PRIMARY KEY," + CONTACTS_USER_ID + " TEXT," + CONTACTS_XBEE_DEVICE_NUMBER + " TEXT," + CONTACTS_NAME + " TEXT," + CONTACTS_OWNER_CONTACT + " TEXT" + ")";
 
         String CREATE_MESSAGES_TABLE = "CREATE TABLE " + TABLE_MESSAGES + "("
                 + MESSAGES_ID + " INTEGER PRIMARY KEY," + MESSAGES_SENDER_ID + " TEXT," + MESSAGES_XBEE_DEVICE_NUMBER_SENDER + " TEXT," + MESSAGES_RECEIVER_ID + " TEXT," + MESSAGES_XBEE_DEVICE_NUMBER_RECEIVER + " TEXT," + MESSAGES_CONTENT + " TEXT" + ")";
@@ -179,7 +180,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(CONTACTS_USER_ID, contact.getUserId());
         values.put(CONTACTS_XBEE_DEVICE_NUMBER, contact.getXbeeDeviceNumber());
-        values.put(CONTACTS_NAME, contact.getName());// User Chats
+        values.put(CONTACTS_NAME, contact.getName());
+        values.put(CONTACTS_OWNER_CONTACT, contact.getOwnerContact());
 
         // Inserting Row
         db.insert(TABLE_CONTACTS, null, values);
@@ -202,14 +204,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     /***
-     *  --- getAllContacts() ---
+     *  --- getAllContacts(String) ---
      *  The function of getting all contacts from the 'Contacts' table.
+     *
+     * @param ownerContact The owner of contact.
      ***/
-    public List<Contact> getAllContacts() {
+    public List<Contact> getAllContacts(String ownerContact) {
         List<Contact> contactList = new ArrayList<>();
 
-        String selectQuery = "SELECT * FROM " + TABLE_CONTACTS;
-
+        String selectQuery = "SELECT * FROM " + TABLE_CONTACTS + " WHERE " + CONTACTS_OWNER_CONTACT + " = '" + ownerContact + "' ";
         SQLiteDatabase.loadLibs(mContext.getApplicationContext());
         SQLiteDatabase db = this.getReadableDatabase(SECRET_KEY);
 
@@ -222,6 +225,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 contact.setUserId(cursor.getString(1));
                 contact.setXbeeDeviceNumber(cursor.getString(2));
                 contact.setName(cursor.getString(3));
+                contact.setOwnerContact(cursor.getString(4));
                 contactList.add(contact);
             } while (cursor.moveToNext());
         }
@@ -239,12 +243,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase(SECRET_KEY);
 
         ContentValues values = new ContentValues();
-        values.put(CONTACTS_USER_ID, contact.getXbeeDeviceNumber());
+        values.put(CONTACTS_USER_ID, contact.getUserId());
         values.put(CONTACTS_XBEE_DEVICE_NUMBER, contact.getXbeeDeviceNumber());
         values.put(CONTACTS_NAME, contact.getName());
+        values.put(CONTACTS_OWNER_CONTACT, contact.getOwnerContact());
 
-        return db.update(TABLE_CONTACTS, values, CONTACTS_USER_ID + " = ?",
-                new String[]{String.valueOf(contact.user_id)});
+        return db.update(TABLE_CONTACTS, values, CONTACTS_USER_ID + " = ? AND " + CONTACTS_XBEE_DEVICE_NUMBER + " = ? AND " + CONTACTS_OWNER_CONTACT + " = ?",
+                new String[]{String.valueOf(contact.user_id), String.valueOf(contact.xbee_device_number),String.valueOf(contact.ownerContact)});
     }
 
     /***
@@ -279,9 +284,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      ***/
     public List<Message> getAllMessages(String chatSenderId, String chatXbeeSender, String chatReceiverId, String chatXbeeReceiver) {
         List<Message> messagesList = new ArrayList<>();
-        String selectQuery = "SELECT  * FROM " + TABLE_MESSAGES + " WHERE " + MESSAGES_SENDER_ID + " = " + chatSenderId + " and " +
-                MESSAGES_XBEE_DEVICE_NUMBER_SENDER + " = " + chatXbeeSender + " and " + MESSAGES_RECEIVER_ID + " = " + chatReceiverId + " and " +
-                MESSAGES_XBEE_DEVICE_NUMBER_RECEIVER + " = " + chatXbeeReceiver;
+        String selectQuery = "SELECT  * FROM " + TABLE_MESSAGES + " WHERE " + MESSAGES_SENDER_ID + " = '" + chatSenderId + "' and " +
+                MESSAGES_XBEE_DEVICE_NUMBER_SENDER + " = '" + chatXbeeSender + "' and " + MESSAGES_RECEIVER_ID + " = '" + chatReceiverId + "' and " +
+                MESSAGES_XBEE_DEVICE_NUMBER_RECEIVER + " = '" + chatXbeeReceiver + "' ";
         SQLiteDatabase.loadLibs(mContext.getApplicationContext());
         SQLiteDatabase db = this.getReadableDatabase(SECRET_KEY);
         Cursor cursor = db.rawQuery(selectQuery, null);

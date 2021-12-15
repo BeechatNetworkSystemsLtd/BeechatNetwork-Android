@@ -54,7 +54,11 @@ public class ContactsScreen extends Fragment {
 
         db = new DatabaseHandler(getActivity());
 
-        contactsFromDb = db.getAllContacts();
+        contactNames.clear();
+        contactXbeeAddress.clear();
+        contactUserIds.clear();
+
+        contactsFromDb = db.getAllContacts(SplashScreen.myGeneratedUserId);
 
         for (Contact cn : contactsFromDb) {
             contactNames.add(cn.getName());
@@ -125,8 +129,8 @@ public class ContactsScreen extends Fragment {
                 Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
                     dialog.dismiss();
                     Intent intent = new Intent(getActivity(), ChatScreen.class);
-                    intent.putExtra("key_myUserId", SplashScreen.myXbeeDevice.getNodeID());
-                    intent.putExtra("key_myXbeeAddress", SplashScreen.myXbeeDevice.get64BitAddress().toString());
+                    intent.putExtra("key_myUserId", SplashScreen.myGeneratedUserId);
+                    intent.putExtra("key_myXbeeAddress", SplashScreen.addressMyXbeeDevice);
                     intent.putExtra("key_selectedName", selectedName);
                     intent.putExtra("key_selectedUserId", selectedUserId);
                     intent.putExtra("key_selectedXbeeAddress", selectedXbeeAddress);
