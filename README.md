@@ -2,7 +2,7 @@
 ## _Android version of the open source, encrypted, peer-to-peer, Beechat app._
 
 ![BNSLTD](https://beechat.network/wp-content/uploads/2021/02/powered-by-1.png)
-![License](https://img.shields.io/badge/License-GPLv2-blue)
+![License](https://img.shields.io/badge/License-GPLv3-blue)
 
 ## Introduction
 
@@ -94,6 +94,6 @@ __Public launch__ (Q4 2021)
 License Information
 -------------------
 
-The hardware is released under the [GNU General Public License, version 2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html).
+The hardware is released under the [GNU General Public License, version 3](https://www.gnu.org/licenses/old-licenses/gpl-3.0.en.html).
 
 Distributed as-is; no warranty is given.
