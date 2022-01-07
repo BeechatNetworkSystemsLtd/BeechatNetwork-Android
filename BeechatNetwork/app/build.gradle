@@ -12,6 +12,13 @@ android {
         versionName "1.0"
     }
 
+    sourceSets {
+        main {
+            jni.srcDirs = [] // disable automatic ndk-build call
+            jniLibs.srcDirs = ['../libs']
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -21,6 +28,7 @@ android {
 
     lintOptions {
         warning 'InvalidPackage'
+        disable "Instantiatable"
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -30,12 +38,12 @@ android {
 
 dependencies {
     implementation project(':xbee_android_library')
-    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     implementation 'pub.devrel:easypermissions:2.0.1'
-    implementation 'com.android.support:design:28.0.0'
-    implementation 'com.android.support:recyclerview-v7:28.0.0'
-    implementation 'com.android.support:cardview-v7:28.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
     def lifecycle_version = "1.1.1"
     implementation "android.arch.lifecycle:extensions:$lifecycle_version"
     implementation "android.arch.persistence.room:runtime:$lifecycle_version"

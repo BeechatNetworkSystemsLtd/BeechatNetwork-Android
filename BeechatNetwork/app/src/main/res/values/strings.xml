@@ -1,5 +1,4 @@
 <resources>
-    //en locale
     <string name="app_name">Beechat Clip</string>
     <string name="select_device">Nearby radio devices</string>
     <string name="back">Back</string>
