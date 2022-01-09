@@ -27,7 +27,8 @@ public class SplashScreen extends AppCompatActivity {
     DatabaseHandler db;
     public static String addressMyXbeeDevice;
     public static XBeeDevice myXbeeDevice;
-    public static String myGeneratedUserId;
+    public static byte[] myGeneratedUserId;
+    private User neo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,14 +44,15 @@ public class SplashScreen extends AppCompatActivity {
         final ProgressDialog dialog = ProgressDialog.show(this, resources.getString(R.string.startup_device_title),
                 resources.getString(R.string.startup_device), true);
 
-        myGeneratedUserId = extras.getString("key_usernameId");
+        neo = db.getUser(extras.getString("key_usernameId"));
+        myGeneratedUserId = Blake3.fromString(extras.getString("key_usernameId"));
         myXbeeDevice = new XBeeDevice(this, BAUD_RATE);
 
         new Thread(() -> {
             try {
                 myXbeeDevice.open();
                 try {
-                    myXbeeDevice.setNodeID(myGeneratedUserId);
+                    myXbeeDevice.setNodeID(Base58.encode(myGeneratedUserId));
                 } catch (XBeeException e) {
                     e.printStackTrace();
                 }
@@ -58,7 +60,7 @@ public class SplashScreen extends AppCompatActivity {
                     dialog.dismiss();
                     if (myXbeeDevice != null) {
                         addressMyXbeeDevice = myXbeeDevice.get64BitAddress().toString();
-                        Toast.makeText(SplashScreen.this, "User:" + myGeneratedUserId + ",XBEE:" + addressMyXbeeDevice, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SplashScreen.this, "User:" + Blake3.toString(myGeneratedUserId) + ",XBEE:" + addressMyXbeeDevice, Toast.LENGTH_SHORT).show();
                     }
 
                     Intent intent = new Intent(SplashScreen.this, MainScreen.class);

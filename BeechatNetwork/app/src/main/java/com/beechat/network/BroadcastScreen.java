@@ -28,7 +28,7 @@ public class BroadcastScreen extends Fragment {
 
         textViewMyID = view.findViewById(R.id.textViewMyID);
 
-        textViewMyID.setText("My ID \n"+SplashScreen.myGeneratedUserId);
+        textViewMyID.setText("My ID \n" + Blake3.toString(SplashScreen.myGeneratedUserId));
         return view;
     }
 }

@@ -58,7 +58,7 @@ public class ContactsScreen extends Fragment {
         contactXbeeAddress.clear();
         contactUserIds.clear();
 
-        contactsFromDb = db.getAllContacts(SplashScreen.myGeneratedUserId);
+        contactsFromDb = db.getAllContacts(Blake3.toString(SplashScreen.myGeneratedUserId));
 
         for (Contact cn : contactsFromDb) {
             contactNames.add(cn.getName());

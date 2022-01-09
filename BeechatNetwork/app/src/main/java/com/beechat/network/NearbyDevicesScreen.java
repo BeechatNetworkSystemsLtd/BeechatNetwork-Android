@@ -83,7 +83,7 @@ public class NearbyDevicesScreen extends Fragment {
 
         contactsFromDb.clear();
 
-        contacts = db.getAllContacts(SplashScreen.myGeneratedUserId);
+        contacts = db.getAllContacts(Blake3.toString(SplashScreen.myGeneratedUserId));
 
         for (Contact cn : contacts) {
             contactsFromDb.add(cn.getXbeeDeviceNumber() + "(" + cn.getUserId() + ")");
@@ -108,7 +108,7 @@ public class NearbyDevicesScreen extends Fragment {
                 intent.putExtra("key_selectedUserId", selectedUserId);
                 startActivity(intent);
             } else {
-                if (!contactsFromDb.contains(selectedXbeeDevice + "(" + selectedUserId+")")) {
+                if (!contactsFromDb.contains(selectedUserId + " (" + selectedXbeeDevice + ")")) {
                     Intent intent = new Intent(getActivity(), AddContactScreen.class);
                     intent.putExtra("key_selectedXbeeDevice", selectedXbeeDevice);
                     intent.putExtra("key_selectedUserId", selectedUserId);
@@ -295,9 +295,21 @@ public class NearbyDevicesScreen extends Fragment {
             devices = network.getDevices();
             int i = 0;
             while (i < devices.size()) {
-                devicesAN.add(devices.get(i).get64BitAddress().toString() + "(" + devices.get(i).getNodeID() + ")");
+                Contact existContact = null;
+                Boolean userExist = false;
+                for (Contact cn : contacts) {
+                    if (cn.getUserId().equals(Blake3.toString(Base58.decode(devices.get(i).getNodeID())))) {
+                        userExist = true;
+                        existContact = cn;
+                    }
+                }
+                if (userExist) {
+                    devicesAN.add(existContact.getName() + " (" + devices.get(i).get64BitAddress().toString() + ")");
+                } else {
+                    devicesAN.add(Blake3.toString(Base58.decode(devices.get(i).getNodeID())) + " (" + devices.get(i).get64BitAddress().toString() + ")");
+                }
                 devicesAddress.add(devices.get(i).get64BitAddress().toString());
-                devicesNodeIds.add(devices.get(i).getNodeID());
+                devicesNodeIds.add(Blake3.toString(Base58.decode(devices.get(i).getNodeID())));
                 i = i + 1;
             }
         } catch (XBeeException e) {

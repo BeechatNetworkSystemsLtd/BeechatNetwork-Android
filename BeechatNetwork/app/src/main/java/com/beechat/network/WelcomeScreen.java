@@ -41,14 +41,18 @@ public class WelcomeScreen extends AppCompatActivity {
     // Variables
     Context context;
     Resources resources;
-    EditText password, passwordConfirm;
+    EditText password, passwordConfirm, logoName;
     Button finishButton;
     CheckBox agreementCheckBox;
     TextView eulaTextView, userIdTextView;
     Spinner languagesSpinner;
-    String largeTextString, generatedUserId;
+    String largeTextString;
+    byte[] generatedUserId;
+    byte[] generatedUserDPk;
+    byte[] generatedUserDSk;
+    byte[] generatedUserKPk;
+    byte[] generatedUserKSk;
     DatabaseHandler DB;
-    private Cipher cipher, decipher;
     private SecretKeySpec secretKeySpec;
 
     // Constants
@@ -72,6 +76,7 @@ public class WelcomeScreen extends AppCompatActivity {
 
         userIdTextView = findViewById(R.id.textViewMyID);
         finishButton = findViewById(R.id.finishButton);
+        logoName = findViewById(R.id.logoName);
         password = findViewById(R.id.passwordOne);
         passwordConfirm = findViewById(R.id.passwordTwo);
         languagesSpinner = findViewById(R.id.languageSpinner);
@@ -117,18 +122,23 @@ public class WelcomeScreen extends AppCompatActivity {
             eulaTextView.setText(R.string.eulaEmpty);
         }
 
+        generatedUserKPk = new byte[Kyber512.KYBER_PUBLICKEYBYTES];
+        generatedUserKSk = new byte[Kyber512.KYBER_SECRETKEYBYTES];
+        generatedUserDPk = new byte[Dilithium.CRYPTO_PUBLICKEYBYTES];
+        generatedUserDSk = new byte[Dilithium.CRYPTO_SECRETKEYBYTES];
+
         try {
-            cipher = Cipher.getInstance(algorithm);
-            decipher = Cipher.getInstance(algorithm);
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-            e.printStackTrace();
+            Kyber512.crypto_kem_keypair(generatedUserKPk, generatedUserKSk);
+            Dilithium.crypto_sign_keypair(generatedUserDPk, generatedUserDSk);
+            Blake3 hasher = new Blake3();
+            hasher.update(generatedUserDPk, Dilithium.CRYPTO_PUBLICKEYBYTES);
+            generatedUserId = hasher.finalize(User.NODEID_SIZE);
+        } catch (Exception ex) {
+            System.out.println("Exception: " + ex.getMessage());
+            ex.printStackTrace();
         }
 
-        generatedUserId = getSaltString();
-        userIdTextView.setText("My ID \n" + generatedUserId);
-
-        byte[] bytes = generatedUserId.getBytes();
-        secretKeySpec = new SecretKeySpec(bytes, algorithm);
+        userIdTextView.setText("A new NodeID \n" + Blake3.toString(generatedUserId));
 
         finishButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -145,7 +155,7 @@ public class WelcomeScreen extends AppCompatActivity {
      *  The function of creating a new chat account in the database.
      ***/
     private void createAccount() {
-        String usernameId = generatedUserId;
+        String logo = logoName.getText().toString();
         String pass = password.getText().toString();
         String passConfirm = passwordConfirm.getText().toString();
 
@@ -153,13 +163,31 @@ public class WelcomeScreen extends AppCompatActivity {
             Toast.makeText(WelcomeScreen.this, "Please enter all the fields!", Toast.LENGTH_SHORT).show();
         else {
             if (pass.equals(passConfirm)) {
-                Boolean checkUser = DB.checkUsername(usernameId);
+                Boolean checkUser = DB.checkUsername(Blake3.toString(generatedUserId));
                 if (!checkUser) {
-                    Boolean insert = DB.addUser(usernameId, AESEncryptionMethod(pass));
+                    byte[] passHash = null;
+                    try {
+                        Blake3 hasher = new Blake3();
+                        hasher.update(pass.getBytes(), pass.length());
+                        passHash = hasher.finalize(User.PASS_HASH_SIZE);
+                    } catch (Exception ex) {
+                        System.out.println("Exception: " + ex.getMessage());
+                        ex.printStackTrace();
+                    }
+                    User neo = new User(
+                        Blake3.toString(generatedUserId)
+                      , Blake3.toString(passHash)
+                      , generatedUserDPk
+                      , generatedUserDSk
+                      , generatedUserKPk
+                      , generatedUserKSk
+                      , logo
+                    );
+                    Boolean insert = DB.addUser(neo);
                     if (insert) {
                         Toast.makeText(WelcomeScreen.this, "Registered successfully!", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(WelcomeScreen.this, SplashScreen.class);
-                        intent.putExtra("key_usernameId", usernameId);
+                        intent.putExtra("key_usernameId", Blake3.toString(generatedUserId));
                         startActivity(intent);
 
                     } else {
@@ -172,55 +200,6 @@ public class WelcomeScreen extends AppCompatActivity {
                 Toast.makeText(WelcomeScreen.this, "Passwords not matching", Toast.LENGTH_SHORT).show();
             }
         }
-    }
-
-    /***
-     *  --- AESEncryptionMethod(String) ---
-     *  The password encryption function.
-     *
-     *  @param string The user password.
-     ***/
-    private String AESEncryptionMethod(String string) {
-
-        byte[] stringByte = string.getBytes();
-        byte[] encryptedByte = new byte[stringByte.length];
-
-        try {
-            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
-            encryptedByte = cipher.doFinal(stringByte);
-        } catch (InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
-            e.printStackTrace();
-        }
-
-        String returnString = null;
-        try {
-            returnString = new String(encryptedByte, charsetNameISO);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return returnString;
-    }
-
-    /***
-     *  --- AESDecryptionMethod(String) ---
-     *  The password decryption function.
-     *
-     *  @param string The user password.
-     ***/
-    private String AESDecryptionMethod(String string) throws UnsupportedEncodingException {
-        byte[] EncryptedByte = string.getBytes(charsetNameISO);
-        String decryptedString = string;
-
-        byte[] decryption;
-
-        try {
-            decipher.init(cipher.DECRYPT_MODE, secretKeySpec);
-            decryption = decipher.doFinal(EncryptedByte);
-            decryptedString = new String(decryption);
-        } catch (InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
-            e.printStackTrace();
-        }
-        return decryptedString;
     }
 
     /***
@@ -268,20 +247,5 @@ public class WelcomeScreen extends AppCompatActivity {
         }
 
         return resultString;
-    }
-
-    /***
-     *  --- getSaltString() ---
-     *  The function of generating a 12-character random string.
-     ***/
-    private String getSaltString() {
-        String SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-        StringBuilder saltString = new StringBuilder();
-        Random rnd = new Random();
-        while (saltString.length() < 12) {
-            int index = (int) (rnd.nextFloat() * SALTCHARS.length());
-            saltString.append(SALTCHARS.charAt(index));
-        }
-        return saltString.toString();
     }
 }

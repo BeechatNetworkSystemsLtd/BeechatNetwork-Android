@@ -50,7 +50,7 @@ public class AddContactScreen extends AppCompatActivity {
             addressTextView.setText("Address " + selectedXbeeDevice + "(" + selectedUserId + ")");
         }
 
-        ownerContact = SplashScreen.myGeneratedUserId;
+        ownerContact = Blake3.toString(SplashScreen.myGeneratedUserId);
 
         backButton.setOnClickListener(v -> finish());
 
