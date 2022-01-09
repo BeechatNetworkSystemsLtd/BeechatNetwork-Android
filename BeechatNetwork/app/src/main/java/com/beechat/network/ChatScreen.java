@@ -41,9 +41,7 @@ import androidx.core.app.NotificationManagerCompat;
 
 import com.digi.xbee.api.RemoteXBeeDevice;
 import com.digi.xbee.api.exceptions.XBeeException;
-import com.digi.xbee.api.listeners.IDataReceiveListener;
 import com.digi.xbee.api.models.XBee64BitAddress;
-import com.digi.xbee.api.models.XBeeMessage;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -72,7 +70,6 @@ public class ChatScreen extends AppCompatActivity {
     EditText inputField;
     TextView textViewAttachment;
     KeyguardManager myKM;
-    DataReceiveListener listener = new DataReceiveListener();
     ChatDeviceAdapter chatDeviceAdapter;
     RemoteXBeeDevice remote;
     String message, filename, sizeFile;
@@ -81,8 +78,17 @@ public class ChatScreen extends AppCompatActivity {
     byte[] array;
 
     static DatabaseHandler db;
+
     static ArrayList<String> messages = new ArrayList<>();
+    public static List<String> getMessages() {
+        return messages;
+    }
+
     static boolean flagNotification = false;
+    public static void setNotification() {
+        flagNotification = true;
+    }
+
     static String myUserId, myXbeeAddress, selectedName, selectedUserId, selectedXbeeAddress;
     static TextView nameTextView;
 
@@ -142,7 +148,6 @@ public class ChatScreen extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 chatDeviceAdapter.clear();
-                SplashScreen.myXbeeDevice.close();
                 finish();
             }
         });
@@ -160,13 +165,18 @@ public class ChatScreen extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
-                String currentDate = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date());
-                String datetime = currentDate + " " + currentTime;
                 message = inputField.getText().toString();
                 message = message + "\n" + currentTime;
                 try {
                     if (!fileFlag) {
-                        SplashScreen.myXbeeDevice.sendData(remote, message.getBytes());
+                        byte[] toSend = new Packet(
+                            Packet.Type.MESSAGE_DATA
+                          , (short)0
+                          , (short)1
+                          , message.getBytes()
+                          , SplashScreen.hasher
+                        ).getData();
+                        SplashScreen.myXbeeDevice.sendData(remote, toSend);
                         messages.add(message + "\n");
                         inputField.setText("");
                     } else {
@@ -193,8 +203,6 @@ public class ChatScreen extends AppCompatActivity {
             }
         });
 
-        // Channel check events added to the device.
-        SplashScreen.myXbeeDevice.addDataListener(listener);
         String REMOTE_NODE_ID = selectedXbeeAddress;
 
         XBee64BitAddress RemoteAddr = new XBee64BitAddress(REMOTE_NODE_ID);
@@ -516,23 +524,6 @@ public class ChatScreen extends AppCompatActivity {
 
                 return layout;
             }
-        }
-    }
-
-    /***
-     *  --- DataReceiveListener ---
-     *  The class that is responsible for listening to the message channel.
-     ***/
-    private static class DataReceiveListener implements IDataReceiveListener {
-        @Override
-        public void dataReceived(XBeeMessage xbeeMessage) {
-            String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
-            String currentDate = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date());
-            String datetime = currentDate + " " + currentTime;
-            messages.add(new String(xbeeMessage.getData()) + "\nS");
-
-            db.insertMessage(new Message(myUserId, myXbeeAddress, selectedUserId, selectedXbeeAddress, new String(xbeeMessage.getData()) + "\nS"));
-            flagNotification = true;
         }
     }
 

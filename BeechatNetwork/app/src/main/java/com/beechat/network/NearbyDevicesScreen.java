@@ -58,7 +58,7 @@ public class NearbyDevicesScreen extends Fragment {
     DatabaseHandler db;
     String selectedXbeeDevice, selectedUserId;
 
-    ArrayList<String> devicesAN = new ArrayList<>();
+    public static ArrayList<String> devicesAN = new ArrayList<>();
     ArrayList<String> devicesAddress = new ArrayList<>();
     ArrayList<String> devicesNodeIds = new ArrayList<>();
 
@@ -102,21 +102,16 @@ public class NearbyDevicesScreen extends Fragment {
             selectedXbeeDevice = devicesAddress.get(i);
             selectedUserId = devicesNodeIds.get(i);
 
-            if (contactsFromDb.isEmpty()) {
-                Intent intent = new Intent(getActivity(), AddContactScreen.class);
-                intent.putExtra("key_selectedXbeeDevice", selectedXbeeDevice);
-                intent.putExtra("key_selectedUserId", selectedUserId);
-                startActivity(intent);
-            } else {
-                if (!contactsFromDb.contains(selectedUserId + " (" + selectedXbeeDevice + ")")) {
-                    Intent intent = new Intent(getActivity(), AddContactScreen.class);
-                    intent.putExtra("key_selectedXbeeDevice", selectedXbeeDevice);
-                    intent.putExtra("key_selectedUserId", selectedUserId);
-                    startActivity(intent);
-                } else {
+            if (!contactsFromDb.isEmpty()) {
+                if (contactsFromDb.contains(selectedUserId + " (" + selectedXbeeDevice + ")")) {
                     Toast.makeText(getActivity(), "Contact is existing in DB!", Toast.LENGTH_SHORT).show();
+                    return;
                 }
             }
+            Intent intent = new Intent(getActivity(), AddContactScreen.class);
+            intent.putExtra("key_selectedXbeeDevice", selectedXbeeDevice);
+            intent.putExtra("key_selectedUserId", selectedUserId);
+            startActivity(intent);
         });
 
         // Handling and event  by clicking the "Refresh" button.
@@ -142,6 +137,22 @@ public class NearbyDevicesScreen extends Fragment {
                 }
             }
         }
+
+        new Thread(() -> {
+            try {
+                while (true) {
+                    getActivity().runOnUiThread(() -> {
+                        remoteXBeeDeviceAdapter.notifyDataSetChanged();
+                    });
+                    Thread.sleep(500);
+                }
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+
         return view;
     }
 

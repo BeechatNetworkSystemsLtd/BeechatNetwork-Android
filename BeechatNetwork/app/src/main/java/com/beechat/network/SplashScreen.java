@@ -29,6 +29,7 @@ public class SplashScreen extends AppCompatActivity {
     public static XBeeDevice myXbeeDevice;
     public static byte[] myGeneratedUserId;
     private User neo;
+    public static Blake3 hasher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +38,13 @@ public class SplashScreen extends AppCompatActivity {
 
         context = LocaleHelper.setLocale(SplashScreen.this, WelcomeScreen.language);
         resources = context.getResources();
+
+        try {
+            hasher = new Blake3();
+        } catch (Exception ex) {
+            System.out.println("Exception: " + ex.getMessage());
+            ex.printStackTrace();
+        }
 
         Bundle extras = getIntent().getExtras();
         db = new DatabaseHandler(this);

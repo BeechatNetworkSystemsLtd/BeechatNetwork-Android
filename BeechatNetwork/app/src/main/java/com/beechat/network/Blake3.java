@@ -111,6 +111,14 @@ public class Blake3 {
         return finalize(size, 0L);
     }
 
+    public int clear() {
+        return init();
+    }
+
+    public int clear(byte[] key) {
+        return init_keyed(key);
+    }
+
     public byte[] finalize(int size, long seek) {
         byte []output = new byte[size];
         finalize_seek_native(seek, output, size);

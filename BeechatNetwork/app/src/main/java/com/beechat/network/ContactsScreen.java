@@ -19,8 +19,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
-import com.digi.xbee.api.exceptions.XBeeException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -36,9 +34,9 @@ public class ContactsScreen extends Fragment {
 
     View view;
     ListView contactsListView;
-    DatabaseHandler db;
+    static DatabaseHandler db;
     List<Contact> contactsFromDb;
-    String selectedXbeeAddress, selectedUserId, selectedName;
+    static String selectedXbeeAddress, selectedUserId, selectedName;
 
     static CustomContactAdapter remoteXBeeDeviceAdapterName;
     static ArrayList<String> contactNames = new ArrayList<>();
@@ -123,31 +121,16 @@ public class ContactsScreen extends Fragment {
                 resources.getString(R.string.connecting_device_description), true);
 
         new Thread(() -> {
-            try {
-                SplashScreen.myXbeeDevice.open();
-
-                Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
-                    dialog.dismiss();
-                    Intent intent = new Intent(getActivity(), ChatScreen.class);
-                    intent.putExtra("key_myUserId", SplashScreen.myGeneratedUserId);
-                    intent.putExtra("key_myXbeeAddress", SplashScreen.addressMyXbeeDevice);
-                    intent.putExtra("key_selectedName", selectedName);
-                    intent.putExtra("key_selectedUserId", selectedUserId);
-                    intent.putExtra("key_selectedXbeeAddress", selectedXbeeAddress);
-                    startActivity(intent);
-                });
-            } catch (final XBeeException e) {
-                e.printStackTrace();
-                Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
-                    dialog.dismiss();
-                    new AlertDialog.Builder(getActivity()).setTitle(resources.getString(R.string.error_connecting_title))
-                            .setMessage(resources.getString(R.string.error_connecting_description, e.getMessage()))
-                            .setPositiveButton(android.R.string.ok, null).show();
-                });
-                SplashScreen.myXbeeDevice.close();
-            }
+            Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
+                dialog.dismiss();
+                Intent intent = new Intent(getActivity(), ChatScreen.class);
+                intent.putExtra("key_myUserId", Blake3.toString(SplashScreen.myGeneratedUserId));
+                intent.putExtra("key_myXbeeAddress", SplashScreen.addressMyXbeeDevice);
+                intent.putExtra("key_selectedName", selectedName);
+                intent.putExtra("key_selectedUserId", selectedUserId);
+                intent.putExtra("key_selectedXbeeAddress", selectedXbeeAddress);
+                startActivity(intent);
+            });
         }).start();
     }
-
-
 }
