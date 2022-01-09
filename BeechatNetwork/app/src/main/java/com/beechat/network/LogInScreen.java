@@ -36,7 +36,6 @@ public class LogInScreen extends AppCompatActivity {
     String usernameId;
     Spinner spinnerUsernames;
     ArrayList<String> listUsernames = new ArrayList<>();
-    private Cipher cipher, decipher;
     private SecretKeySpec secretKeySpec;
 
     // Constants
@@ -50,7 +49,14 @@ public class LogInScreen extends AppCompatActivity {
 
         db = new DatabaseHandler(this);
 
-        listUsernames = (ArrayList<String>) db.getNames();
+        ArrayList<User> listUsers = (ArrayList<User>)db.getUsers();
+        for (User u: listUsers) {
+            if (u.getLogo().length() == 0) {
+                listUsernames.add(u.getUsername());
+                break;
+            }
+            listUsernames.add(u.getLogo());
+        }
         password = findViewById(R.id.editTextPassword);
 
         buttonLogin = findViewById(R.id.buttonLogIn);
@@ -65,7 +71,7 @@ public class LogInScreen extends AppCompatActivity {
         AdapterView.OnItemSelectedListener itemSelectedListener = new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                usernameId = (String) parent.getItemAtPosition(position);
+                usernameId = listUsers.get(position).getUsername();
             }
 
             @Override
@@ -74,18 +80,8 @@ public class LogInScreen extends AppCompatActivity {
         };
 
         spinnerUsernames.setOnItemSelectedListener(itemSelectedListener);
-        usernameId = spinnerUsernames.getSelectedItem().toString();
-
-        try {
-            cipher = Cipher.getInstance(algorithm);
-            decipher = Cipher.getInstance(algorithm);
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-            e.printStackTrace();
-        }
-
-        byte[] bytes = usernameId.getBytes();
-        secretKeySpec = new SecretKeySpec(bytes, algorithm);
-
+        User temp = listUsers.get(spinnerUsernames.getSelectedItemPosition());
+        usernameId = temp.getUsername();
         buttonLogin.setOnClickListener(view -> logInChat());
 
         buttonCreateAccount.setOnClickListener(view -> {
@@ -107,7 +103,16 @@ public class LogInScreen extends AppCompatActivity {
         if (pass.equals(""))
             Toast.makeText(LogInScreen.this, "Please enter password!", Toast.LENGTH_SHORT).show();
         else {
-            Boolean checkUserPass = db.checkUsernamePassword(usernameId, AESEncryptionMethod(pass));
+            byte[] passHash = null;
+            try {
+                Blake3 hasher = new Blake3();
+                hasher.update(pass.getBytes(), pass.length());
+                passHash = hasher.finalize(User.PASS_HASH_SIZE);
+            } catch (Exception ex) {
+                System.out.println("Blake3 exception: " + ex.getMessage());
+                ex.printStackTrace();
+            }
+            Boolean checkUserPass = db.checkUsernamePassword(usernameId, Blake3.toString(passHash));
             if (checkUserPass) {
                 Toast.makeText(LogInScreen.this, "Sign in successful!", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(LogInScreen.this, SplashScreen.class);
@@ -117,54 +122,5 @@ public class LogInScreen extends AppCompatActivity {
                 Toast.makeText(LogInScreen.this, "Invalid Credentials!", Toast.LENGTH_SHORT).show();
             }
         }
-    }
-
-    /***
-     *  --- AESEncryptionMethod(String) ---
-     *  The password encryption function.
-     *
-     *  @param string The user password.
-     ***/
-    private String AESEncryptionMethod(String string) {
-
-        byte[] stringByte = string.getBytes();
-        byte[] encryptedByte = new byte[stringByte.length];
-
-        try {
-            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
-            encryptedByte = cipher.doFinal(stringByte);
-        } catch (InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
-            e.printStackTrace();
-        }
-
-        String returnString = null;
-        try {
-            returnString = new String(encryptedByte, charsetNameISO);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return returnString;
-    }
-
-    /***
-     *  --- AESDecryptionMethod(String) ---
-     *  The password decryption function.
-     *
-     *  @param string The user password.
-     ***/
-    private String AESDecryptionMethod(String string) throws UnsupportedEncodingException {
-        byte[] EncryptedByte = string.getBytes(charsetNameISO);
-        String decryptedString = string;
-
-        byte[] decryption;
-
-        try {
-            decipher.init(cipher.DECRYPT_MODE, secretKeySpec);
-            decryption = decipher.doFinal(EncryptedByte);
-            decryptedString = new String(decryption);
-        } catch (InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
-            e.printStackTrace();
-        }
-        return decryptedString;
     }
 }

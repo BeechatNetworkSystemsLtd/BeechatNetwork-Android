@@ -48,7 +48,7 @@ public class EditContactScreen extends AppCompatActivity {
             addressTextView.setText("Address " + selectedXbeeAddress+"("+selectedUserId+")");
         }
 
-        ownerContact = SplashScreen.myGeneratedUserId;
+        ownerContact = Blake3.toString(SplashScreen.myGeneratedUserId);
 
         backButton.setOnClickListener(v -> finish());
         updateContactButton.setOnClickListener(v -> {

@@ -236,7 +236,7 @@ public class ChatScreen extends AppCompatActivity {
      *  The function of updating the current contact name in database.
      ***/
     public static void updateName() {
-        List<Contact> contactsFromDb = db.getAllContacts(SplashScreen.myGeneratedUserId);
+        List<Contact> contactsFromDb = db.getAllContacts(Blake3.toString(SplashScreen.myGeneratedUserId));
 
         ContactsScreen.contactNames.clear();
         ContactsScreen.contactXbeeAddress.clear();

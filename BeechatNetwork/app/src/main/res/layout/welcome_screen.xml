@@ -72,6 +72,15 @@
             android:textSize="16sp" />
 
         <EditText
+            android:id="@+id/logoName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/nunito_regular"
+            android:hint="Username"
+            android:textColor="@android:color/black"
+            android:textSize="30sp" />
+
+        <EditText
             android:id="@+id/passwordOne"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -103,7 +112,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dip"
+            android:layout_height="178dp"
             android:layout_gravity="bottom|center"
             android:layout_weight="1"
             android:gravity="center|bottom"
@@ -111,11 +120,11 @@
 
             <CheckBox
                 android:id="@+id/agreementCheckBox"
-                android:padding="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:fontFamily="@font/nunito_regular"
+                android:padding="10dp"
                 android:text="@string/eula_agreement"
                 android:textColor="@android:color/black"
                 android:textSize="16sp"

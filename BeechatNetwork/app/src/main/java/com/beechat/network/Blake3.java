@@ -107,21 +107,61 @@ public class Blake3 {
         //update_critical_native(input, len);
     }
 
-    public String finalize(int size) {
+    public byte[] finalize(int size) {
         return finalize(size, 0L);
     }
 
-    public String finalize(int size, long seek) {
+    public byte[] finalize(int size, long seek) {
         byte []output = new byte[size];
         finalize_seek_native(seek, output, size);
+        return output;
+    }
 
+    public static String toString(byte[] input) {
         String result = new String();
-        for (byte c : output) {
+        for (byte c : input) {
             result += String.format("%02X", c);
         }
-
         return result;
     }
 
+    private static byte hexToByte(char c) {
+        byte result = 0;
+        switch (c) {
+            case 'A':
+                result = 10;
+                break;
+            case 'B':
+                result = 11;
+                break;
+            case 'C':
+                result = 12;
+                break;
+            case 'D':
+                result = 13;
+                break;
+            case 'E':
+                result = 14;
+                break;
+            case 'F':
+                result = 15;
+                break;
+            default:
+                if (c >= '0' && c <= '9') {
+                    result = (byte)(c - '0');
+                }
+        }
+        return result;
+    }
+
+    public static byte[] fromString(String input) {
+        int size = input.length() / 2;
+        byte[] result = new byte[size];
+        for (int i = 0, j = 0; i < size; i++, j += 2) {
+            result[i] = (byte)(hexToByte(input.charAt(j)) * 16 + hexToByte(input.charAt(j
++ 1)));
+        }
+        return result;
+    }
 }
 

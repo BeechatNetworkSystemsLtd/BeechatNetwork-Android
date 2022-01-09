@@ -27,6 +27,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String USERS_ID = "id";
     private static final String USERS_USERNAME = "username";
     private static final String USERS_PASSWORD = "password";
+    private static final String USERS_D_PRIVATE_KEY = "d_priv_key";
+    private static final String USERS_D_PUBLIC_KEY = "d_pub_key";
+    private static final String USERS_K_PRIVATE_KEY = "k_priv_key";
+    private static final String USERS_K_PUBLIC_KEY = "k_pub_key";
+    private static final String USERS_LOGO = "logo";
 
     private static final String TABLE_CONTACTS = "contacts";
     private static final String CONTACTS_ID = "id";
@@ -58,13 +63,29 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String CREATE_USERS_TABLE = "CREATE TABLE " + TABLE_USERS + "("
-                + USERS_ID + " INTEGER PRIMARY KEY," + USERS_USERNAME + " TEXT," + USERS_PASSWORD + " TEXT" + ")";
+          + USERS_ID + " INTEGER PRIMARY KEY,"
+          + USERS_USERNAME + " TEXT,"
+          + USERS_PASSWORD + " TEXT,"
+          + USERS_D_PRIVATE_KEY + " BINARY,"
+          + USERS_D_PUBLIC_KEY + " BINARY,"
+          + USERS_K_PRIVATE_KEY + " BINARY,"
+          + USERS_K_PUBLIC_KEY + " BINARY,"
+          + USERS_LOGO + " TEXT"
+        + ")";
 
         String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_CONTACTS + "("
-                + CONTACTS_ID + " INTEGER PRIMARY KEY," + CONTACTS_USER_ID + " TEXT," + CONTACTS_XBEE_DEVICE_NUMBER + " TEXT," + CONTACTS_NAME + " TEXT," + CONTACTS_OWNER_CONTACT + " TEXT" + ")";
+          + CONTACTS_ID + " INTEGER PRIMARY KEY,"
+          + CONTACTS_USER_ID + " TEXT,"
+          + CONTACTS_XBEE_DEVICE_NUMBER + " TEXT,"
+          + CONTACTS_NAME + " TEXT,"
+          + CONTACTS_OWNER_CONTACT + " TEXT"
+        + ")";
 
         String CREATE_MESSAGES_TABLE = "CREATE TABLE " + TABLE_MESSAGES + "("
-                + MESSAGES_ID + " INTEGER PRIMARY KEY," + MESSAGES_SENDER_ID + " TEXT," + MESSAGES_XBEE_DEVICE_NUMBER_SENDER + " TEXT," + MESSAGES_RECEIVER_ID + " TEXT," + MESSAGES_XBEE_DEVICE_NUMBER_RECEIVER + " TEXT," + MESSAGES_CONTENT + " TEXT" + ")";
+          + MESSAGES_ID + " INTEGER PRIMARY KEY,"
+          + MESSAGES_SENDER_ID + " TEXT,"
+          + MESSAGES_XBEE_DEVICE_NUMBER_SENDER + " TEXT,"
+          + MESSAGES_RECEIVER_ID + " TEXT," + MESSAGES_XBEE_DEVICE_NUMBER_RECEIVER + " TEXT," + MESSAGES_CONTENT + " TEXT" + ")";
 
         db.execSQL(CREATE_USERS_TABLE);
         db.execSQL(CREATE_CONTACTS_TABLE);
@@ -107,16 +128,88 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      *
      *  @param username The generated username.
      *  @param password The password.
+     *  @param dPubKey Dilithium public key.
+     *  @param dPrivKey Dilithium private key.
      ***/
-    public Boolean addUser(String username, String password) {
+    public Boolean addUser(User user) {
         SQLiteDatabase.loadLibs(mContext.getApplicationContext());
         SQLiteDatabase db = this.getWritableDatabase(SECRET_KEY);
 
         ContentValues contentValues = new ContentValues();
-        contentValues.put(USERS_USERNAME, username);
-        contentValues.put(USERS_PASSWORD, password);
+        contentValues.put(USERS_USERNAME, user.getUsername());
+        contentValues.put(USERS_PASSWORD, user.getPassword());
+        contentValues.put(USERS_D_PRIVATE_KEY, user.getDPrivKey());
+        contentValues.put(USERS_D_PUBLIC_KEY, user.getDPubKey());
+        contentValues.put(USERS_K_PRIVATE_KEY, user.getKPrivKey());
+        contentValues.put(USERS_K_PUBLIC_KEY, user.getKPubKey());
+        contentValues.put(USERS_LOGO, user.getLogo());
         long result = db.insert(TABLE_USERS, null, contentValues);
         return result != -1;
+    }
+
+    /**
+     * The function of getting a user secrets.
+     *
+     * \param[in] username The generated user name.
+    */
+    public User getUser(String username) {
+        List<User> result = getUser(username, false);
+        if (result == null) {
+            return null;
+        }
+        if (result.size() != 1) {
+            return null;
+        }
+        return result.get(0);
+    }
+
+    /**
+     * The function of getting users secrets.
+    */
+    public List<User> getUsers() {
+        return getUser(null, true);
+    }
+
+    /**
+     * The function of getting users secrets.
+     *
+     * \param[in] username The generated user name.
+     * \param[in] all Get all users option.
+    */
+    public List<User> getUser(String username, Boolean all) {
+        if (username == null && all == false) {
+            return null;
+        }
+        User temp = null;
+        List<User> result = new ArrayList<User>();
+        String selectQuery = "SELECT * FROM " + TABLE_USERS + " WHERE username = ?";
+        if (all) {
+            selectQuery = "SELECT * FROM " + TABLE_USERS;
+        }
+        SQLiteDatabase.loadLibs(mContext.getApplicationContext());
+        SQLiteDatabase db = this.getReadableDatabase(SECRET_KEY);
+        Cursor cursor;
+        if (all) {
+            cursor = db.rawQuery(selectQuery, null);
+        } else {
+            cursor = db.rawQuery(selectQuery, new String[]{username});
+        }
+
+        if (cursor.moveToFirst()) {
+            do {
+                temp = new User(
+                    cursor.getString(1)
+                  , cursor.getString(2)
+                  , cursor.getBlob(3)
+                  , cursor.getBlob(4)
+                  , cursor.getBlob(5)
+                  , cursor.getBlob(6)
+                  , cursor.getString(7)
+                );
+                result.add(temp);
+            } while (cursor.moveToNext());
+        }
+        return result;
     }
 
     /***
@@ -144,27 +237,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase(SECRET_KEY);
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_USERS + " WHERE USERNAME = ? AND PASSWORD = ?", new String[]{username, password});
         return cursor.getCount() > 0;
-    }
-
-    /***
-     *  --- getNames() ---
-     *  The function of getting all usernames from the 'Users' table.
-     ***/
-    public List<String> getNames() {
-        List<String> names = new ArrayList<>();
-        String selectQuery = "SELECT  * FROM " + TABLE_USERS;
-
-        SQLiteDatabase.loadLibs(mContext.getApplicationContext());
-        SQLiteDatabase db = this.getReadableDatabase(SECRET_KEY);
-        Cursor cursor = db.rawQuery(selectQuery, null);
-
-        if (cursor.moveToFirst()) {
-            do {
-                String name = cursor.getString(1);
-                names.add(name);
-            } while (cursor.moveToNext());
-        }
-        return names;
     }
 
     /***
