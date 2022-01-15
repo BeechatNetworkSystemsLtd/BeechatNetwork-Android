@@ -49,6 +49,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -180,20 +181,38 @@ public class ChatScreen extends AppCompatActivity {
                         messages.add(message + "\n");
                         inputField.setText("");
                     } else {
-                        SplashScreen.myXbeeDevice.sendData(remote, textViewAttachment.getText().toString().getBytes());
-                        messages.add(message + "\n");
+                        Packet sender = new Packet(
+                            Packet.Type.FILE_NAME_DATA
+                          , (short)0
+                          , (short)1
+                          , textViewAttachment.getText().toString().getBytes()
+                          , SplashScreen.hasher
+                        );
+                        SplashScreen.myXbeeDevice.sendData(remote, sender.getData());
+
+                        ByteBuffer bb = ByteBuffer.wrap(array);
+                        byte[] packageFile = new byte[sizeOfPackage];
+
+                        for (short i = 0; i < (short)numberOfPackage; i++) {
+                            bb.get(packageFile, 0, packageFile.length - 7);
+                            sender.setData(
+                                Packet.Type.FILE_DATA
+                              , (short)i
+                              , (short)numberOfPackage
+                              , textViewAttachment.getText().toString().getBytes()
+                              , SplashScreen.hasher
+                            );
+                            SplashScreen.myXbeeDevice.sendData(
+                                remote
+                              , sender.getData()
+                            );
+                        }
+
+                        messages.add(textViewAttachment.getText().toString() + "\n");
                         inputField.setText("");
                         textViewAttachment.setText("");
                         fileFlag = false;
                     }
-                    /*ByteBuffer bb = ByteBuffer.wrap(array);
-                    byte[] packageFile = new byte[sizeOfPackage];
-                    bb.get(packageFile, 0, packageFile.length-1);
-                    device.sendData(remote, packageFile);
-                    messages.add(message + "\n");
-                    inputField.setText("");*/
-
-
                 } catch (XBeeException e) {
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
                     messages.add("Error transmitting message: " + e.getMessage());
@@ -391,8 +410,8 @@ public class ChatScreen extends AppCompatActivity {
                     textViewAttachment.setText(filename + " (" + sizeFile + ")");
                     File fileSave = getExternalFilesDir(null);
                     String sourcePath = getExternalFilesDir(null).toString();
-                    /*array = method(new File(sourcePath + "/" + filename));
-                    numberOfPackage = array.length/sizeOfPackage;*/
+                    array = method(new File(sourcePath + "/" + filename));
+                    numberOfPackage = array.length/sizeOfPackage;
                     fileFlag = true;
                     try {
                         copyFileStream(new File(sourcePath + "/" + filename), uri, this);

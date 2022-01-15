@@ -3,6 +3,7 @@ package com.beechat.network;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Environment;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -18,6 +19,7 @@ import com.digi.xbee.api.exceptions.XBeeException;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.List;
+import java.io.*;
 
 
 
@@ -31,6 +33,7 @@ public class MainScreen extends AppCompatActivity {
     ViewPager viewPager;
     TabLayout tabLayout;
     ArrayList<Fragment> fragments;
+    static FileOutputStream outputStream;
     static DatabaseHandler db;
     DataReceiveListener listener = new DataReceiveListener();
     static ArrayList<String> contactNames = new ArrayList<>();
@@ -80,7 +83,6 @@ public class MainScreen extends AppCompatActivity {
         tabLayout.getTabAt(3).setIcon(R.drawable.settings_black);
 
         try {
-            SplashScreen.myXbeeDevice.open();
             // Channel check events added to the device.
             SplashScreen.myXbeeDevice.addDataListener(listener);
             byte[] toSend = new Packet(
@@ -98,7 +100,6 @@ public class MainScreen extends AppCompatActivity {
                         .setMessage(resources.getString(R.string.error_connecting_description, e.getMessage()))
                         .setPositiveButton(android.R.string.ok, null).show();
             });
-            SplashScreen.myXbeeDevice.close();
         }
     }
 
@@ -134,6 +135,22 @@ public class MainScreen extends AppCompatActivity {
                 currentType = temp.getType();
                 currentTotal = temp.getTotalNumber();
             }
+            if (currentType == Packet.Type.FILE_DATA) {
+                try {
+                    outputStream.write(temp.getData());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if (temp.getPartNumber() == currentTotal - 1) {
+                    try {
+                        outputStream.flush();
+                        outputStream.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                return;
+            }
             if (temp.getPartNumber() == currentTotal - 1) {
                 if (currentType == Packet.Type.MESSAGE_DATA) {
                     int i = contactUserIds.indexOf(xbeeMessage.getDevice().getNodeID());
@@ -152,7 +169,15 @@ public class MainScreen extends AppCompatActivity {
                 }
                 if (currentType == Packet.Type.KP_KEY) {
                 }
-                if (currentType == Packet.Type.FILE_DATA) {
+                if (currentType == Packet.Type.FILE_NAME_DATA) {
+                    try {
+                        String dir = Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_DOWNLOADS
+                        ).getAbsolutePath();
+                        outputStream = new FileOutputStream(new File(dir + "/" + new String(temp.getData())));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
                 if (currentType == Packet.Type.INFO) {
                     //int i = contactXbeeAddress.indexOf(xbeeMessage.getDevice().get64BitAddress().toString());
