@@ -12,7 +12,8 @@ public class Packet {
         FILE_DATA((byte)2),
         DP_KEY((byte)3),
         KP_KEY((byte)4),
-        INFO((byte)5);
+        INFO((byte)5),
+        FILE_NAME_DATA((byte)6);
 
         private byte value;
         private static Map map = new HashMap<>();
@@ -53,6 +54,10 @@ public class Packet {
     }
 
     public Packet(Type type, short num, short totalNumber, byte[] data, Blake3 hasher) {
+        setData(type, num, totalNumber, data, hasher);
+    }
+
+    public void setData(Type type, short num, short totalNumber, byte[] data, Blake3 hasher) {
         this.hasher = hasher;
         this.type = type.getValue();
         this.partNumber = num;
@@ -76,6 +81,8 @@ public class Packet {
         this.data[1] = temp[0];
         this.data[2] = temp[1];
     }
+
+
 
     public void setRaw(byte[] data) {
         int len = data.length;
