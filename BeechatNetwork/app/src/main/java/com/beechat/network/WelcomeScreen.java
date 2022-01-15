@@ -138,7 +138,7 @@ public class WelcomeScreen extends AppCompatActivity {
             ex.printStackTrace();
         }
 
-        userIdTextView.setText("A new NodeID \n" + Blake3.toString(generatedUserId));
+        userIdTextView.setText("Your Beechat address\n" + Blake3.toString(generatedUserId));
 
         finishButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {

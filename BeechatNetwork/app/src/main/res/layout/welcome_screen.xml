@@ -101,7 +101,7 @@
         <TextView
             android:id="@+id/textViewEULA"
             android:layout_width="match_parent"
-            android:layout_height="150dp"
+            android:layout_height="83dp"
             android:fontFamily="@font/nunito_regular"
             android:isScrollContainer="true"
             android:paddingHorizontal="20dp"
@@ -113,9 +113,10 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="178dp"
-            android:layout_gravity="bottom|center"
+            android:layout_gravity="top"
             android:layout_weight="1"
-            android:gravity="center|bottom"
+            android:gravity="bottom|top"
+            android:isScrollContainer="true"
             android:orientation="vertical">
 
             <CheckBox
@@ -125,6 +126,7 @@
                 android:layout_gravity="center_horizontal"
                 android:fontFamily="@font/nunito_regular"
                 android:padding="10dp"
+                android:scrollHorizontally="false"
                 android:text="@string/eula_agreement"
                 android:textColor="@android:color/black"
                 android:textSize="16sp"
