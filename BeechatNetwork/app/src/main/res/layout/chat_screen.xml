@@ -9,6 +9,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/active"
         android:orientation="vertical">
 
         <LinearLayout
@@ -22,22 +23,25 @@
             <ImageButton
                 android:id="@+id/backButton"
                 android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_height="70dp"
                 android:layout_marginStart="10dp"
-                android:background="@drawable/round_button"
+                android:background="@color/active"
                 android:scaleType="centerInside"
                 android:src="@drawable/back_button"
-                android:tint="@color/colorAccent" />
+                android:tint="@color/inActive" />
 
             <TextView
                 android:id="@+id/nameTextView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="70dp"
                 android:clickable="true"
                 android:focusable="true"
-                android:gravity="center"
+                android:fontFamily="@font/nunito_regular"
+                android:gravity="left|center_vertical"
+                android:textAlignment="gravity"
                 android:textColor="@color/white"
-                android:textSize="40sp" />
+                android:textSize="30sp"
+                android:translationY="-4dp" />
         </LinearLayout>
 
         <ListView
@@ -45,8 +49,12 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:background="@color/active"
+            android:clipToPadding="false"
+            android:isScrollContainer="true"
             android:listSelector="@android:color/transparent"
-            android:transcriptMode="alwaysScroll"></ListView>
+            android:transcriptMode="alwaysScroll"
+            android:verticalScrollbarPosition="right" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -56,30 +64,36 @@
 
             <ImageButton
                 android:id="@+id/attachButton"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:background="@drawable/round_attach_button"
+                android:layout_width="43dp"
+                android:layout_height="34dp"
+                android:background="@color/active"
                 android:scaleType="centerInside"
-                android:src="@drawable/attach_button"
+                android:src="@android:drawable/ic_input_add"
                 android:tint="@color/colorAccent" />
 
             <EditText
                 android:id="@+id/inputField"
-                android:layout_width="0dp"
+                android:layout_width="332dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="center_vertical" />
+                android:background="@drawable/round_rect_shape"
+                android:gravity="center_vertical"
+                android:inputType="textMultiLine|textCapSentences"
+                android:maxLines="6"
+                android:minHeight="34dp"
+                android:paddingLeft="20dp" />
 
-            <Button
+            <ImageButton
                 android:id="@+id/sendButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/rounded_corner_for_button"
-                android:fontFamily="@font/nunito_regular"
-                android:padding="10dp"
-                android:text="@string/send"
-                android:textColor="@android:color/white"
-                android:textSize="16sp" />
+                android:layout_width="82dp"
+                android:layout_height="34dp"
+                android:layout_weight="1"
+                android:background="@color/active"
+                android:focusable="auto"
+                android:paddingLeft="10dp"
+                android:tint="@color/colorAccent"
+                app:srcCompat="@android:drawable/ic_menu_send" />
+
         </LinearLayout>
 
         <TextView

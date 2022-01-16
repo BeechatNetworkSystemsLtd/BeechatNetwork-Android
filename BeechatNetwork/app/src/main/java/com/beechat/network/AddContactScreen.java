@@ -2,6 +2,7 @@ package com.beechat.network;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -24,6 +25,7 @@ public class AddContactScreen extends AppCompatActivity {
     Context context;
     Resources resources;
     DatabaseHandler db;
+    int selectedNum;
 
     String selectedXbeeDevice, selectedUserId, name, ownerContact;
 
@@ -47,6 +49,7 @@ public class AddContactScreen extends AppCompatActivity {
         if (extras != null) {
             selectedXbeeDevice = extras.getString("key_selectedXbeeDevice");
             selectedUserId = extras.getString("key_selectedUserId");
+            selectedNum = extras.getInt("num_selected");
             addressTextView.setText("Address " + selectedXbeeDevice + "(" + selectedUserId + ")");
         }
 
@@ -61,6 +64,14 @@ public class AddContactScreen extends AppCompatActivity {
             ContactsScreen.contactUserIds.add(selectedUserId);
             ContactsScreen.contactXbeeAddress.add(selectedXbeeDevice);
             ContactsScreen.onRefresh();
+
+            Intent intent = new Intent();
+            intent.putExtra("newname", name);
+            intent.putExtra("userid", selectedUserId);
+            intent.putExtra("addr", selectedXbeeDevice);
+            intent.putExtra("name", name + " (" + selectedXbeeDevice + ")");
+            intent.putExtra("id", selectedNum);
+            setResult(RESULT_OK, intent);
             finish();
         });
 

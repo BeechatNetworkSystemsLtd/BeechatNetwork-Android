@@ -3,17 +3,19 @@ package com.beechat.network;
 import java.util.*;
 
 /**
- *  The Packet class of a message.
+ *  The Packet class of a part of Message.
  **/
 public class Packet {
 
     public enum Type {
+        NONE((byte)0),
         MESSAGE_DATA((byte)1),
         FILE_DATA((byte)2),
         DP_KEY((byte)3),
         KP_KEY((byte)4),
-        INFO((byte)5),
-        FILE_NAME_DATA((byte)6);
+        SH_KEY((byte)5),
+        INFO((byte)6),
+        FILE_NAME_DATA((byte)7);
 
         private byte value;
         private static Map map = new HashMap<>();
@@ -44,7 +46,7 @@ public class Packet {
     byte[] data;
     Blake3 hasher;
 
-    public Packet( Blake3 hasher) {
+    public Packet(Blake3 hasher) {
         this.hasher = hasher;
     }
 
@@ -53,12 +55,19 @@ public class Packet {
         setRaw(data);
     }
 
+    public static int getMaxLen() {
+        return 66;
+    }
+
     public Packet(Type type, short num, short totalNumber, byte[] data, Blake3 hasher) {
         setData(type, num, totalNumber, data, hasher);
     }
 
     public void setData(Type type, short num, short totalNumber, byte[] data, Blake3 hasher) {
         this.hasher = hasher;
+        if (type == Packet.Type.NONE) {
+            return;
+        }
         this.type = type.getValue();
         this.partNumber = num;
         this.totalNumber = totalNumber;
@@ -80,12 +89,13 @@ public class Packet {
 
         this.data[1] = temp[0];
         this.data[2] = temp[1];
+        correct = true;
     }
-
 
 
     public void setRaw(byte[] data) {
         int len = data.length;
+        correct = false;
         if (len < 8 || hasher == null) {
             return;
         }

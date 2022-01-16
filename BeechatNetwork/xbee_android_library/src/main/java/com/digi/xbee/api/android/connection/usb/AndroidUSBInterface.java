@@ -453,6 +453,8 @@ public class AndroidUSBInterface implements IConnectionInterface {
 		}
 		// Configure USB baud rate.
 		usbConnection.controlTransfer(0x40, 0x03, calculateBaudRate(baudRate, BASE_CLOCK), 0, null, 0, 0);
+		// Configure flow control. Enable CTS, RTS
+		usbConnection.controlTransfer(0x40, 0x02, 0x7E7, 0, null, 0, 0);
 		// Instantiate input stream and output stream.
 		inputStream = new AndroidUSBInputStream(this, receiveEndPoint, usbConnection);
 		outputStream = new AndroidUSBOutputStream(sendEndPoint, usbConnection);

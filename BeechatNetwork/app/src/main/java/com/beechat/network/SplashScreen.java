@@ -21,7 +21,7 @@ public class SplashScreen extends AppCompatActivity {
     Resources resources;
 
     // Constants.
-    public static int BAUD_RATE = 57600;
+    public static int BAUD_RATE = 115200;
 
     // Variables.
     DatabaseHandler db;
@@ -77,8 +77,6 @@ public class SplashScreen extends AppCompatActivity {
 
             } catch (XBeeException e) {
                 e.printStackTrace();
-                myXbeeDevice.close();
-            } finally {
                 myXbeeDevice.close();
             }
         }).start();

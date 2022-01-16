@@ -325,12 +325,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     /***
-     *  --- insertMessage(Message) ---
+     *  --- insertMessage(TextMessage) ---
      *  The function to insert message to the 'Messages' table.
      *
      *  @param message Transmitted message.
      ***/
-    public void insertMessage(Message message) {
+    public void insertMessage(TextMessage message) {
         SQLiteDatabase.loadLibs(mContext.getApplicationContext());
         SQLiteDatabase db = this.getWritableDatabase(SECRET_KEY);
 
@@ -354,8 +354,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      *  @param chatReceiverId Selected user id.
      *  @param chatXbeeReceiver Selected Xbee address.
      ***/
-    public List<Message> getAllMessages(String chatSenderId, String chatXbeeSender, String chatReceiverId, String chatXbeeReceiver) {
-        List<Message> messagesList = new ArrayList<>();
+    public List<TextMessage> getAllMessages(String chatSenderId, String chatXbeeSender, String chatReceiverId, String chatXbeeReceiver) {
+        List<TextMessage> messagesList = new ArrayList<>();
         String selectQuery = "SELECT  * FROM " + TABLE_MESSAGES + " WHERE " + MESSAGES_SENDER_ID + " = '" + chatSenderId + "' and " +
                 MESSAGES_XBEE_DEVICE_NUMBER_SENDER + " = '" + chatXbeeSender + "' and " + MESSAGES_RECEIVER_ID + " = '" + chatReceiverId + "' and " +
                 MESSAGES_XBEE_DEVICE_NUMBER_RECEIVER + " = '" + chatXbeeReceiver + "' ";
@@ -365,7 +365,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()) {
             do {
-                Message message = new Message();
+                TextMessage message = new TextMessage();
                 message.setId(Integer.parseInt(cursor.getString(0)));
                 message.setSenderId(cursor.getString(1));
                 message.setXbeeSender(cursor.getString(2));
