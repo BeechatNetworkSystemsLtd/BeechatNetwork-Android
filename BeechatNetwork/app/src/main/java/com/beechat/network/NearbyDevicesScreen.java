@@ -59,11 +59,11 @@ public class NearbyDevicesScreen extends Fragment {
     String selectedXbeeDevice, selectedUserId;
 
     public static ArrayList<String> devicesAN = new ArrayList<>();
-    ArrayList<String> devicesAddress = new ArrayList<>();
-    ArrayList<String> devicesNodeIds = new ArrayList<>();
+    public static ArrayList<String> devicesAddress = new ArrayList<>();
+    public static ArrayList<String> devicesNodeIds = new ArrayList<>();
 
     List<Contact> contacts;
-    ArrayList<String> contactsFromDb = new ArrayList<>();
+    public static ArrayList<String> contactsFromDb = new ArrayList<>();
 
     // Constants.
     private static final File root = new File(String.valueOf(Environment.getExternalStorageDirectory()));
@@ -86,7 +86,7 @@ public class NearbyDevicesScreen extends Fragment {
         contacts = db.getAllContacts(Blake3.toString(SplashScreen.myGeneratedUserId));
 
         for (Contact cn : contacts) {
-            contactsFromDb.add(cn.getXbeeDeviceNumber() + "(" + cn.getUserId() + ")");
+            contactsFromDb.add(cn.getUserId() + " (" + cn.getXbeeDeviceNumber() + ")");
         }
 
         devicesLabel = view.findViewById(R.id.devicesLabelTextView);
@@ -111,7 +111,8 @@ public class NearbyDevicesScreen extends Fragment {
             Intent intent = new Intent(getActivity(), AddContactScreen.class);
             intent.putExtra("key_selectedXbeeDevice", selectedXbeeDevice);
             intent.putExtra("key_selectedUserId", selectedUserId);
-            startActivity(intent);
+            intent.putExtra("num_selected", i);
+            startActivityForResult(intent, 1);
         });
 
         // Handling and event  by clicking the "Refresh" button.

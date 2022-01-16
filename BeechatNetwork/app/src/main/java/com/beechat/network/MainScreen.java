@@ -2,6 +2,7 @@ package com.beechat.network;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 
@@ -14,7 +15,13 @@ import com.google.android.material.tabs.TabLayout;
 
 import com.digi.xbee.api.listeners.IDataReceiveListener;
 import com.digi.xbee.api.models.XBeeMessage;
+import com.digi.xbee.api.RemoteXBeeDevice;
 import com.digi.xbee.api.exceptions.XBeeException;
+
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import java.security.NoSuchAlgorithmException;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -39,6 +46,7 @@ public class MainScreen extends AppCompatActivity {
     static ArrayList<String> contactNames = new ArrayList<>();
     static ArrayList<String> contactXbeeAddress = new ArrayList<>();
     static ArrayList<String> contactUserIds = new ArrayList<>();
+    static boolean replyReceived = false;
     List<Contact> contactsFromDb;
 
     @Override
@@ -103,6 +111,19 @@ public class MainScreen extends AppCompatActivity {
         }
     }
 
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (data == null) {
+            return;
+        }
+        NearbyDevicesScreen.devicesAN.set(data.getIntExtra("id", 0), data.getStringExtra("name"));
+        contactUserIds.add(data.getStringExtra("userid"));
+        contactXbeeAddress.add(data.getStringExtra("addr"));
+        contactNames.add(data.getStringExtra("newname"));
+        NearbyDevicesScreen.contactsFromDb.add(data.getStringExtra("userid") + " (" + data.getStringExtra("addr") + ")");
+    }
+
     /***
      *  --- DataReceiveListener ---
      *  The class that is responsible for listening to the message channel.
@@ -110,8 +131,10 @@ public class MainScreen extends AppCompatActivity {
     private static class DataReceiveListener implements IDataReceiveListener {
         static Packet temp;
         static Packet.Type currentType = Packet.Type.MESSAGE_DATA;
-        static short currentPart = 0;
+        static short currentPart = -1;
         static short currentTotal = 1;
+        String reply = new String("REPLY");
+        static Message message = new Message();
 
         public DataReceiveListener() {
             super();
@@ -126,18 +149,36 @@ public class MainScreen extends AppCompatActivity {
         @Override
         public void dataReceived(XBeeMessage xbeeMessage) {
             temp.setRaw(xbeeMessage.getData());
-            if (temp.isCorrect()) {
-                ChatScreen.getMessages().add(new String(temp.getData()) + "\nS");
+            if (!temp.isCorrect()) {
+                return;
             }
-            if (currentType != temp.getType()) {
-                currentTotal = 0;
-                currentPart = 0;
+            if (currentType != temp.getType() || currentPart != temp.getPartNumber() - 1) {
+                currentPart = temp.getPartNumber();
+                if (currentPart != 0) {
+                    currentPart = -1;
+                    currentTotal = 1;
+                    currentType = Packet.Type.NONE;
+                    message.clear();
+                    return;
+                }
                 currentType = temp.getType();
                 currentTotal = temp.getTotalNumber();
+                message.clear();
             }
             if (currentType == Packet.Type.FILE_DATA) {
+                byte [] decrypted = null;
                 try {
-                    outputStream.write(temp.getData());
+                    Cipher cipher = Cipher.getInstance("AES");
+                    cipher.init(
+                        Cipher.DECRYPT_MODE
+                      , getUserSk(xbeeMessage.getDevice().get64BitAddress())
+                    );
+                    decrypted = cipher.doFinal(temp.getData());
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+                try {
+                    outputStream.write(decrypted);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -151,55 +192,104 @@ public class MainScreen extends AppCompatActivity {
                 }
                 return;
             }
-            if (temp.getPartNumber() == currentTotal - 1) {
+            if (currentType == Packet.Type.INFO) {
+                if ((new String(temp.getData())).equals("REPLY")) {
+                    replyReceived = true;
+                    return;
+                }
+            }
+            if (message.add(temp)) {
+                currentPart++;
                 if (currentType == Packet.Type.MESSAGE_DATA) {
-                    int i = contactUserIds.indexOf(xbeeMessage.getDevice().getNodeID());
+                    byte[] toSend = new Packet(
+                        Packet.Type.INFO
+                      , (short)0
+                      , (short)1
+                      , reply.getBytes()
+                      , SplashScreen.hasher
+                    ).getData();
+                    try {
+                        SplashScreen.myXbeeDevice.sendData(
+                            new RemoteXBeeDevice(
+                                SplashScreen.myXbeeDevice
+                              , xbeeMessage.getDevice().get64BitAddress()
+                            )
+                          , toSend
+                        );
+                    } catch (final XBeeException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            if (!message.isReady()) {
+                return;
+            }
+
+            switch (message.getType()) {
+                case MESSAGE_DATA: {
+                    String newMessageAddr = xbeeMessage.getDevice().get64BitAddress().toString();
                     db.insertMessage(
-                        new Message(
+                        new TextMessage(
                             Blake3.toString(SplashScreen.myGeneratedUserId)
                           , SplashScreen.addressMyXbeeDevice
-                          , contactNames.get(i)
-                          , Blake3.toString(Base58.decode(xbeeMessage.getDevice().getNodeID()))
-                          , new String(temp.getData()) + "\nS"
+                          , contactUserIds.get(contactXbeeAddress.indexOf(newMessageAddr))
+                          , newMessageAddr
+                          , new String(message.getData()) + "\nS"
                         )
                     );
+                    ChatScreen.getMessages().add(new String(message.getData()) + "\nS");
                     ChatScreen.setNotification();
+                    message.clear();
+                    break;
                 }
-                if (currentType == Packet.Type.DP_KEY) {
+                case DP_KEY: {
+                    break;
                 }
-                if (currentType == Packet.Type.KP_KEY) {
+                case KP_KEY: {
+                    break;
                 }
-                if (currentType == Packet.Type.FILE_NAME_DATA) {
+                case KP_SHKEY: {
+                    break;
+                }
+                case FILE_NAME_DATA: {
                     try {
                         String dir = Environment.getExternalStoragePublicDirectory(
                             Environment.DIRECTORY_DOWNLOADS
                         ).getAbsolutePath();
-                        outputStream = new FileOutputStream(new File(dir + "/" + new String(temp.getData())));
+                        outputStream = new FileOutputStream(new File(dir + "/" + new String(temp.getData()).split(" ")[0]));
+                        ChatScreen.getMessages().add(new String(message.getData()) + "\nS");
+                        ChatScreen.setNotification();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                    break;
                 }
-                if (currentType == Packet.Type.INFO) {
-                    //int i = contactXbeeAddress.indexOf(xbeeMessage.getDevice().get64BitAddress().toString());
-                    if ((new String(temp.getData())).substring(0, 3).equals("ACK")) {
-                        String save = Blake3.toString(Base58.decode((new String(temp.getData())).substring(3)));
-                        int i = contactUserIds.indexOf(save);
-                        if (contactUserIds.contains(save)) {
-                            NearbyDevicesScreen.devicesAN.add(
-                                contactNames.get(i)
-                              + " ("
-                              + xbeeMessage.getDevice().get64BitAddress().toString()
-                              + ")"
-                            );
-                        } else {
-                            NearbyDevicesScreen.devicesAN.add(
-                                save
-                              + " ("
-                              + xbeeMessage.getDevice().get64BitAddress().toString()
-                              + ")"
-                            );
-                        }
+                case INFO: {
+                    if (!(new String(temp.getData())).substring(0, 3).equals("ACK")) {
+                        return;
                     }
+                    String save = Blake3.toString(Base58.decode((new String(message.getData())).substring(3)));
+                    int i = contactUserIds.indexOf(save);
+                    if (contactUserIds.contains(save)) {
+                        NearbyDevicesScreen.devicesAN.add(
+                            contactNames.get(i)
+                          + " ("
+                          + xbeeMessage.getDevice().get64BitAddress().toString()
+                          + ")"
+                        );
+                    } else {
+                        NearbyDevicesScreen.devicesAN.add(
+                            save
+                          + " ("
+                          + xbeeMessage.getDevice().get64BitAddress().toString()
+                          + ")"
+                        );
+                    }
+                    NearbyDevicesScreen.devicesAddress.add(
+                        xbeeMessage.getDevice().get64BitAddress().toString()
+                    );
+                    NearbyDevicesScreen.devicesNodeIds.add(save);
+                    break;
                 }
             }
         }

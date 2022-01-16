@@ -28,9 +28,11 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.core.content.res.ResourcesCompat;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -65,7 +67,7 @@ public class ChatScreen extends AppCompatActivity {
     // Variables.
     Context context;
     Resources resources;
-    Button sendButton;
+    ImageButton sendButton;
     ImageButton backButton, attachButton;
     ListView chatListView;
     EditText inputField;
@@ -125,10 +127,11 @@ public class ChatScreen extends AppCompatActivity {
         myXbeeAddress = extras.getString("key_myXbeeAddress");
         selectedName = extras.getString("key_selectedName");
         selectedUserId = extras.getString("key_selectedUserId");
+        selectedUserSk = extras.getString("key_selectedUserSk");
         selectedXbeeAddress = extras.getString("key_selectedXbeeAddress");
 
-        List<Message> messagesDB = db.getAllMessages(myUserId, myXbeeAddress, selectedUserId, selectedXbeeAddress);
-        for (Message mg : messagesDB) {
+        List<TextMessage> messagesDB = db.getAllMessages(myUserId, myXbeeAddress, selectedUserId, selectedXbeeAddress);
+        for (TextMessage mg : messagesDB) {
             messages.add(mg.getContent());
         }
 
@@ -167,39 +170,46 @@ public class ChatScreen extends AppCompatActivity {
             public void onClick(View view) {
                 String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
                 message = inputField.getText().toString();
+                if (message.length() == 0) {
+                    return;
+                }
                 message = message + "\n" + currentTime;
                 try {
                     if (!fileFlag) {
-                        byte[] toSend = new Packet(
+                        Message m = new Message(
                             Packet.Type.MESSAGE_DATA
-                          , (short)0
-                          , (short)1
                           , message.getBytes()
-                          , SplashScreen.hasher
-                        ).getData();
-                        SplashScreen.myXbeeDevice.sendData(remote, toSend);
+                          , selectedUserSk
+                        );
+                        m.send(SplashScreen.myXbeeDevice, remote, SplashScreen.hasher);
                         messages.add(message + "\n");
                         inputField.setText("");
                     } else {
-                        Packet sender = new Packet(
+                        Message m = new Message(
                             Packet.Type.FILE_NAME_DATA
-                          , (short)0
-                          , (short)1
                           , textViewAttachment.getText().toString().getBytes()
-                          , SplashScreen.hasher
+                          , selectedUserSk
                         );
-                        SplashScreen.myXbeeDevice.sendData(remote, sender.getData());
+                        m.send(SplashScreen.myXbeeDevice, remote, SplashScreen.hasher);
 
                         ByteBuffer bb = ByteBuffer.wrap(array);
                         byte[] packageFile = new byte[sizeOfPackage];
 
+                        Packet sender = new Packet(SplashScreen.hasher);
                         for (short i = 0; i < (short)numberOfPackage; i++) {
-                            bb.get(packageFile, 0, packageFile.length - 7);
+                            bb.get(packageFile, 0, packageFile.length - 7 - 16);
+                            try {
+                                Cipher cipher = Cipher.getInstance("AES");
+                                cipher.init(Cipher.ENCRYPT_MODE, selectedUserSk);
+                                packageFile = cipher.doFinal(packageFile);
+                            } catch (Exception e){
+                                e.printStackTrace();
+                            }
                             sender.setData(
                                 Packet.Type.FILE_DATA
                               , (short)i
                               , (short)numberOfPackage
-                              , textViewAttachment.getText().toString().getBytes()
+                              , packageFile
                               , SplashScreen.hasher
                             );
                             SplashScreen.myXbeeDevice.sendData(
@@ -207,7 +217,6 @@ public class ChatScreen extends AppCompatActivity {
                               , sender.getData()
                             );
                         }
-
                         messages.add(textViewAttachment.getText().toString() + "\n");
                         inputField.setText("");
                         textViewAttachment.setText("");
@@ -217,7 +226,7 @@ public class ChatScreen extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
                     messages.add("Error transmitting message: " + e.getMessage());
                 }
-                db.insertMessage(new Message(myUserId, myXbeeAddress, selectedUserId, selectedXbeeAddress, message));
+                db.insertMessage(new TextMessage(myUserId, myXbeeAddress, selectedUserId, selectedXbeeAddress, message));
                 chatDeviceAdapter.notifyDataSetChanged();
             }
         });
@@ -382,12 +391,12 @@ public class ChatScreen extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 try {
                     Uri uri = data.getData();
+                    String path = getPath(this, uri);
                     /*if (filesize >= FILE_SIZE_LIMIT) {
                         Toast.makeText(this, "The selected file is too large. Select a new file with size less than 2mb", Toast.LENGTH_LONG).show();
                     } */
                     String mimeType = getContentResolver().getType(uri);
                     if (mimeType == null) {
-                        String path = getPath(this, uri);
                         File file = new File(path);
                         filename = file.getName();
                         /*if (path == null) {
@@ -410,15 +419,15 @@ public class ChatScreen extends AppCompatActivity {
                     textViewAttachment.setText(filename + " (" + sizeFile + ")");
                     File fileSave = getExternalFilesDir(null);
                     String sourcePath = getExternalFilesDir(null).toString();
-                    array = method(new File(sourcePath + "/" + filename));
+                    array = method(new File(path));
                     numberOfPackage = array.length/sizeOfPackage;
                     fileFlag = true;
-                    try {
+                    /*try {
                         copyFileStream(new File(sourcePath + "/" + filename), uri, this);
 
                     } catch (Exception e) {
                         e.printStackTrace();
-                    }
+                    }*/
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -496,50 +505,97 @@ public class ChatScreen extends AppCompatActivity {
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             String message = messages.get(position);
+            Typeface typeface = ResourcesCompat.getFont(context, R.font.nunito_regular);
 
             if (message.endsWith("S")) {
                 message = removeLastChar(message);
+                message = removeLastChar(message);
+                String[] mesData = message.split("\n");
 
-                LinearLayout layout = new LinearLayout(context);
-                layout.setOrientation(LinearLayout.VERTICAL);
+                RelativeLayout layout = new RelativeLayout(context);
+                //layout.setOrientation(LinearLayout.VERTICAL);
                 layout.setPadding(40, 30, 40, 30);
 
-                TextView nameText = new TextView(context);
-
-                nameText.setText(message);
-                nameText.setTypeface(nameText.getTypeface(), Typeface.BOLD);
-                nameText.setTextSize(15);
+                LinearLayout layout2 = new LinearLayout(context);
+                layout2.setOrientation(LinearLayout.VERTICAL);
                 Drawable drawable = getResources().getDrawable(R.drawable.server_message_box);
-                nameText.setBackground(drawable);
-                layout.addView(nameText);
+                layout2.setBackground(drawable);
+
+                TextView nameText = new TextView(context);
+                nameText.setText(message.split("\n")[0]);
+                nameText.setTypeface(typeface);
+                nameText.setTextSize(15);
+                nameText.setPadding(20, 20, 40, 10);
+
+                TextView timeText = null;
+                if (mesData.length > 1) {
+                    timeText = new TextView(context);
+                    timeText.setText(message.split("\n")[1]);
+                    timeText.setTypeface(nameText.getTypeface(), Typeface.BOLD);
+                    timeText.setTextSize(11);
+                    timeText.setPadding(20, 0, 20, 20);
+                }
+
+                layout2.addView(nameText);
+                if (timeText != null) {
+                    layout2.addView(timeText);
+                }
+                layout.addView(layout2);
 
 
                 return layout;
             } else {
-                LinearLayout layout = new LinearLayout(context);
-                layout.setOrientation(LinearLayout.VERTICAL);
+                int color = Color.parseColor("#010523");
+                String[] mesData = message.split("\n");
+                RelativeLayout layout = new RelativeLayout(context);
+                //layout.setOrientation(LinearLayout.VERTICAL);
                 layout.setPadding(40, 30, 40, 30);
 
                 TextView nameText = new TextView(context);
                 nameText.setGravity(Gravity.RIGHT);
-                nameText.setText(message);
-                nameText.setTypeface(nameText.getTypeface(), Typeface.BOLD);
+                nameText.setText(mesData[0]);
+                nameText.setTypeface(typeface);
+                nameText.setTextColor(color);
                 nameText.setTextSize(15);
+                nameText.setPadding(40, 20, 20, 15);
                 Drawable drawable = getResources().getDrawable(R.drawable.client_message_box);
-                nameText.setBackground(drawable);
 
                 LinearLayout layout2 = new LinearLayout(context);
+                layout2.setOrientation(LinearLayout.VERTICAL);
                 Drawable iconTick = getResources().getDrawable(R.drawable.sent_tick);
-
-                ImageView imgView = new ImageView(context);
-                imgView.setImageDrawable(iconTick);
-                int color = Color.parseColor("#00FF00"); //The color u want
-                imgView.setColorFilter(color);
-                layout2.addView(imgView);
+                layout2.setBackground(drawable);
                 layout2.setGravity(Gravity.RIGHT);
 
-                layout.addView(nameText);
+                LinearLayout layout3 = null;
+                TextView timeText = null;
+                TextView imgView = null;
+                if (mesData.length > 1) {
+                    layout3 = new LinearLayout(context);
+                    layout3.setGravity(Gravity.RIGHT);
+                    layout3.setOrientation(LinearLayout.HORIZONTAL);
+                    timeText = new TextView(context);
+                    timeText.setGravity(Gravity.RIGHT);
+                    timeText.setText(mesData[1]);
+                    timeText.setTypeface(nameText.getTypeface());
+                    timeText.setPadding(20, 0, 0, 10);
+                    timeText.setTextSize(11);
+
+                    imgView = new TextView(context);
+                    imgView.setTypeface(nameText.getTypeface());
+                    imgView.setTextSize(11);
+                    imgView.setTextColor(color);
+                    imgView.setPadding(10, 0, 15, 10);
+                    imgView.setText("\u2713");
+                }
+
+                layout2.addView(nameText);
+                if (timeText != null && layout3 != null && imgView != null) {
+                    layout3.addView(timeText);
+                    layout3.addView(imgView);
+                    layout2.addView(layout3);
+                }
                 layout.addView(layout2);
+                layout.setGravity(Gravity.RIGHT);
 
                 return layout;
             }
