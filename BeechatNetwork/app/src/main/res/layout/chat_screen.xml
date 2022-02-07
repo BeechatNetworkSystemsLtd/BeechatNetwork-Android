@@ -100,6 +100,16 @@
             android:id="@+id/textViewAttachment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="" />
+            android:text=""
+            android:textColor="#FFFFFF" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="1000"
+            android:progress="0"
+            android:progressTint="#FFEB3B" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

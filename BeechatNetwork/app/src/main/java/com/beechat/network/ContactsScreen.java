@@ -36,13 +36,12 @@ public class ContactsScreen extends Fragment {
     ListView contactsListView;
     static DatabaseHandler db;
     List<Contact> contactsFromDb;
-    static String selectedXbeeAddress, selectedUserId, selectedUserSk, selectedName;
+    static String selectedXbeeAddress, selectedUserId, selectedName;
 
     static CustomContactAdapter remoteXBeeDeviceAdapterName;
     static ArrayList<String> contactNames = new ArrayList<>();
     static ArrayList<String> contactXbeeAddress = new ArrayList<>();
     static ArrayList<String> contactUserIds = new ArrayList<>();
-    static ArrayList<String> contactUserSks = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -56,7 +55,6 @@ public class ContactsScreen extends Fragment {
         contactNames.clear();
         contactXbeeAddress.clear();
         contactUserIds.clear();
-        contactUserSks.clear();
 
         contactsFromDb = db.getAllContacts(Blake3.toString(SplashScreen.myGeneratedUserId));
 
@@ -64,7 +62,6 @@ public class ContactsScreen extends Fragment {
             contactNames.add(cn.getName());
             contactXbeeAddress.add(cn.getXbeeDeviceNumber());
             contactUserIds.add(cn.getUserId());
-            contactUserSks.add(cn.getUserSk());
         }
 
         contactsListView = view.findViewById(R.id.contactsListView);
@@ -76,7 +73,6 @@ public class ContactsScreen extends Fragment {
 
             selectedXbeeAddress = contactXbeeAddress.get(i);
             selectedUserId = contactUserIds.get(i);
-            selectedUserSk = contactUserSks.get(i);
             selectedName = contactNames.get(i);
 
             connectToContactDevice();
@@ -132,7 +128,6 @@ public class ContactsScreen extends Fragment {
                 intent.putExtra("key_myXbeeAddress", SplashScreen.addressMyXbeeDevice);
                 intent.putExtra("key_selectedName", selectedName);
                 intent.putExtra("key_selectedUserId", selectedUserId);
-                intent.putExtra("key_selectedUserSk", selectedUserSk);
                 intent.putExtra("key_selectedXbeeAddress", selectedXbeeAddress);
                 startActivity(intent);
             });

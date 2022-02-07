@@ -21,7 +21,6 @@ public class SplashScreen extends AppCompatActivity {
     Resources resources;
 
     // Constants.
-    public static int BAUD_RATE = 115200;
 
     // Variables.
     DatabaseHandler db;

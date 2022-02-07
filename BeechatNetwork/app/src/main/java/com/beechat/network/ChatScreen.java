@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -78,6 +79,8 @@ public class ChatScreen extends AppCompatActivity {
     String message, filename, sizeFile;
     Boolean fileFlag = false;
     int numberOfPackage;
+    int remainOfPackage;
+    static int transmitProgressValue = 0;
     byte[] array;
 
     static DatabaseHandler db;
@@ -97,7 +100,7 @@ public class ChatScreen extends AppCompatActivity {
 
     // Constants
     int FILE_SELECT_CODE = 101;
-    int sizeOfPackage = 73;
+    int sizeOfPackage = Packet.getMaxLen();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,7 +130,6 @@ public class ChatScreen extends AppCompatActivity {
         myXbeeAddress = extras.getString("key_myXbeeAddress");
         selectedName = extras.getString("key_selectedName");
         selectedUserId = extras.getString("key_selectedUserId");
-        selectedUserSk = extras.getString("key_selectedUserSk");
         selectedXbeeAddress = extras.getString("key_selectedXbeeAddress");
 
         List<TextMessage> messagesDB = db.getAllMessages(myUserId, myXbeeAddress, selectedUserId, selectedXbeeAddress);
@@ -169,8 +171,9 @@ public class ChatScreen extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
+                ProgressBar transmitProgress = findViewById(R.id.progressBar);
                 message = inputField.getText().toString();
-                if (message.length() == 0) {
+                if (message.length() == 0 && !fileFlag) {
                     return;
                 }
                 message = message + "\n" + currentTime;
@@ -179,50 +182,72 @@ public class ChatScreen extends AppCompatActivity {
                         Message m = new Message(
                             Packet.Type.MESSAGE_DATA
                           , message.getBytes()
-                          , selectedUserSk
                         );
                         m.send(SplashScreen.myXbeeDevice, remote, SplashScreen.hasher);
                         messages.add(message + "\n");
                         inputField.setText("");
                     } else {
-                        Message m = new Message(
-                            Packet.Type.FILE_NAME_DATA
-                          , textViewAttachment.getText().toString().getBytes()
-                          , selectedUserSk
-                        );
-                        m.send(SplashScreen.myXbeeDevice, remote, SplashScreen.hasher);
-
-                        ByteBuffer bb = ByteBuffer.wrap(array);
-                        byte[] packageFile = new byte[sizeOfPackage];
-
-                        Packet sender = new Packet(SplashScreen.hasher);
-                        for (short i = 0; i < (short)numberOfPackage; i++) {
-                            bb.get(packageFile, 0, packageFile.length - 7 - 16);
+                        new Thread(() -> {
                             try {
-                                Cipher cipher = Cipher.getInstance("AES");
-                                cipher.init(Cipher.ENCRYPT_MODE, selectedUserSk);
-                                packageFile = cipher.doFinal(packageFile);
-                            } catch (Exception e){
+                                Message m = new Message(
+                                    Packet.Type.FILE_NAME_DATA
+                                  , textViewAttachment.getText().toString().getBytes()
+                                );
+                                m.send(SplashScreen.myXbeeDevice, remote, SplashScreen.hasher);
+
+                                ByteBuffer bb = ByteBuffer.wrap(array);
+                                byte[] packageFile = new byte[sizeOfPackage];
+                                int tcount = remainOfPackage != 0 ? numberOfPackage + 1 : numberOfPackage;
+                                Packet sender = new Packet(SplashScreen.hasher);
+                                for (short i = 0; i < (short)numberOfPackage; i++) {
+                                    bb.get(packageFile, 0, packageFile.length);
+                                    sender.setData(
+                                        Packet.Type.FILE_DATA
+                                      , (short)i
+                                      , (short)tcount
+                                      , packageFile
+                                      , SplashScreen.hasher
+                                    );
+                                    SplashScreen.myXbeeDevice.sendData(
+                                        remote
+                                      , sender.getData()
+                                    );
+                                    transmitProgressValue = (int)(((float)i / (float)numberOfPackage) * transmitProgress.getMax());
+                                    ChatScreen.this.runOnUiThread(() -> {
+                                        transmitProgress.setProgress(transmitProgressValue);
+                                    });
+                                    //transmitProgress.setProgress((int)(((float)i / (float)numberOfPackage) * transmitProgress.getMax()));
+                                }
+                                if (remainOfPackage != 0) {
+                                    sender = new Packet(SplashScreen.hasher);
+                                    packageFile = new byte[remainOfPackage];
+                                    bb.get(packageFile, 0, packageFile.length);
+                                    sender.setData(
+                                        Packet.Type.FILE_DATA
+                                      , (short)0
+                                      , (short)1
+                                      , packageFile
+                                      , SplashScreen.hasher
+                                    );
+                                    SplashScreen.myXbeeDevice.sendData(
+                                        remote
+                                      , sender.getData()
+                                    );
+                                }
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
-                            sender.setData(
-                                Packet.Type.FILE_DATA
-                              , (short)i
-                              , (short)numberOfPackage
-                              , packageFile
-                              , SplashScreen.hasher
-                            );
-                            SplashScreen.myXbeeDevice.sendData(
-                                remote
-                              , sender.getData()
-                            );
-                        }
+                            transmitProgressValue = 0;
+                            ChatScreen.this.runOnUiThread(() -> {
+                                textViewAttachment.setText("");
+                                transmitProgress.setProgress(0);
+                            });
+                        }).start();
                         messages.add(textViewAttachment.getText().toString() + "\n");
                         inputField.setText("");
-                        textViewAttachment.setText("");
                         fileFlag = false;
                     }
-                } catch (XBeeException e) {
+                } catch (Exception e) {
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
                     messages.add("Error transmitting message: " + e.getMessage());
                 }
@@ -421,6 +446,7 @@ public class ChatScreen extends AppCompatActivity {
                     String sourcePath = getExternalFilesDir(null).toString();
                     array = method(new File(path));
                     numberOfPackage = array.length/sizeOfPackage;
+                    remainOfPackage = array.length % sizeOfPackage;
                     fileFlag = true;
                     /*try {
                         copyFileStream(new File(sourcePath + "/" + filename), uri, this);

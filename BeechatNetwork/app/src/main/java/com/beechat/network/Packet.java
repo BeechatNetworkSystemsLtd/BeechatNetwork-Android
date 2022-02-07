@@ -13,9 +13,8 @@ public class Packet {
         FILE_DATA((byte)2),
         DP_KEY((byte)3),
         KP_KEY((byte)4),
-        SH_KEY((byte)5),
-        INFO((byte)6),
-        FILE_NAME_DATA((byte)7);
+        INFO((byte)5),
+        FILE_NAME_DATA((byte)6);
 
         private byte value;
         private static Map map = new HashMap<>();
@@ -56,7 +55,7 @@ public class Packet {
     }
 
     public static int getMaxLen() {
-        return 66;
+        return 30;
     }
 
     public Packet(Type type, short num, short totalNumber, byte[] data, Blake3 hasher) {
