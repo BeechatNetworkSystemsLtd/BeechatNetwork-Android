@@ -12,9 +12,11 @@ public class Packet {
         MESSAGE_DATA((byte)1),
         FILE_DATA((byte)2),
         DP_KEY((byte)3),
-        KP_KEY((byte)4),
-        INFO((byte)5),
-        FILE_NAME_DATA((byte)6);
+        SIGNED_HASH((byte)4),
+        KP_KEY((byte)5),
+        CHIPHER((byte)6),
+        INFO((byte)7),
+        FILE_NAME_DATA((byte)8);
 
         private byte value;
         private static Map map = new HashMap<>();

@@ -25,6 +25,12 @@ public class Message extends ArrayList<Packet> {
         super();
     }
 
+    public Message(Packet.Type t) {
+        super();
+        type = t;
+        setData(new byte[1]);
+    }
+
     public Message(Packet.Type t, byte[] data) {
         super();
         type = t;

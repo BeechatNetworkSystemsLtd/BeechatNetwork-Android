@@ -19,6 +19,7 @@ import com.digi.xbee.api.RemoteXBeeDevice;
 import com.digi.xbee.api.exceptions.XBeeException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.List;
 import java.io.*;
@@ -36,10 +37,12 @@ public class MainScreen extends AppCompatActivity {
     ArrayList<Fragment> fragments;
     static FileOutputStream outputStream;
     static DatabaseHandler db;
+    static Fragment linkAct;
     DataReceiveListener listener = new DataReceiveListener();
     static ArrayList<String> contactNames = new ArrayList<>();
     static ArrayList<String> contactXbeeAddress = new ArrayList<>();
     static ArrayList<String> contactUserIds = new ArrayList<>();
+    static String cname, cselectedUserId, cselectedXbeeDevice;
     static boolean replyReceived = false;
     List<Contact> contactsFromDb;
 
@@ -70,7 +73,8 @@ public class MainScreen extends AppCompatActivity {
         fragments = new ArrayList<>();
 
         fragments.add(new NearbyDevicesScreen());
-        fragments.add(new ContactsScreen());
+        linkAct = new ContactsScreen();
+        fragments.add(linkAct);
         fragments.add(new BroadcastScreen());
         fragments.add(new SettingsScreen());
 
@@ -111,10 +115,13 @@ public class MainScreen extends AppCompatActivity {
         if (data == null) {
             return;
         }
+        cname = data.getStringExtra("newname");
+        cselectedUserId = data.getStringExtra("userid");
+        cselectedXbeeDevice = data.getStringExtra("addr");
         NearbyDevicesScreen.devicesAN.set(data.getIntExtra("id", 0), data.getStringExtra("name"));
-        contactUserIds.add(data.getStringExtra("userid"));
-        contactXbeeAddress.add(data.getStringExtra("addr"));
-        contactNames.add(data.getStringExtra("newname"));
+        contactUserIds.add(cselectedUserId);
+        contactXbeeAddress.add(cselectedXbeeDevice);
+        contactNames.add(cname);
         NearbyDevicesScreen.contactsFromDb.add(data.getStringExtra("userid") + " (" + data.getStringExtra("addr") + ")");
     }
 
@@ -191,9 +198,19 @@ public class MainScreen extends AppCompatActivity {
                     break;
                 }
                 case DP_KEY: {
+                    signRandomHash(xbeeMessage);
+                    break;
+                }
+                case SIGNED_HASH: {
+                    verifyRandomHash(xbeeMessage);
                     break;
                 }
                 case KP_KEY: {
+                    getKyberPublic(xbeeMessage);
+                    break;
+                }
+                case CHIPHER: {
+                    acceptChipher(xbeeMessage);
                     break;
                 }
                 case FILE_NAME_DATA: {
@@ -205,6 +222,127 @@ public class MainScreen extends AppCompatActivity {
                     break;
                 }
             }
+        }
+
+
+        private void signRandomHash(XBeeMessage xbeeMessage) {
+            byte[] sm = new byte[Dilithium.CRYPTO_BYTES + message.getData().length];
+
+            Dilithium.crypto_sign(sm, message.getData(), message.getData().length, SplashScreen.myDSKey);
+
+            byte[] smKey = new byte[sm.length + Dilithium.CRYPTO_PUBLICKEYBYTES];
+            System.arraycopy(SplashScreen.myDPKey, 0, smKey, 0, Dilithium.CRYPTO_PUBLICKEYBYTES);
+            System.arraycopy(sm, 0, smKey, Dilithium.CRYPTO_PUBLICKEYBYTES, sm.length);
+
+            Message getDP = new Message(Packet.Type.SIGNED_HASH, smKey);
+            try {
+                getDP.send(
+                    SplashScreen.myXbeeDevice
+                  , new RemoteXBeeDevice(
+                        SplashScreen.myXbeeDevice
+                        , xbeeMessage.getDevice().get64BitAddress()
+                    )
+                  , SplashScreen.hasher
+                );
+            } catch (Exception ex) {
+                System.out.println("Exception: " + ex.getMessage());
+                ex.printStackTrace();
+            }
+
+        }
+
+
+        private void verifyRandomHash(XBeeMessage xbeeMessage) {
+            byte[] userKey = new byte[Dilithium.CRYPTO_PUBLICKEYBYTES];
+            System.arraycopy(message.getData(), 0, userKey, 0, Dilithium.CRYPTO_PUBLICKEYBYTES);
+            byte[] signedHash = new byte[message.getData().length - Dilithium.CRYPTO_PUBLICKEYBYTES];
+            System.arraycopy(message.getData(), Dilithium.CRYPTO_PUBLICKEYBYTES, signedHash, 0, message.getData().length - Dilithium.CRYPTO_PUBLICKEYBYTES);
+            byte[] m = new byte[signedHash.length - Dilithium.CRYPTO_BYTES];
+
+            Dilithium.crypto_sign_open(m, signedHash, signedHash.length, userKey);
+
+            if (!Arrays.equals(m, SplashScreen.randomHash)) {
+                return;
+            }
+
+            Message getDP = new Message(Packet.Type.KP_KEY, SplashScreen.myKPKey);
+            try {
+                getDP.send(
+                    SplashScreen.myXbeeDevice
+                  , new RemoteXBeeDevice(
+                        SplashScreen.myXbeeDevice
+                        , xbeeMessage.getDevice().get64BitAddress()
+                    )
+                  , SplashScreen.hasher
+                );
+            } catch (Exception ex) {
+                System.out.println("Exception: " + ex.getMessage());
+                ex.printStackTrace();
+            }
+        }
+
+
+        private void getKyberPublic(XBeeMessage xbeeMessage) {
+            byte[] bob_skey = new byte[Kyber512.KYBER_SSBYTES];
+            byte[] ct = new byte[Kyber512.KYBER_CIPHERTEXTBYTES];
+
+            Kyber512.crypto_kem_enc(ct, bob_skey, message.getData());
+
+            try {
+                SplashScreen.hasher.clear();
+                SplashScreen.hasher.update(bob_skey, Kyber512.KYBER_SSBYTES);
+                byte[] secret = SplashScreen.hasher.finalize(256);
+                db.addKey(xbeeMessage.getDevice().get64BitAddress().toString(), secret);
+            } catch (Exception ex) {
+                System.out.println("Exception: " + ex.getMessage());
+                ex.printStackTrace();
+            }
+
+            Message getDP = new Message(Packet.Type.CHIPHER, ct);
+            try {
+                getDP.send(
+                    SplashScreen.myXbeeDevice
+                  , new RemoteXBeeDevice(
+                        SplashScreen.myXbeeDevice
+                        , xbeeMessage.getDevice().get64BitAddress()
+                    )
+                  , SplashScreen.hasher
+                );
+            } catch (Exception ex) {
+                System.out.println("Exception: " + ex.getMessage());
+                ex.printStackTrace();
+            }
+        }
+
+
+        private void acceptChipher(XBeeMessage xbeeMessage) {
+            byte[] alice_skey = new byte[Kyber512.KYBER_SSBYTES];
+            Kyber512.crypto_kem_dec(alice_skey, message.getData(), SplashScreen.myKSKey);
+
+            try {
+                SplashScreen.hasher.clear();
+                SplashScreen.hasher.update(alice_skey, Kyber512.KYBER_SSBYTES);
+                byte[] secret = SplashScreen.hasher.finalize(256);
+                db.addKey(xbeeMessage.getDevice().get64BitAddress().toString(), secret);
+            } catch (Exception ex) {
+                System.out.println("Exception: " + ex.getMessage());
+                ex.printStackTrace();
+            }
+
+            db.addContact(
+                new Contact(
+                    cselectedUserId
+                  , cselectedXbeeDevice
+                  , cname
+                  , Blake3.toString(SplashScreen.myGeneratedUserId)
+                )
+            );
+            ContactsScreen.contactNames.add(cname);
+            ContactsScreen.contactUserIds.add(cselectedUserId);
+            ContactsScreen.contactXbeeAddress.add(cselectedXbeeDevice);
+            linkAct.getActivity().runOnUiThread(() -> {
+                ContactsScreen.onRefresh();
+            });
         }
 
 
