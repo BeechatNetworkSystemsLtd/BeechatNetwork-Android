@@ -23,6 +23,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "XBEE.DB";
     private static final int DATABASE_VERSION = 1;
 
+    private static final String TABLE_SECRETS = "secrets";
+    private static final String SECRETS_ID = "id";
+    private static final String SECRETS_ADDR = "addr";
+    private static final String SECRETS_KEY = "key";
+
     private static final String TABLE_USERS = "users";
     private static final String USERS_ID = "id";
     private static final String USERS_USERNAME = "username";
@@ -62,6 +67,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      ***/
     @Override
     public void onCreate(SQLiteDatabase db) {
+        String CREATE_SECRETS_TABLE = "CREATE TABLE " + TABLE_SECRETS + "("
+          + SECRETS_ID + " INTEGER PRIMARY KEY,"
+          + SECRETS_ADDR + " TEXT,"
+          + SECRETS_KEY + " BINARY"
+        + ")";
+
         String CREATE_USERS_TABLE = "CREATE TABLE " + TABLE_USERS + "("
           + USERS_ID + " INTEGER PRIMARY KEY,"
           + USERS_USERNAME + " TEXT,"
@@ -87,6 +98,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
           + MESSAGES_XBEE_DEVICE_NUMBER_SENDER + " TEXT,"
           + MESSAGES_RECEIVER_ID + " TEXT," + MESSAGES_XBEE_DEVICE_NUMBER_RECEIVER + " TEXT," + MESSAGES_CONTENT + " TEXT" + ")";
 
+        db.execSQL(CREATE_SECRETS_TABLE);
         db.execSQL(CREATE_USERS_TABLE);
         db.execSQL(CREATE_CONTACTS_TABLE);
         db.execSQL(CREATE_MESSAGES_TABLE);
@@ -103,6 +115,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Drop older table if existed
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SECRETS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONTACTS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_MESSAGES);
@@ -117,10 +130,50 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     void deleteDB() {
         SQLiteDatabase.loadLibs(mContext);
         SQLiteDatabase db = this.getWritableDatabase(SECRET_KEY);
+        db.delete(TABLE_SECRETS, null, null);
         db.delete(TABLE_USERS, null, null);
         db.delete(TABLE_CONTACTS, null, null);
         db.delete(TABLE_MESSAGES, null, null);
     }
+
+    /***
+     *  --- addKey(String, byte[]) ---
+     *  The function of adding a new key in 'Secrets' table.
+     *
+     *  @param addr The address.
+     *  @param key The generated key.
+     ***/
+    public Boolean addKey(String addr, byte[] key) {
+        SQLiteDatabase.loadLibs(mContext.getApplicationContext());
+        SQLiteDatabase db = this.getWritableDatabase(SECRET_KEY);
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(SECRETS_ADDR, addr);
+        contentValues.put(SECRETS_KEY, key);
+        long result = db.insert(TABLE_SECRETS, null, contentValues);
+        return result != -1;
+    }
+
+    /***
+     *  --- getKey(String) ---
+     *  The function of getting a key from 'Secrets' table.
+     *
+     *  @param addr The address.
+     ***/
+    public byte[] getKey(String addr) {
+        SQLiteDatabase.loadLibs(mContext.getApplicationContext());
+        SQLiteDatabase db = this.getReadableDatabase(SECRET_KEY);
+
+        byte[] result = null;
+        String selectQuery = "SELECT * FROM " + TABLE_SECRETS + " WHERE addr = ?";
+        Cursor cursor = db.rawQuery(selectQuery, new String[]{addr});
+
+        if (cursor.moveToFirst()) {
+            result = cursor.getBlob(2);
+        }
+        return result;
+    }
+
 
     /***
      *  --- addUser(String, String) ---
@@ -200,10 +253,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 temp = new User(
                     cursor.getString(1)
                   , cursor.getString(2)
-                  , cursor.getBlob(3)
                   , cursor.getBlob(4)
-                  , cursor.getBlob(5)
+                  , cursor.getBlob(3)
                   , cursor.getBlob(6)
+                  , cursor.getBlob(5)
                   , cursor.getString(7)
                 );
                 result.add(temp);

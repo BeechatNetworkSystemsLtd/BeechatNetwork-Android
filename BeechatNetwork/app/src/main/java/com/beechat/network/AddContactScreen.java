@@ -9,6 +9,11 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.digi.xbee.api.models.XBeeMessage;
+import com.digi.xbee.api.RemoteXBeeDevice;
+import com.digi.xbee.api.exceptions.XBeeException;
+import com.digi.xbee.api.models.XBee64BitAddress;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 /***
@@ -34,12 +39,12 @@ public class AddContactScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_contact_screen);
 
+        db = new DatabaseHandler(this);
+
         context = LocaleHelper.setLocale(getApplicationContext(), WelcomeScreen.language);
         resources = context.getResources();
 
         Bundle extras = getIntent().getExtras();
-
-        db = new DatabaseHandler(this);
 
         addressTextView = findViewById(R.id.addressTextView);
         nameEditText = findViewById(R.id.nameEditText);
@@ -59,11 +64,44 @@ public class AddContactScreen extends AppCompatActivity {
 
         addContactButton.setOnClickListener(v -> {
             name = nameEditText.getText().toString();
-            db.addContact(new Contact(selectedUserId, selectedXbeeDevice, name, ownerContact));
-            ContactsScreen.contactNames.add(name);
-            ContactsScreen.contactUserIds.add(selectedUserId);
-            ContactsScreen.contactXbeeAddress.add(selectedXbeeDevice);
-            ContactsScreen.onRefresh();
+
+            if (db.getKey(selectedXbeeDevice) != null) {
+                db.addContact(
+                    new Contact(
+                        selectedUserId
+                      , selectedXbeeDevice
+                      , name
+                      , ownerContact
+                    )
+                );
+                ContactsScreen.contactNames.add(name);
+                ContactsScreen.contactUserIds.add(selectedUserId);
+                ContactsScreen.contactXbeeAddress.add(selectedXbeeDevice);
+                ContactsScreen.onRefresh();
+            } else {
+                try {
+                    SplashScreen.hasher.clear();
+                    SplashScreen.hasher.update(SplashScreen.myGeneratedUserId, User.NODEID_SIZE);
+                    SplashScreen.randomHash = SplashScreen.hasher.finalize(128);
+                } catch (Exception ex) {
+                    System.out.println("Exception: " + ex.getMessage());
+                    ex.printStackTrace();
+                }
+                Message getDP = new Message(Packet.Type.DP_KEY, SplashScreen.randomHash);
+                try {
+                    getDP.send(
+                        SplashScreen.myXbeeDevice
+                      , new RemoteXBeeDevice(
+                            SplashScreen.myXbeeDevice
+                            , new XBee64BitAddress(selectedXbeeDevice)
+                        )
+                      , SplashScreen.hasher
+                    );
+                } catch (Exception ex) {
+                    System.out.println("Exception: " + ex.getMessage());
+                    ex.printStackTrace();
+                }
+            }
 
             Intent intent = new Intent();
             intent.putExtra("newname", name);

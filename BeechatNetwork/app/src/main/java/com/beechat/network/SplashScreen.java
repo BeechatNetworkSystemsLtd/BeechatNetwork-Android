@@ -28,6 +28,11 @@ public class SplashScreen extends AppCompatActivity {
     public static String addressMyXbeeDevice;
     public static XBeeDevice myXbeeDevice;
     public static byte[] myGeneratedUserId;
+    public static byte[] myDPKey;
+    public static byte[] myDSKey;
+    public static byte[] myKPKey;
+    public static byte[] myKSKey;
+    public static byte[] randomHash;
     private User neo;
     public static Blake3 hasher;
 
@@ -55,6 +60,10 @@ public class SplashScreen extends AppCompatActivity {
         neo = db.getUser(extras.getString("key_usernameId"));
         myGeneratedUserId = Blake3.fromString(extras.getString("key_usernameId"));
         myXbeeDevice = new XBeeDevice(this, BAUD_RATE);
+        myDPKey = neo.getDPubKey();
+        myDSKey = neo.getDPrivKey();
+        myKPKey = neo.getKPubKey();
+        myKSKey = neo.getKPrivKey();
 
         new Thread(() -> {
             try {
