@@ -70,6 +70,7 @@ public class ChatScreen extends AppCompatActivity {
     Resources resources;
     ImageButton sendButton;
     ImageButton backButton, attachButton;
+    ImageButton fileStopButton, filePauseButton;
     ListView chatListView;
     EditText inputField;
     TextView textViewAttachment;
@@ -80,10 +81,20 @@ public class ChatScreen extends AppCompatActivity {
     Boolean fileFlag = false;
     int numberOfPackage;
     int remainOfPackage;
+    boolean filePause = false;
+    boolean fileStop = false;
     static int transmitProgressValue = 0;
+    static int transmitPercentageValue = 0;
+    static ProgressBar transmitProgress = null;
     byte[] array;
 
     static DatabaseHandler db;
+
+    static void setFileDelivery(float val) {
+        if (transmitProgress != null) {
+            transmitProgress.setProgress((int)(val * transmitProgress.getMax()));
+        }
+    }
 
     static ArrayList<String> messages = new ArrayList<>();
     public static List<String> getMessages() {
@@ -116,10 +127,15 @@ public class ChatScreen extends AppCompatActivity {
 
         textViewAttachment = findViewById(R.id.textViewAttachment);
 
+        transmitProgress = findViewById(R.id.progressBar);
         sendButton = findViewById(R.id.sendButton);
         nameTextView = findViewById(R.id.nameTextView);
         backButton = findViewById(R.id.backButton);
         attachButton = findViewById(R.id.attachButton);
+        fileStopButton = findViewById(R.id.fileStopButton);
+        filePauseButton = findViewById(R.id.filePauseButton);
+        fileStopButton.setVisibility(View.INVISIBLE);
+        filePauseButton.setVisibility(View.INVISIBLE);
 
         inputField = findViewById(R.id.inputField);
 
@@ -167,6 +183,29 @@ public class ChatScreen extends AppCompatActivity {
         });
 
         // Handling the message sending event.
+        fileStopButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                fileStop = true;
+            }
+        });
+
+        // Handling the message sending event.
+        filePauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                filePause = !filePause;
+                Drawable drawable = null;
+                if (filePause) {
+                    drawable = getResources().getDrawable(android.R.drawable.ic_media_play);
+                } else {
+                    drawable = getResources().getDrawable(android.R.drawable.ic_media_pause);
+                }
+                filePauseButton.setImageDrawable(drawable);
+            }
+        });
+
+        // Handling the message sending event.
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -199,6 +238,12 @@ public class ChatScreen extends AppCompatActivity {
                                 byte[] packageFile = new byte[sizeOfPackage];
                                 int tcount = remainOfPackage != 0 ? numberOfPackage + 1 : numberOfPackage;
                                 Packet sender = new Packet(SplashScreen.hasher);
+
+                                ChatScreen.this.runOnUiThread(() -> {
+                                    fileStopButton.setVisibility(View.VISIBLE);
+                                    filePauseButton.setVisibility(View.VISIBLE);
+                                });
+
                                 for (short i = 0; i < (short)numberOfPackage; i++) {
                                     bb.get(packageFile, 0, packageFile.length);
                                     sender.setData(
@@ -213,12 +258,18 @@ public class ChatScreen extends AppCompatActivity {
                                       , sender.getData()
                                     );
                                     transmitProgressValue = (int)(((float)i / (float)numberOfPackage) * transmitProgress.getMax());
+                                    transmitPercentageValue = (int)(((float)i / (float)numberOfPackage) * 100);
                                     ChatScreen.this.runOnUiThread(() -> {
                                         transmitProgress.setProgress(transmitProgressValue);
+                                        textViewAttachment.setText(filename + "  " + Integer.toString(transmitPercentageValue) + "%");
                                     });
-                                    //transmitProgress.setProgress((int)(((float)i / (float)numberOfPackage) * transmitProgress.getMax()));
+                                    if (fileStop) {
+                                        break;
+                                    } else while (filePause) {
+                                        Thread.sleep(500);
+                                    }
                                 }
-                                if (remainOfPackage != 0) {
+                                if (remainOfPackage != 0 && !fileStop) {
                                     sender = new Packet(SplashScreen.hasher);
                                     packageFile = new byte[remainOfPackage];
                                     bb.get(packageFile, 0, packageFile.length);
@@ -234,10 +285,14 @@ public class ChatScreen extends AppCompatActivity {
                                       , sender.getData()
                                     );
                                 }
+                                ChatScreen.this.runOnUiThread(() -> {
+                                    fileStopButton.setVisibility(View.INVISIBLE);
+                                    filePauseButton.setVisibility(View.INVISIBLE);
+                                });
+                                fileStop = false;
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
-                            transmitProgressValue = 0;
                             ChatScreen.this.runOnUiThread(() -> {
                                 textViewAttachment.setText("");
                                 transmitProgress.setProgress(0);
