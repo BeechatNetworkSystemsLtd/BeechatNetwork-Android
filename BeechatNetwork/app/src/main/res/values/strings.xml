@@ -1,16 +1,16 @@
 <resources>
     <string name="app_name">Beechat Clip</string>
-    <string name="select_device">Nearby radio devices</string>
+    <string name="select_device">Nearby Beenodes</string>
     <string name="back">Back</string>
     <string name="send">Send</string>
-    <string name="connecting_device_title">Connecting to device</string>
-    <string name="scanning_device_title">Scanning devices</string>
-    <string name="startup_device_title">Scanning ID XBEE device</string>
-    <string name="connecting_device_description">Please wait while connecting to the selected XBee device...</string>
-    <string name="scanning_devices">Please wait while scanning of XBee devices...</string>
-    <string name="startup_device">Please wait while scanning ID your device...</string>
+    <string name="connecting_device_title">Connecting to remote Beenode</string>
+    <string name="scanning_device_title">Scanning for surrounding Beenodes</string>
+    <string name="startup_device_title">Scanning ID of your Clip</string>
+    <string name="connecting_device_description">Please wait while connecting to the selected Beenode...</string>
+    <string name="scanning_devices">Please wait while scanning for surrounding Beenodes...</string>
+    <string name="startup_device">Please wait while scanning the ID of your Clip...</string>
     <string name="error_connecting_title">Error connecting</string>
-    <string name="error_connecting_description">Could not connect to the selected XBee device: %1$s</string>
+    <string name="error_connecting_description">Could not connect to the selected Beenode: %1$s</string>
     <string name="eula_agreement">I agree <u>to the Privacy Policy and to the End User License Agreement</u></string>
     <string name="eula_text">EULA text</string>
     <string name="language">ENGLISH</string>
@@ -38,7 +38,7 @@
     <string name="yesButtonLabel">Yes</string>
     <string name="noButtonLabel">No</string>
     <string name="areYouSureLabel">Are you sure?</string>
-    <string name="okButtonLabel">Ok</string>
+    <string name="okButtonLabel">OK</string>
     <string name="successLabel">Success</string>
     <string name="backLabel">Back</string>
     <string name="edit_contactLabel">Edit contact</string>
