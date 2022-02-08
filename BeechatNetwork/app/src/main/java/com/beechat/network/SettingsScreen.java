@@ -85,7 +85,7 @@ public class SettingsScreen extends Fragment {
 
         applyButton.setOnClickListener(v -> {
             SplashScreen.BAUD_RATE = listValues.get(valueBaudRate);
-            Toast.makeText(getContext(), "The BAUD RATE was change to " + SplashScreen.BAUD_RATE, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "The baud rate was changed to " + SplashScreen.BAUD_RATE, Toast.LENGTH_SHORT).show();
         });
 
         return view;

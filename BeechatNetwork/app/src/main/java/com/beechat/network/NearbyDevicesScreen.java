@@ -104,7 +104,7 @@ public class NearbyDevicesScreen extends Fragment {
 
             if (!contactsFromDb.isEmpty()) {
                 if (contactsFromDb.contains(selectedUserId + " (" + selectedXbeeDevice + ")")) {
-                    Toast.makeText(getActivity(), "Contact is existing in DB!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "The selected Beenode is already a contact, please navigate to Conversations window and click on the contact to begin chat.", Toast.LENGTH_SHORT).show();
                     return;
                 }
             }

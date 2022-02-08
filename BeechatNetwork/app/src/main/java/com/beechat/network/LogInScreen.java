@@ -101,7 +101,7 @@ public class LogInScreen extends AppCompatActivity {
         String pass = password.getText().toString();
 
         if (pass.equals(""))
-            Toast.makeText(LogInScreen.this, "Please enter password!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(LogInScreen.this, "Please enter the password", Toast.LENGTH_SHORT).show();
         else {
             byte[] passHash = null;
             try {

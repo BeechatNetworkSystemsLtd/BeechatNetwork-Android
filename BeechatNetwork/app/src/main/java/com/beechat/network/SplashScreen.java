@@ -78,7 +78,7 @@ public class SplashScreen extends AppCompatActivity {
                     dialog.dismiss();
                     if (myXbeeDevice != null) {
                         addressMyXbeeDevice = myXbeeDevice.get64BitAddress().toString();
-                        Toast.makeText(SplashScreen.this, "User:" + Blake3.toString(myGeneratedUserId) + ",XBEE:" + addressMyXbeeDevice, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SplashScreen.this, "User:" + Blake3.toString(myGeneratedUserId) + ", XBee:" + addressMyXbeeDevice, Toast.LENGTH_SHORT).show();
                     }
 
                     Intent intent = new Intent(SplashScreen.this, MainScreen.class);
