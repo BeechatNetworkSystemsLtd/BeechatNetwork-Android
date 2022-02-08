@@ -164,9 +164,11 @@ public class MainScreen extends AppCompatActivity {
             if (currentType == Packet.Type.FILE_DATA) {
                 try {
                     outputStream.write(temp.getData());
+                    ChatScreen.setFileDelivery((float)temp.getPartNumber() / currentTotal);
                     if (temp.getPartNumber() == currentTotal - 1) {
                         outputStream.flush();
                         outputStream.close();
+                        ChatScreen.setFileDelivery(0);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
