@@ -75,8 +75,9 @@ public class ChatScreen extends AppCompatActivity {
     EditText inputField;
     TextView textViewAttachment;
     KeyguardManager myKM;
-    ChatDeviceAdapter chatDeviceAdapter;
+    static ChatDeviceAdapter chatDeviceAdapter;
     RemoteXBeeDevice remote;
+    public static AppCompatActivity linkAct = null;
     String message, filename, sizeFile;
     Boolean fileFlag = false;
     int numberOfPackage;
@@ -103,6 +104,9 @@ public class ChatScreen extends AppCompatActivity {
 
     static boolean flagNotification = false;
     public static void setNotification() {
+        linkAct.runOnUiThread(() -> {
+            chatDeviceAdapter.notifyDataSetChanged();
+        });
         flagNotification = true;
     }
 
@@ -156,6 +160,7 @@ public class ChatScreen extends AppCompatActivity {
         chatDeviceAdapter = new ChatDeviceAdapter(this, messages);
         chatListView.setAdapter(chatDeviceAdapter);
 
+        linkAct = this;
         nameTextView.setText(selectedName);
 
         nameTextView.setOnClickListener(v -> {
@@ -335,7 +340,7 @@ public class ChatScreen extends AppCompatActivity {
         // Checking the message channel and generating notifications.
         handler.postDelayed(new Runnable() {
             public void run() {
-                chatDeviceAdapter.notifyDataSetChanged();
+                //chatDeviceAdapter.notifyDataSetChanged();
                 if (myKM.inKeyguardRestrictedInputMode() && flagNotification) {
                     String message = selectedName + ":\n" + messages.get(messages.size() - 1);
                     message = removeLastChar(message);
