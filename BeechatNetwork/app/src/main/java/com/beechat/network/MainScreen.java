@@ -35,6 +35,7 @@ public class MainScreen extends AppCompatActivity {
     ViewPager viewPager;
     TabLayout tabLayout;
     ArrayList<Fragment> fragments;
+    static String fileString;
     static FileOutputStream outputStream;
     static DatabaseHandler db;
     static Fragment linkAct;
@@ -172,10 +173,12 @@ public class MainScreen extends AppCompatActivity {
                 try {
                     outputStream.write(temp.getData());
                     ChatScreen.setFileDelivery((float)temp.getPartNumber() / currentTotal);
+                    ChatScreen.setFileText(fileString, (int)(100 * (float)temp.getPartNumber() / currentTotal));
                     if (temp.getPartNumber() == currentTotal - 1) {
                         outputStream.flush();
                         outputStream.close();
                         ChatScreen.setFileDelivery(0);
+                        ChatScreen.setFileText("", 0);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -371,9 +374,11 @@ public class MainScreen extends AppCompatActivity {
                 ).getAbsolutePath();
                 outputStream = new FileOutputStream(
                     new File(
-                        dir + "/" + new String(temp.getData()).split(" ")[0]
+                        dir + "/" + new String(message.getData()).split(" ")[0]
                     )
                 );
+                fileString = new String(message.getData());
+                if (fileString.length() > 34) fileString = fileString.substring(fileString.length() - 20);
                 ChatScreen.getMessages().add(
                     new String(message.getData()) + "\nS"
                 );
