@@ -73,7 +73,7 @@ public class ChatScreen extends AppCompatActivity {
     ImageButton fileStopButton, filePauseButton;
     ListView chatListView;
     EditText inputField;
-    TextView textViewAttachment;
+    static TextView textViewAttachment;
     KeyguardManager myKM;
     static ChatDeviceAdapter chatDeviceAdapter;
     RemoteXBeeDevice remote;
@@ -94,6 +94,16 @@ public class ChatScreen extends AppCompatActivity {
     static void setFileDelivery(float val) {
         if (transmitProgress != null) {
             transmitProgress.setProgress((int)(val * transmitProgress.getMax()));
+        }
+    }
+
+    static void setFileText(String text, int per) {
+        if (textViewAttachment != null) {
+            if (per != 0) {
+                textViewAttachment.setText(text + " " + Integer.toString(per) + "%");
+            } else {
+                textViewAttachment.setText("");
+            }
         }
     }
 
@@ -484,6 +494,7 @@ public class ChatScreen extends AppCompatActivity {
                     if (mimeType == null) {
                         File file = new File(path);
                         filename = file.getName();
+                        if (filename.length() > 20) filename = filename.substring(filename.length() - 20);
                         /*if (path == null) {
                             filename = FilenameUtils.getName(uri.toString());
                         } else {
