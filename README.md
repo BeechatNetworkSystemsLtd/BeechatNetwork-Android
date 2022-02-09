@@ -1,8 +1,8 @@
 # Beechat Network for Android
 ## _Android version of the open source, encrypted, peer-to-peer, Beechat app._
 
-![BNSLTD](https://beechat.network/wp-content/uploads/2021/02/powered-by-1.png)
-![License](https://img.shields.io/badge/License-GPLv2-blue)
+![BNSLTD](https://beechat.network/wp-content/uploads/2022/02/powered-by.png)
+![License](https://img.shields.io/badge/License-GPLv3-blue)
 
 ## Introduction
 
@@ -14,7 +14,7 @@ Beechat is an open source system which allows people to securely communicate ove
 
 If you want to send a message to someone outside your range, people in between you two can act as a bridge, without ever knowing the contents of the encrypted message.
 
-[Download pre-release demo APK](https://github.com/BeechatNetworkSystemsLtd/BeechatNetwork-Android/releases)
+[Download Android APK](https://github.com/BeechatNetworkSystemsLtd/BeechatNetwork-Android/releases/tag/Android)
 -------------------
 
 Code 
@@ -48,7 +48,7 @@ Timeline
 Threat model
 -------------------
 * __MITM Attacks__: we assume an intermediary node could spoof the 64 bit hardware address (HWAddr) of both Alice’s and Bob’s radios. The bad actor can then conduct a man in the middle attack.
-__Solution__: By having Alice and Bob sign & encrypt their messages, and share their usernames via QR codes in person, even if the bad actor spoofs the HWAddr, they will not be able to see contents of the message as they do not have the private key to decrypt the message.
+__Solution__: Alice uses her hash of the Dilithium public key as her address. Any subsequent Kyber encryption keys must be signed by that Dilithium key, even if the bad actor spoofs the HWAddr, they will not be able to see contents of the message as they do not have the private key to decrypt the message.
 
 * __DoS attack__: an attacker can spam the network and flood it with packets by modifying the open source app and creating an infinite loop sending packets. 
 Attack limits: the bad actor’s packets will only reach 20 hops or less in case the network has fewer nodes. 
@@ -63,37 +63,37 @@ Features
 **Alpha Features**
 | Feature | Description | 
 | ------ | ------ |
-| Basic radio chat | Select from nodes in your network and start a chat | 
+| Basic radio chat | **(Complete)** Select from nodes in your network and start a chat | 
 
 **Beta Features** Q3 2021
 | Category | Feature | Description |
 | ------ | ------ | ------ |
-| UX | Notifications |  **Added on 1/9/2021** add system notifications for messages received when the device is locked or in another app. |
-| Security | Extended error catching and debug log system | **Added on 1/9/2021** add better error catching to prevent unexpected hang-ups. |
-| Optimisations |  Separate thread for listnodes | **(Added)** run listnodes method on a separate thread to prevent app hang-up. |
-| UX | Splash screen | **(Added)** add a splash screen on startup with progress bar. |
-| Misc. | SQLite DB | **(Added)** add database file to be able to save conversations with and other data persistently. |
-| UX | Saved conversations window | **(Added)** add a new window containing saved conversations & broadcasts. |
-| UX | Settings window | **(Added)** baud rate slider, language, dark mode, wipe database. |
-| UX | Refresh animation | **(Added)** show a loading animation when clicking on the refresh button. |
-| Misc. | Receipts | **(Added)** Sent & read receipts as well as timestamped  messages. |
-|Security | kyber-JNI implementation | implementing asymmetric encryption of messages utilising our [kyber-JNI](https://github.com/BeechatNetworkSystemsLtd/kyber-JNI) repo. | 
-|Security | dilithium-JNI implementation | implementing digital signature scheme authenticated messages utilising our [dilithium-JNI](https://github.com/BeechatNetworkSystemsLtd/dilithium-JNI) repo. |
+| UX | Notifications |  **(Complete)** add system notifications for messages received when the device is locked or in another app. |
+| Security | Extended error catching and debug log system | **(Complete)** add better error catching to prevent unexpected hang-ups. |
+| Optimisations |  Separate thread for listnodes | **(Complete)** run listnodes method on a separate thread to prevent app hang-up. |
+| UX | Splash screen | **(Complete)** add a splash screen on startup with progress bar. |
+| Misc. | SQLite DB | **(Complete)** add database file to be able to save conversations with and other data persistently. |
+| UX | Saved conversations window | **(Complete)** add a new window containing saved conversations & broadcasts. |
+| UX | Settings window | **(Complete)** baud rate slider, language, dark mode, wipe database. |
+| UX | Refresh animation | **(Complete)** show a loading animation when clicking on the refresh button. |
+| Misc. | Receipts | **(Complete)** Sent & read receipts as well as timestamped  messages. |
+|Security | kyber-JNI implementation | **(Complete)** implementing asymmetric encryption of messages utilising our [kyber-JNI](https://github.com/BeechatNetworkSystemsLtd/kyber-JNI) repo. | 
+|Security | dilithium-JNI implementation | **(Complete)** implementing digital signature scheme authenticated messages utilising our [dilithium-JNI](https://github.com/BeechatNetworkSystemsLtd/dilithium-JNI) repo. |
 
 
-__Public launch__ (Q4 2021)
+__Public launch__ (Q1 2022)
 
  Category | Feature | Description |
 | ------ | ------ | ------ |
-|Security | Multiple identities | switch between different kyber-dilithium keypairs within the application. | 
+|Security | Multiple identities | **(Complete)** switch between different kyber-dilithium keypairs within the application. | 
 |Misc. | Signed broadcasts with dilithium-JNI | allow subscriber nodes to subscribe to publisher nodes. Publisher nodes can then send signed public messages to their subscribers. | 
-|Misc. | File sending | allow sending of images, docx, pdf and other files in an encrypted manner. | 
+|Misc. | File sending | **(Complete)** allow sending of images, docx, pdf and other files in an encrypted manner. | 
 
 
 
 License Information
 -------------------
 
-The hardware is released under the [GNU General Public License, version 2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html).
+The hardware is released under the [GNU General Public License, version 3](https://www.gnu.org/licenses/gpl-3.0.en.html).
 
 Distributed as-is; no warranty is given.
