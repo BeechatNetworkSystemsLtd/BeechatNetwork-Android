@@ -5,11 +5,20 @@ import android.content.res.Resources;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.net.Uri;
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.SecretKey;
+import javax.crypto.*;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.appcompat.app.AlertDialog;
 import androidx.viewpager.widget.ViewPager;
+import android.widget.Toast;
 
 import com.google.android.material.tabs.TabLayout;
 
@@ -22,6 +31,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.List;
+import javax.crypto.*;
+import javax.crypto.spec.*;
+import javax.crypto.spec.PBEKeySpec;
+import java.security.spec.KeySpec;
 import java.io.*;
 
 
@@ -45,6 +58,7 @@ public class MainScreen extends AppCompatActivity {
     static ArrayList<String> contactUserIds = new ArrayList<>();
     static String cname, cselectedUserId, cselectedXbeeDevice;
     static boolean replyReceived = false;
+    int FILE_SELECT_CODE = 101;
     List<Contact> contactsFromDb;
 
     @Override
@@ -89,6 +103,9 @@ public class MainScreen extends AppCompatActivity {
         tabLayout.getTabAt(2).setIcon(R.drawable.broadcast_black);
         tabLayout.getTabAt(3).setIcon(R.drawable.settings_black);
 
+        if (SplashScreen.myXbeeDevice.isOpen() == false) {
+            return;
+        }
         try {
             // Channel check events added to the device.
             SplashScreen.myXbeeDevice.addDataListener(listener);
@@ -110,10 +127,81 @@ public class MainScreen extends AppCompatActivity {
         }
     }
 
+    // AES key derived from a password
+    public static SecretKey getAESKeyFromPassword(String password, String salt) {
+        try {
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+            // iterationCount = 65536
+            // keyLength = 256
+            KeySpec spec = new PBEKeySpec(password.toCharArray(), salt.getBytes(), 65536, 256);
+            SecretKey secret = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
+            return secret;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (data == null) {
+            return;
+        }
+        if (requestCode == 65536 + 14) {
+            String cw = data.getStringExtra("cw");
+            SecretKey skey = getAESKeyFromPassword(cw, "AES");
+            try {
+                String dir = Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DOWNLOADS
+                ).getAbsolutePath();
+                FileOutputStream outputStream = new FileOutputStream(
+                    new File(
+                        dir + "/" + SplashScreen.neo.getLogo() + ".user"
+                    )
+                );
+                int seek = 0;
+                byte[] towrite = new byte[
+                    User.NODEID_SIZE * 2
+                  + User.PASS_HASH_SIZE * 2
+                  + Dilithium.CRYPTO_PUBLICKEYBYTES
+                  + Dilithium.CRYPTO_SECRETKEYBYTES
+                  + Kyber512.KYBER_PUBLICKEYBYTES
+                  + Kyber512.KYBER_SECRETKEYBYTES
+                  + SplashScreen.neo.getLogo().length()
+                ];
+
+                System.arraycopy(SplashScreen.neo.getUsername().getBytes(), 0, towrite, seek, User.NODEID_SIZE * 2);
+                seek += User.NODEID_SIZE * 2;
+
+                System.arraycopy(SplashScreen.neo.getPassword().getBytes(), 0, towrite, seek, User.PASS_HASH_SIZE * 2);
+                seek += User.PASS_HASH_SIZE * 2;
+
+                System.arraycopy(SplashScreen.neo.getDPubKey(), 0, towrite, seek, Dilithium.CRYPTO_PUBLICKEYBYTES);
+                seek += Dilithium.CRYPTO_PUBLICKEYBYTES;
+
+                System.arraycopy(SplashScreen.neo.getDPrivKey(), 0, towrite, seek, Dilithium.CRYPTO_SECRETKEYBYTES);
+                seek += Dilithium.CRYPTO_SECRETKEYBYTES;
+
+                System.arraycopy(SplashScreen.neo.getKPubKey(), 0, towrite, seek, Kyber512.KYBER_PUBLICKEYBYTES);
+                seek += Kyber512.KYBER_PUBLICKEYBYTES;
+
+                System.arraycopy(SplashScreen.neo.getKPrivKey(), 0, towrite, seek, Kyber512.KYBER_SECRETKEYBYTES);
+                seek += Kyber512.KYBER_SECRETKEYBYTES;
+
+                System.arraycopy(SplashScreen.neo.getLogo().getBytes(), 0, towrite, seek, SplashScreen.neo.getLogo().length());
+
+                Cipher cipher = Cipher.getInstance("AES");
+                cipher.init(Cipher.ENCRYPT_MODE, skey);
+                outputStream.write(cipher.doFinal(towrite));
+                outputStream.flush();
+                outputStream.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Export error!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Toast.makeText(this, "Current user was exported!", Toast.LENGTH_SHORT).show();
             return;
         }
         cname = data.getStringExtra("newname");

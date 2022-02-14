@@ -1,5 +1,10 @@
 package com.beechat.network;
 
+import android.Manifest;
+import androidx.core.app.ActivityCompat;
+import android.content.pm.PackageManager;
+
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -14,6 +19,9 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.net.Uri;
+import android.os.Build;
+import androidx.annotation.RequiresApi;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,12 +33,22 @@ import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import java.security.NoSuchAlgorithmException;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
+import java.util.Objects;
 
 /***
  *  --- WelcomeScreen ---
@@ -42,7 +60,7 @@ public class WelcomeScreen extends AppCompatActivity {
     Context context;
     Resources resources;
     EditText password, passwordConfirm, logoName;
-    Button finishButton;
+    Button finishButton, importButton;
     CheckBox agreementCheckBox;
     TextView eulaTextView, userIdTextView;
     Spinner languagesSpinner;
@@ -54,6 +72,8 @@ public class WelcomeScreen extends AppCompatActivity {
     byte[] generatedUserKSk;
     DatabaseHandler DB;
     private SecretKeySpec secretKeySpec;
+    int FILE_SELECT_CODE = 101;
+    String path = null;
 
     // Constants
     String algorithm = "AES";
@@ -76,6 +96,7 @@ public class WelcomeScreen extends AppCompatActivity {
 
         userIdTextView = findViewById(R.id.textViewMyID);
         finishButton = findViewById(R.id.finishButton);
+        importButton = findViewById(R.id.buttonImport);
         logoName = findViewById(R.id.logoName);
         password = findViewById(R.id.passwordOne);
         passwordConfirm = findViewById(R.id.passwordTwo);
@@ -146,9 +167,44 @@ public class WelcomeScreen extends AppCompatActivity {
             }
         });
 
+        askPermissions();
+
+        // Handling the event of attaching files.
+        importButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("*/*");
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                try {
+                    startActivityForResult(Intent.createChooser(intent, "Select a File to Upload"), FILE_SELECT_CODE);
+                } catch (Exception ex) {
+                    System.out.println("browseClick :" + ex);
+                }
+            }
+        });
+
         agreementCheckBox = findViewById(R.id.agreementCheckBox);
         agreementCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> finishButton.setEnabled(isChecked));
     }
+
+    /***
+     *  --- askPermissions() ---
+     *  The function of requesting permission to access the internal storage of the phone.
+     ***/
+    protected void askPermissions() {
+        String[] permissions = {
+                "android.permission.READ_EXTERNAL_STORAGE",
+                "android.permission.WRITE_EXTERNAL_STORAGE"
+        };
+        int permission = ActivityCompat.checkSelfPermission(Objects.requireNonNull(this), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                    this, permissions, 1);
+        }
+    }
+
 
     /***
      *  --- createAccount() ---
@@ -248,4 +304,99 @@ public class WelcomeScreen extends AppCompatActivity {
 
         return resultString;
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == FILE_SELECT_CODE) {
+            if (resultCode == RESULT_OK) {
+                try {
+                    Uri uri = data.getData();
+                    path = ChatScreen.getPath(this, uri);
+                    Intent intent = new Intent(this, CodeWordScreen.class);
+                    startActivityForResult(intent, 1);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        } else if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+                String cw = data.getStringExtra("cw");
+                byte[] neo_raw = readRecovery(new File(path), cw);
+                int seek = 0;
+                if (neo_raw == null) {
+                    Toast.makeText(this, "The code word is not accepted!", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                byte[] userId = new byte[User.NODEID_SIZE * 2];
+                System.arraycopy(neo_raw, seek, userId, 0, User.NODEID_SIZE * 2);
+                seek += User.NODEID_SIZE * 2;
+
+                byte[] passh = new byte[User.PASS_HASH_SIZE * 2];
+                System.arraycopy(neo_raw, seek, passh, 0, User.PASS_HASH_SIZE * 2);
+                seek += User.PASS_HASH_SIZE * 2;
+
+                byte[] dpk = new byte[Dilithium.CRYPTO_PUBLICKEYBYTES];
+                System.arraycopy(neo_raw, seek, dpk, 0, Dilithium.CRYPTO_PUBLICKEYBYTES);
+                seek += Dilithium.CRYPTO_PUBLICKEYBYTES;
+
+                byte[] dsk = new byte[Dilithium.CRYPTO_SECRETKEYBYTES];
+                System.arraycopy(neo_raw, seek, dsk, 0, Dilithium.CRYPTO_SECRETKEYBYTES);
+                seek += Dilithium.CRYPTO_SECRETKEYBYTES;
+
+                byte[] kpk = new byte[Kyber512.KYBER_PUBLICKEYBYTES];
+                System.arraycopy(neo_raw, seek, kpk, 0, Kyber512.KYBER_PUBLICKEYBYTES);
+                seek += Kyber512.KYBER_PUBLICKEYBYTES;
+
+                byte[] ksk = new byte[Kyber512.KYBER_SECRETKEYBYTES];
+                System.arraycopy(neo_raw, seek, ksk, 0, Kyber512.KYBER_SECRETKEYBYTES);
+                seek += Kyber512.KYBER_SECRETKEYBYTES;
+
+                byte[] logo = new byte[neo_raw.length - seek];
+                System.arraycopy(neo_raw, seek, logo, 0, neo_raw.length - seek);
+
+                User neo = new User(
+                    new String(userId)
+                  , new String(passh)
+                  , dpk
+                  , dsk
+                  , kpk
+                  , ksk
+                  , new String(logo)
+                );
+                DB.addUser(neo);
+                Toast.makeText(this, "The user is imported!", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(getApplicationContext(), LogInScreen.class);
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "The code word is not accepted!", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+	public static byte[] readRecovery(File bFile, String cw){
+		FileInputStream fin;
+		try {
+			fin = new FileInputStream(bFile);
+			BufferedInputStream in = new BufferedInputStream(fin);
+			try {
+				byte[] data = new byte[in.available()];
+                SecretKey skey = MainScreen.getAESKeyFromPassword(cw, "AES");
+				in.read(data);
+                Cipher cipher = Cipher.getInstance("AES");
+                cipher.init(Cipher.DECRYPT_MODE, skey);
+                byte [] output = cipher.doFinal(data);
+				return output;
+			} catch (Exception e) {
+				in.close();
+            } finally {
+				in.close();
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+        return null;
+	}
 }

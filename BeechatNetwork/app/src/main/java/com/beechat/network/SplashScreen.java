@@ -6,6 +6,9 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.widget.Toast;
+import android.widget.Button;
+import android.widget.TextView;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -34,8 +37,11 @@ public class SplashScreen extends AppCompatActivity {
     public static byte[] myKPKey;
     public static byte[] myKSKey;
     public static byte[] randomHash;
-    private User neo;
+    public static User neo;
     public static Blake3 hasher;
+    int dotCounter = 0;
+    boolean isEnter = false;
+    TextView skipView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,9 +60,68 @@ public class SplashScreen extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         db = new DatabaseHandler(this);
+        Button skipButton = findViewById(R.id.buttonSkip);
+        Button reqButton = findViewById(R.id.buttonSkip2);
+        TextView skipView = findViewById(R.id.textView2);
+        //skipView.setText("Connecting to device " + Integer.toString(BAUD_RATE) + " bps");
 
-        final ProgressDialog dialog = ProgressDialog.show(this, resources.getString(R.string.startup_device_title),
-                resources.getString(R.string.startup_device), true);
+        skipButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new Thread(() -> {
+                    isEnter = true;
+                    Intent intent = new Intent(SplashScreen.this, MainScreen.class);
+                    startActivity(intent);
+                }).start();
+            }
+        });
+
+        reqButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new Thread(() -> {
+                    try {
+                        myXbeeDevice.open();
+                        myXbeeDevice.setNodeID(Base58.encode(myGeneratedUserId));
+
+                        isEnter = true;
+                        SplashScreen.this.runOnUiThread(() -> {
+                            //dialog.dismiss();
+                            if (myXbeeDevice != null) {
+                                addressMyXbeeDevice = myXbeeDevice.get64BitAddress().toString();
+                                Toast.makeText(SplashScreen.this, "User:" + Blake3.toString(myGeneratedUserId) + ", XBee:" + addressMyXbeeDevice, Toast.LENGTH_SHORT).show();
+                            }
+
+                            Intent intent = new Intent(SplashScreen.this, MainScreen.class);
+                            startActivity(intent);
+                        });
+                    } catch (XBeeException e) {
+                        e.printStackTrace();
+                        myXbeeDevice.close();
+                    }
+                }).start();
+
+                new Thread(() -> {
+                    while (!isEnter) {
+                        if (dotCounter == 5) dotCounter = 0;
+                        SplashScreen.this.runOnUiThread(() -> {
+                            skipView.setText("Connecting to device " + Integer.toString(BAUD_RATE) + " bps ");
+                        });
+                        for (int i = 0; i < dotCounter; i++) {
+                            SplashScreen.this.runOnUiThread(() -> {
+                                skipView.setText(skipView.getText() + ".");
+                            });
+                            try {
+                                Thread.sleep(500);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        dotCounter++;
+                    }
+                }).start();
+            }
+        });
 
         neo = db.getUser(extras.getString("key_usernameId"));
         myGeneratedUserId = Blake3.fromString(extras.getString("key_usernameId"));
@@ -65,31 +130,6 @@ public class SplashScreen extends AppCompatActivity {
         myDSKey = neo.getDPrivKey();
         myKPKey = neo.getKPubKey();
         myKSKey = neo.getKPrivKey();
-
-        new Thread(() -> {
-            try {
-                myXbeeDevice.open();
-                try {
-                    myXbeeDevice.setNodeID(Base58.encode(myGeneratedUserId));
-                } catch (XBeeException e) {
-                    e.printStackTrace();
-                }
-                SplashScreen.this.runOnUiThread(() -> {
-                    dialog.dismiss();
-                    if (myXbeeDevice != null) {
-                        addressMyXbeeDevice = myXbeeDevice.get64BitAddress().toString();
-                        Toast.makeText(SplashScreen.this, "User:" + Blake3.toString(myGeneratedUserId) + ", XBee:" + addressMyXbeeDevice, Toast.LENGTH_SHORT).show();
-                    }
-
-                    Intent intent = new Intent(SplashScreen.this, MainScreen.class);
-                    startActivity(intent);
-                });
-
-            } catch (XBeeException e) {
-                e.printStackTrace();
-                myXbeeDevice.close();
-            }
-        }).start();
     }
 }
 

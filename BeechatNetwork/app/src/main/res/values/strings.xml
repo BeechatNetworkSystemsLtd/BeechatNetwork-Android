@@ -43,6 +43,8 @@
     <string name="backLabel">Back</string>
     <string name="edit_contactLabel">Edit contact</string>
     <string name="log_outButtonLabel">Log Out</string>
+    <string name="exportButtonLabel">EXPORT</string>
+    <string name="codeWordText">Code word</string>
 </resources>
 
 

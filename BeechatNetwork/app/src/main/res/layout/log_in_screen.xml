@@ -41,19 +41,6 @@
             android:textSize="16sp" />
 
         <Button
-            android:id="@+id/buttonImportAccount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="5dp"
-            android:background="@drawable/rounded_corner_for_button"
-            android:fontFamily="@font/nunito_regular"
-            android:padding="10dp"
-            android:text="@string/import_accountButtonLabel"
-            android:textColor="@android:color/white"
-            android:textSize="16sp" />
-
-        <Button
             android:id="@+id/buttonCreateAccount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

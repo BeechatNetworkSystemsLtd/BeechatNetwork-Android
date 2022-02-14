@@ -26,6 +26,7 @@
         <activity android:name="com.beechat.network.SplashScreen" />
         <activity android:name="com.beechat.network.WelcomeScreen" />
         <activity android:name="com.beechat.network.MainScreen" />
+        <activity android:name="com.beechat.network.CodeWordScreen" />
         <activity android:name="com.beechat.network.ChatScreen" />
         <activity android:name="com.beechat.network.AddContactScreen" />
         <activity android:name="com.beechat.network.EditContactScreen" />
