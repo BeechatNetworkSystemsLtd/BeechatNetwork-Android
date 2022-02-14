@@ -31,7 +31,7 @@ public class LogInScreen extends AppCompatActivity {
 
     // Variables
     EditText password;
-    Button buttonLogin, buttonCreateAccount, buttonImportAccount;
+    Button buttonLogin, buttonCreateAccount;
     DatabaseHandler db;
     String usernameId;
     Spinner spinnerUsernames;
@@ -61,7 +61,6 @@ public class LogInScreen extends AppCompatActivity {
 
         buttonLogin = findViewById(R.id.buttonLogIn);
         buttonCreateAccount = findViewById(R.id.buttonCreateAccount);
-        buttonImportAccount = findViewById(R.id.buttonImportAccount);
 
         spinnerUsernames = findViewById(R.id.accountSpinner);
         ArrayAdapter<String> adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, listUsernames);
@@ -89,8 +88,6 @@ public class LogInScreen extends AppCompatActivity {
             startActivity(intent);
         });
 
-        buttonImportAccount.setOnClickListener(view -> {
-        });
     }
 
     /***
