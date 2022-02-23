@@ -1,0 +1,50 @@
+<resources>
+    <string name="app_name">Beechat Clip</string>
+    <string name="select_device">Umliegende Beenodes</string>
+    <string name="back">Zurück</string>
+    <string name="send">Senden</string>
+    <string name="connecting_device_title">Sie werden mit der Beenode verbunden</string>
+    <string name="scanning_device_title">Scannen von umgebenen Beenodes</string>
+    <string name="startup_device_title">Die Identität Ihres Clips wird ermittelt</string>
+    <string name="connecting_device_description">Bitte warten Sie. Sie werden mit der ausgewählten Beenode verbunden...</string>
+    <string name="scanning_devices">Bitte warten Sie, während umliegende Beenodes gescannt werden...</string>
+    <string name="startup_device">Bitte warten Sie, während die Identität Ihres Clips ermittelt wird...</string>
+    <string name="error_connecting_title">Fehler beim Verbinden</string>
+    <string name="error_connecting_description">Konnte nicht mit der ausgewählten Beenode verbunden werden: %1$s</string>
+    <string name="eula_agreement">Ich stimme <u>der Datenschutzerklärung und der Endbenutzerlizenzvereinbarung</u>zu </string>
+    <string name="eula_text">EULA Text</string>
+    <string name="language">Deutsch</string>
+    <string name="eulaEmpty">EULA konnte nicht gefunden werden!</string>
+    <string name="selectLanguageLabel">Sprache wählen</string>
+    <string name="languageLabel">Sprache</string>
+    <string name="importLabelButton">Import</string>
+    <string name="my_id_nempty">Meine Identität \nempty</string>
+    <string name="passwordLabel">Passwort</string>
+    <string name="confirm_passwordLabel">Bestätigen Sie das Passwort</string>
+    <string name="finishLabelButton">Beenden</string>
+    <string name="log_inLabel">Log in</string>
+    <string name="import_accountButtonLabel">Importien eines Accounts</string>
+    <string name="create_accountButtonLabel">Einen neuen Account einrichten</string>
+    <string name="add_contactLabel">Kontakt hinzufügen</string>
+    <string name="addressLabelContact">Addresse</string>
+    <string name="nameLabelContact">Name</string>
+    <string name="add_contactButtonLabel">Kontakt hinzufügen</string>
+    <string name="conversationsLabel">Chats</string>
+    <string name="broadcast_my_idButtonLabel">Meine Identität broadcasten</string>
+    <string name="baud_rateLabel">Baud-Rate</string>
+    <string name="applyButtonLabel">Anwenden</string>
+    <string name="data_settingsLabel">Dateneinstellungen</string>
+    <string name="wipe_dataButtonLabel">Daten löschen</string>
+    <string name="yesButtonLabel">Ja</string>
+    <string name="noButtonLabel">Nein</string>
+    <string name="areYouSureLabel">Sind Sie sich sicher?</string>
+    <string name="okButtonLabel">Ok</string>
+    <string name="successLabel">Erfolg</string>
+    <string name="backLabel">Zurück</string>
+    <string name="edit_contactLabel">Kontakt bearbeiten</string>
+    <string name="log_outButtonLabel">Log out</string>
+    <string name="exportButtonLabel">EXPORTIEREN</string>
+    <string name="codeWordText">Codewort</string>
+</resources>
+
+
