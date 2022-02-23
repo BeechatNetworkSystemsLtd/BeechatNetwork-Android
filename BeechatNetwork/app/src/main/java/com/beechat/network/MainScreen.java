@@ -222,8 +222,8 @@ public class MainScreen extends AppCompatActivity {
         static Packet temp;
         static Blake3 tempBlake;
         static Packet.Type currentType = Packet.Type.MESSAGE_DATA;
-        static short currentPart = -1;
-        static short currentTotal = 1;
+        static int currentPart = -1;
+        static int currentTotal = 1;
         static Message message = new Message();
 
         public DataReceiveListener() {

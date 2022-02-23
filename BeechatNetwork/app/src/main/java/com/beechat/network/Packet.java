@@ -42,8 +42,8 @@ public class Packet {
     boolean correct = false;
     byte type;
     byte[] hash = new byte[2];
-    short partNumber = 0;
-    short totalNumber = 0;
+    int partNumber = 0;
+    int totalNumber = 0;
     byte[] data;
     Blake3 hasher;
 
@@ -57,14 +57,14 @@ public class Packet {
     }
 
     public static int getMaxLen() {
-        return 30;
+        return 26;
     }
 
     public Packet(Type type, short num, short totalNumber, byte[] data, Blake3 hasher) {
         setData(type, num, totalNumber, data, hasher);
     }
 
-    public void setData(Type type, short num, short totalNumber, byte[] data, Blake3 hasher) {
+    public void setData(Type type, int num, int totalNumber, byte[] data, Blake3 hasher) {
         this.hasher = hasher;
         if (type == Packet.Type.NONE) {
             return;
@@ -78,13 +78,18 @@ public class Packet {
         }
         this.hasher.clear();
 
-        this.data = new byte[data.length + 7];
+        this.data = new byte[data.length + 11];
         this.data[0] = this.type;
-        this.data[3] = (byte)(this.partNumber >> 8);
-        this.data[4] = (byte)(this.partNumber & 0xFF);
-        this.data[5] = (byte)(this.totalNumber >> 8);
-        this.data[6] = (byte)(this.totalNumber & 0xFF);
-        System.arraycopy(data, 0, this.data, 7, data.length);
+        this.data[3] = (byte)(this.partNumber >> 24);
+        this.data[4] = (byte)(this.partNumber >> 16);
+        this.data[5] = (byte)(this.partNumber >> 8);
+        this.data[6] = (byte)(this.partNumber & 0xFF);
+        this.data[7] = (byte)(this.totalNumber >> 24);
+        this.data[8] = (byte)(this.totalNumber >> 16);
+        this.data[9] = (byte)(this.totalNumber >> 8);
+        this.data[10] = (byte)(this.totalNumber & 0xFF);
+
+        System.arraycopy(data, 0, this.data, 11, data.length);
         this.hasher.update(data, data.length);
         byte[] temp = this.hasher.finalize(2);
 
@@ -97,7 +102,7 @@ public class Packet {
     public void setRaw(byte[] data) {
         int len = data.length;
         correct = false;
-        if (len < 8 || hasher == null) {
+        if (len < 12 || hasher == null) {
             return;
         }
 
@@ -106,13 +111,17 @@ public class Packet {
         type = data[0];
         hash[0] = data[1];
         hash[1] = data[2];
-        partNumber = (short)(((data[3] & 0xFF) << 8)
-                           | ((data[4] & 0xFF) << 0));
-        totalNumber = (short)(((data[5] & 0xFF) << 8)
-                            | ((data[6] & 0xFF) << 0));
-        this.data = new byte[len - 7];
-        System.arraycopy(data, 7, this.data, 0, len - 7);
-        hasher.update(this.data, len - 7);
+        partNumber = (int)(((data[3] & 0xFF) << 24)
+                         | ((data[4] & 0xFF) << 16)
+                         | ((data[5] & 0xFF) << 8)
+                         | ((data[6] & 0xFF) << 0));
+        totalNumber = (int)(((data[7] & 0xFF) << 24)
+                          | ((data[8] & 0xFF) << 16)
+                          | ((data[9] & 0xFF) << 8)
+                          | ((data[10] & 0xFF) << 0));
+        this.data = new byte[len - 11];
+        System.arraycopy(data, 11, this.data, 0, len - 7);
+        hasher.update(this.data, len - 11);
         if (!Arrays.equals(hasher.finalize(2), hash)) {
             return;
         }
@@ -124,11 +133,11 @@ public class Packet {
         return correct;
     }
 
-    public short getPartNumber() {
+    public int getPartNumber() {
         return partNumber;
     }
 
-    public short getTotalNumber() {
+    public int getTotalNumber() {
         return totalNumber;
     }
 
