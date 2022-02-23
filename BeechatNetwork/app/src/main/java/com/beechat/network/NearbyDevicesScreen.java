@@ -287,6 +287,11 @@ public class NearbyDevicesScreen extends Fragment {
         List<RemoteXBeeDevice> devices = null;
 
         XBeeNetwork network = myDevice.getNetwork();
+        try {
+            network.setDiscoveryTimeout(10000);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
         network.startDiscoveryProcess();
 
         while (network.isDiscoveryRunning()) {
