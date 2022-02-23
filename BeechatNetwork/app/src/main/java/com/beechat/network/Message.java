@@ -16,8 +16,8 @@ import java.security.NoSuchAlgorithmException;
  **/
 public class Message extends ArrayList<Packet> {
     Packet.Type type = Packet.Type.NONE;
-    public short partNumber = -1;
-    public short totalNumber = -1;
+    public int partNumber = -1;
+    public int totalNumber = -1;
     boolean ready = false;
     byte[] result = null;
 
@@ -56,12 +56,12 @@ public class Message extends ArrayList<Packet> {
             return false;
         }
         this.type = temp;
-        short packetNum = e.getPartNumber();
+        int packetNum = e.getPartNumber();
         if (packetNum != partNumber + 1) {
             return false;
         }
         partNumber++;
-        short packetTotal = e.getTotalNumber();
+        int packetTotal = e.getTotalNumber();
         if (packetTotal < 1 || (packetTotal != totalNumber && totalNumber != -1)) {
             return false;
         }
