@@ -57,10 +57,10 @@ public class Packet {
     }
 
     public static int getMaxLen() {
-        return 26;
+        return 24;
     }
 
-    public Packet(Type type, short num, short totalNumber, byte[] data, Blake3 hasher) {
+    public Packet(Type type, int num, int totalNumber, byte[] data, Blake3 hasher) {
         setData(type, num, totalNumber, data, hasher);
     }
 
@@ -120,7 +120,7 @@ public class Packet {
                           | ((data[9] & 0xFF) << 8)
                           | ((data[10] & 0xFF) << 0));
         this.data = new byte[len - 11];
-        System.arraycopy(data, 11, this.data, 0, len - 7);
+        System.arraycopy(data, 11, this.data, 0, len - 11);
         hasher.update(this.data, len - 11);
         if (!Arrays.equals(hasher.finalize(2), hash)) {
             return;

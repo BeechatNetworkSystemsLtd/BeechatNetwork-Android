@@ -79,6 +79,9 @@ public class AddContactScreen extends AppCompatActivity {
                 ContactsScreen.contactXbeeAddress.add(selectedXbeeDevice);
                 ContactsScreen.onRefresh();
             } else {
+                if (MainScreen.userAddLock) {
+                    finish();
+                }
                 try {
                     SplashScreen.hasher.clear();
                     SplashScreen.hasher.update(SplashScreen.myGeneratedUserId, User.NODEID_SIZE);
@@ -87,6 +90,8 @@ public class AddContactScreen extends AppCompatActivity {
                     System.out.println("Exception: " + ex.getMessage());
                     ex.printStackTrace();
                 }
+                ContactsScreen.contactNames.add("Init ...");
+                ContactsScreen.onRefresh();
                 Message getDP = new Message(Packet.Type.DP_KEY, SplashScreen.randomHash);
                 try {
                     getDP.send(

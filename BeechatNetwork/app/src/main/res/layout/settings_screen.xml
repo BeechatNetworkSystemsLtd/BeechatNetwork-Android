@@ -18,35 +18,12 @@
             android:layout_marginBottom="20dp"
             android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/languageTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/nunito_regular"
-                android:text="@string/languageLabel"
-                android:textColor="@android:color/black"
-                android:textSize="30sp" />
-
-            <Spinner
-                android:id="@+id/languageSpinner"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:drawSelectorOnTop="true"
-                android:entries="@array/items" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:orientation="horizontal">
-
             <Switch
                 android:id="@+id/darkModeSwitch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/nunito_regular"
-                android:text="Dark mode"
+                android:text="@string/settingsDarkModeLabel"
                 android:textColor="@android:color/black"
                 android:textSize="30sp" />
 
@@ -65,7 +42,7 @@
                 android:background="@drawable/rounded_corner_for_button"
                 android:fontFamily="@font/nunito_regular"
                 android:padding="10dp"
-                android:text="Saved Data"
+                android:text="@string/settingsSavedDataButton"
                 android:textColor="@android:color/white"
                 android:textSize="16sp" />
 

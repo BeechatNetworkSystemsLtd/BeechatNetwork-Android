@@ -28,12 +28,12 @@
 
             <TextView
                 android:id="@+id/labelTextView"
-                android:text= "Edit contact"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
+                android:text="@string/editContactLabel"
                 android:textColor="@color/white"
-                android:textSize="40dp"/>
+                android:textSize="40dp" />
 
         </LinearLayout>
 
@@ -47,22 +47,24 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
                 android:orientation="horizontal">
+
                 <TextView
                     android:id="@+id/addressTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text= "Address"/>
+                    android:text="@string/editContactAddressLabel" />
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
                 android:orientation="horizontal">
+
                 <TextView
                     android:id="@+id/labelNameTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text= "Name"/>
+                    android:text="@string/editContactNameLabel" />
                 <EditText
                     android:id="@+id/nameEditText"
                     android:layout_width="match_parent"
@@ -75,11 +77,11 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:background="@drawable/rounded_corner_for_button"
-                android:textColor="@android:color/white"
-                android:textSize="16sp"
-                android:padding="10dp"
                 android:fontFamily="@font/nunito_regular"
-                android:text= "Update contact"/>
+                android:padding="10dp"
+                android:text="@string/editContactUpdateContactButton"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
         </LinearLayout>
 
 

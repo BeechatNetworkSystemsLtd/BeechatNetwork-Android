@@ -24,6 +24,7 @@
             android:layout_marginTop="20dp"
             android:fontFamily="@font/nunito_regular"
             android:hint="@string/passwordLabel"
+            android:inputType="textPassword"
             android:textColor="@android:color/black"
             android:textSize="30sp" />
 

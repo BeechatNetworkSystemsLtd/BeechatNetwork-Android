@@ -45,6 +45,15 @@
     <string name="log_outButtonLabel">Log Out</string>
     <string name="exportButtonLabel">EXPORT</string>
     <string name="codeWordText">Code word</string>
+    <string name="editContactLabel">Edit Contact</string>
+    <string name="editContactAddressLabel">Address</string>
+    <string name="editContactNameLabel">Name</string>
+    <string name="editContactUpdateContactButton">Update Contact</string>
+    <string name="settingsDarkModeLabel">Dark Mode</string>
+    <string name="settingsSavedDataButton">Saved Data</string>
+    <string name="splashMainLabel">Connect to the device by clicking on the Request button</string>
+    <string name="splashReqButton">Request permisions</string>
+    <string name="splashSkipButton">Skip</string>
 </resources>
 
 
