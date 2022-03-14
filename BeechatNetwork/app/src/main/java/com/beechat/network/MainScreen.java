@@ -52,6 +52,7 @@ public class MainScreen extends AppCompatActivity {
     static FileOutputStream outputStream;
     static DatabaseHandler db;
     static Fragment linkAct;
+    public static boolean userAddLock = false;
     DataReceiveListener listener = new DataReceiveListener();
     static ArrayList<String> contactNames = new ArrayList<>();
     static ArrayList<String> contactXbeeAddress = new ArrayList<>();
@@ -260,8 +261,8 @@ public class MainScreen extends AppCompatActivity {
             if (currentType == Packet.Type.FILE_DATA) {
                 try {
                     outputStream.write(temp.getData());
-                    ChatScreen.setFileDelivery((float)temp.getPartNumber() / currentTotal);
-                    ChatScreen.setFileText(fileString, (int)(100 * (float)temp.getPartNumber() / currentTotal));
+                    ChatScreen.setFileDelivery((float)temp.getPartNumber() / (float)currentTotal);
+                    ChatScreen.setFileText(fileString, (int)(100 * ((float)temp.getPartNumber() / (float)currentTotal)));
                     if (temp.getPartNumber() == currentTotal - 1) {
                         outputStream.flush();
                         outputStream.close();
@@ -317,6 +318,7 @@ public class MainScreen extends AppCompatActivity {
 
 
         private void signRandomHash(XBeeMessage xbeeMessage) {
+            userAddLock = true;
             byte[] sm = new byte[Dilithium.CRYPTO_BYTES + message.getData().length];
 
             Dilithium.crypto_sign(sm, message.getData(), message.getData().length, SplashScreen.myDSKey);
@@ -370,6 +372,11 @@ public class MainScreen extends AppCompatActivity {
                 System.out.println("Exception: " + ex.getMessage());
                 ex.printStackTrace();
             }
+            ContactsScreen.contactNames.remove(ContactsScreen.contactNames.size() - 1);
+            ContactsScreen.contactNames.add("Verify ...");
+            linkAct.getActivity().runOnUiThread(() -> {
+                ContactsScreen.onRefresh();
+            });
         }
 
 
@@ -403,6 +410,7 @@ public class MainScreen extends AppCompatActivity {
                 System.out.println("Exception: " + ex.getMessage());
                 ex.printStackTrace();
             }
+            userAddLock = false;
         }
 
 
@@ -428,6 +436,7 @@ public class MainScreen extends AppCompatActivity {
                   , Blake3.toString(SplashScreen.myGeneratedUserId)
                 )
             );
+            ContactsScreen.contactNames.remove(ContactsScreen.contactNames.size() - 1);
             ContactsScreen.contactNames.add(cname);
             ContactsScreen.contactUserIds.add(cselectedUserId);
             ContactsScreen.contactXbeeAddress.add(cselectedXbeeDevice);

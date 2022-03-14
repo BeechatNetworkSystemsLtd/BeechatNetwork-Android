@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -10,40 +11,6 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="15dp">
-
-        <TextView
-            android:id="@+id/SelectLanguageTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/nunito_regular"
-            android:text="@string/selectLanguageLabel"
-            android:textColor="@android:color/black"
-            android:textSize="30sp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/languageTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/nunito_regular"
-                android:text="@string/languageLabel"
-                android:textColor="@android:color/black"
-                android:textSize="30sp" />
-
-            <Spinner
-                android:id="@+id/languageSpinner"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:drawSelectorOnTop="true"
-                android:fontFamily="@font/nunito_regular"
-                android:textColor="@android:color/black"
-                android:textSize="30sp" />
-        </LinearLayout>
 
         <Button
             android:id="@+id/buttonImport"
@@ -80,28 +47,36 @@
             android:textColor="@android:color/black"
             android:textSize="30sp" />
 
-        <EditText
-            android:id="@+id/passwordOne"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/nunito_regular"
-            android:hint="@string/passwordLabel"
-            android:textColor="@android:color/black"
-            android:textSize="30sp" />
+            android:layout_height="70dp"
+            android:orientation="horizontal">
 
-        <EditText
-            android:id="@+id/passwordTwo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/nunito_regular"
-            android:hint="@string/confirm_passwordLabel"
-            android:textColor="@android:color/black"
-            android:textSize="30sp" />
+            <EditText
+                android:id="@+id/passwordOne"
+                android:layout_width="330dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/nunito_regular"
+                android:hint="@string/passwordLabel"
+                android:inputType="textPassword"
+                android:textColor="@android:color/black"
+                android:textSize="30sp" />
+
+            <ImageButton
+                android:id="@+id/hidePassButton"
+                android:layout_width="wrap_content"
+                android:layout_height="65dp"
+                android:layout_weight="1"
+                android:background="@color/colorAccent"
+                android:focusable="auto"
+                android:tint="@color/active"
+                app:srcCompat="@android:drawable/ic_menu_view" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/textViewEULA"
             android:layout_width="match_parent"
-            android:layout_height="83dp"
+            android:layout_height="145dp"
             android:fontFamily="@font/nunito_regular"
             android:isScrollContainer="true"
             android:paddingHorizontal="20dp"

@@ -103,8 +103,8 @@ public class Message extends ArrayList<Packet> {
             System.arraycopy(result, i * Packet.getMaxLen(), bs, 0, packetRemain);
             byte[] toSend = new Packet(
                 this.type
-              , (short)i
-              , (short)(packetCount)
+              , (int)i
+              , (int)(packetCount)
               , bs
               , hasher
             ).getData();
@@ -128,10 +128,10 @@ public class Message extends ArrayList<Packet> {
     public void setData(byte[] data) {
         result = data;
         ready = true;
-        totalNumber = (short)(data.length / Packet.getMaxLen()
+        totalNumber = (int)(data.length / Packet.getMaxLen()
                     + (data.length % Packet.getMaxLen() != 0 ? 1 : 0))
         ;
-        partNumber = (short)(totalNumber - 1);
+        partNumber = (int)(totalNumber - 1);
     }
 
     public Packet.Type getType() {

@@ -38,6 +38,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String USERS_K_PUBLIC_KEY = "k_pub_key";
     private static final String USERS_LOGO = "logo";
 
+    private static final String TABLE_BAUD = "baud";
+    private static final String BAUD_ID = "id";
+    private static final String BAUD_VALUE = "value";
+
     private static final String TABLE_CONTACTS = "contacts";
     private static final String CONTACTS_ID = "id";
     private static final String CONTACTS_USER_ID = "user_id";
@@ -98,10 +102,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
           + MESSAGES_XBEE_DEVICE_NUMBER_SENDER + " TEXT,"
           + MESSAGES_RECEIVER_ID + " TEXT," + MESSAGES_XBEE_DEVICE_NUMBER_RECEIVER + " TEXT," + MESSAGES_CONTENT + " TEXT" + ")";
 
+        String CREATE_BAUD_TABLE = "CREATE TABLE " + TABLE_BAUD + "("
+          + BAUD_ID + " INTEGER PRIMARY KEY,"
+          + BAUD_VALUE + " INTEGER"
+        + ")";
+
         db.execSQL(CREATE_SECRETS_TABLE);
         db.execSQL(CREATE_USERS_TABLE);
         db.execSQL(CREATE_CONTACTS_TABLE);
         db.execSQL(CREATE_MESSAGES_TABLE);
+        db.execSQL(CREATE_BAUD_TABLE);
+        db.execSQL("INSERT INTO " + TABLE_BAUD + "(" + BAUD_VALUE + ") VALUES(9600)");
     }
 
     /***
@@ -119,6 +130,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONTACTS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_MESSAGES);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BAUD);
         // Create tables again
         onCreate(db);
     }
@@ -134,7 +146,46 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.delete(TABLE_USERS, null, null);
         db.delete(TABLE_CONTACTS, null, null);
         db.delete(TABLE_MESSAGES, null, null);
+        db.delete(TABLE_BAUD, null, null);
     }
+
+    /***
+     *  --- setBaud(int) ---
+     *  The function of adding a new baud value.
+     *
+     *  @param val A new value.
+     ***/
+    public Boolean setBaud(int val) {
+        SQLiteDatabase.loadLibs(mContext.getApplicationContext());
+        SQLiteDatabase db = this.getWritableDatabase(SECRET_KEY);
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(BAUD_VALUE, val);
+
+        String where = "id=?";
+        String[] whereArgs = new String[] {new String("1")};
+        long result = db.update(TABLE_BAUD, contentValues, where, whereArgs);
+        return result != -1;
+    }
+
+    /***
+     *  --- getBaud(int) ---
+     *  The function of getting a new baud value.
+     ***/
+    public int getBaud() {
+        SQLiteDatabase.loadLibs(mContext.getApplicationContext());
+        SQLiteDatabase db = this.getReadableDatabase(SECRET_KEY);
+
+        int result = 9600;
+        String selectQuery = "SELECT * FROM " + TABLE_BAUD + " WHERE id = ?";
+        Cursor cursor = db.rawQuery(selectQuery, new String[]{new String("1")});
+
+        if (cursor.moveToFirst()) {
+            result = cursor.getInt(1);
+        }
+        return result;
+    }
+
 
     /***
      *  --- addKey(String, byte[]) ---

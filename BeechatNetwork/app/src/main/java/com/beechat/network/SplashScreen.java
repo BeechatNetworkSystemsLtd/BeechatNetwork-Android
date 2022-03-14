@@ -125,7 +125,9 @@ public class SplashScreen extends AppCompatActivity {
 
         neo = db.getUser(extras.getString("key_usernameId"));
         myGeneratedUserId = Blake3.fromString(extras.getString("key_usernameId"));
-        myXbeeDevice = new XBeeDevice(this, BAUD_RATE);
+        int baud = db.getBaud();
+        BAUD_RATE = baud;
+        myXbeeDevice = new XBeeDevice(this, baud);
         myDPKey = neo.getDPubKey();
         myDSKey = neo.getDPrivKey();
         myKPKey = neo.getKPubKey();

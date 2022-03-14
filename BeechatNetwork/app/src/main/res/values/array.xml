@@ -3,5 +3,8 @@
     <string-array name="items">
         <item>en</item>
         <item>es</item>
+        <item>fr</item>
+        <item>de</item>
+        <item>ru</item>
     </string-array>
 </resources>

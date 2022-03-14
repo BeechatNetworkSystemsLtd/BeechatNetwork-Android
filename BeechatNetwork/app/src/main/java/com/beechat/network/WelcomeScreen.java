@@ -15,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 import android.net.Uri;
 import android.os.Build;
 import androidx.annotation.RequiresApi;
+import android.text.method.PasswordTransformationMethod;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -59,11 +61,11 @@ public class WelcomeScreen extends AppCompatActivity {
     // Variables
     Context context;
     Resources resources;
-    EditText password, passwordConfirm, logoName;
+    EditText password, logoName;
+    ImageButton hidePassButton;
     Button finishButton, importButton;
     CheckBox agreementCheckBox;
     TextView eulaTextView, userIdTextView;
-    Spinner languagesSpinner;
     String largeTextString;
     byte[] generatedUserId;
     byte[] generatedUserDPk;
@@ -74,12 +76,13 @@ public class WelcomeScreen extends AppCompatActivity {
     private SecretKeySpec secretKeySpec;
     int FILE_SELECT_CODE = 101;
     String path = null;
+    boolean passHide = false;
 
     // Constants
     String algorithm = "AES";
     String charsetNameISO = "ISO-8859-1";
     String charsetNameUTF = "UTF-8";
-    String[] languages = {"en", "es"};
+    String[] languages = {"en", "es", "de", "fr", "ru"};
     public static String language = "en";
 
     @Override
@@ -97,43 +100,14 @@ public class WelcomeScreen extends AppCompatActivity {
         userIdTextView = findViewById(R.id.textViewMyID);
         finishButton = findViewById(R.id.finishButton);
         importButton = findViewById(R.id.buttonImport);
+        hidePassButton = findViewById(R.id.hidePassButton);
         logoName = findViewById(R.id.logoName);
         password = findViewById(R.id.passwordOne);
-        passwordConfirm = findViewById(R.id.passwordTwo);
-        languagesSpinner = findViewById(R.id.languageSpinner);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, languages);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        languagesSpinner.setAdapter(adapter);
-
-        AdapterView.OnItemSelectedListener itemSelectedListener = new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                language = (String) parent.getItemAtPosition(position);
-                if (language.equals("en")) {
-                    largeTextString = getStringFromRawRes(R.raw.eula_en);
-                } else largeTextString = getStringFromRawRes(R.raw.eula_es);
-
-                if (largeTextString != null) {
-                    eulaTextView.setText(largeTextString);
-                } else {
-                    eulaTextView.setText(R.string.eulaEmpty);
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        };
-
-        languagesSpinner.setOnItemSelectedListener(itemSelectedListener);
-
-        language = languagesSpinner.getSelectedItem().toString();
-        context = LocaleHelper.setLocale(WelcomeScreen.this, language);
+        context = LocaleHelper.setLocale(WelcomeScreen.this, "en");
         resources = context.getResources();
 
-        if (language.equals("en")) {
+        if (true) {
             largeTextString = getStringFromRawRes(R.raw.eula_en);
         } else largeTextString = getStringFromRawRes(R.raw.eula_es);
 
@@ -184,6 +158,19 @@ public class WelcomeScreen extends AppCompatActivity {
             }
         });
 
+        hidePassButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (passHide) {
+                    password.setTransformationMethod(new PasswordTransformationMethod());
+                } else {
+                    password.setTransformationMethod(null);
+                }
+                passHide = !passHide;
+            }
+        });
+
+
         agreementCheckBox = findViewById(R.id.agreementCheckBox);
         agreementCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> finishButton.setEnabled(isChecked));
     }
@@ -213,49 +200,60 @@ public class WelcomeScreen extends AppCompatActivity {
     private void createAccount() {
         String logo = logoName.getText().toString();
         String pass = password.getText().toString();
-        String passConfirm = passwordConfirm.getText().toString();
+        byte[] passHash = null;
 
-        if (passConfirm.equals("") || pass.equals(""))
-            Toast.makeText(WelcomeScreen.this, "Please enter all the fields!", Toast.LENGTH_SHORT).show();
-        else {
-            if (pass.equals(passConfirm)) {
-                Boolean checkUser = DB.checkUsername(Blake3.toString(generatedUserId));
-                if (!checkUser) {
-                    byte[] passHash = null;
-                    try {
-                        Blake3 hasher = new Blake3();
-                        hasher.update(pass.getBytes(), pass.length());
-                        passHash = hasher.finalize(User.PASS_HASH_SIZE);
-                    } catch (Exception ex) {
-                        System.out.println("Exception: " + ex.getMessage());
-                        ex.printStackTrace();
-                    }
-                    User neo = new User(
-                        Blake3.toString(generatedUserId)
-                      , Blake3.toString(passHash)
-                      , generatedUserDPk
-                      , generatedUserDSk
-                      , generatedUserKPk
-                      , generatedUserKSk
-                      , logo
-                    );
-                    Boolean insert = DB.addUser(neo);
-                    if (insert) {
-                        Toast.makeText(WelcomeScreen.this, "Registered successfully!", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(WelcomeScreen.this, SplashScreen.class);
-                        intent.putExtra("key_usernameId", Blake3.toString(generatedUserId));
-                        startActivity(intent);
-
-                    } else {
-                        Toast.makeText(WelcomeScreen.this, "Registration failed!", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Toast.makeText(WelcomeScreen.this, "User already exists! Please Sign in!", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                Toast.makeText(WelcomeScreen.this, "Passwords not matching", Toast.LENGTH_SHORT).show();
-            }
+        if (pass.equals("")) {
+            Toast.makeText(
+                WelcomeScreen.this
+              , "Please enter all the fields!"
+              , Toast.LENGTH_SHORT
+            ).show();
+            return;
         }
+        if (DB.checkUsername(Blake3.toString(generatedUserId))) {
+            Toast.makeText(
+                WelcomeScreen.this
+              , "User already exists! Please Sign in!"
+              , Toast.LENGTH_SHORT
+            ).show();
+            return;
+        }
+
+        try {
+            Blake3 hasher = new Blake3();
+            hasher.update(pass.getBytes(), pass.length());
+            passHash = hasher.finalize(User.PASS_HASH_SIZE);
+        } catch (Exception ex) {
+            System.out.println("Exception: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+        User neo = new User(
+            Blake3.toString(generatedUserId)
+          , Blake3.toString(passHash)
+          , generatedUserDPk
+          , generatedUserDSk
+          , generatedUserKPk
+          , generatedUserKSk
+          , logo
+        );
+
+        if (DB.addUser(neo) == false) {
+            Toast.makeText(
+                WelcomeScreen.this
+              , "Registration failed!"
+              , Toast.LENGTH_SHORT
+            ).show();
+            return;
+        }
+
+        Toast.makeText(
+            WelcomeScreen.this
+          , "Registered successfully!"
+          , Toast.LENGTH_SHORT
+        ).show();
+        Intent intent = new Intent(WelcomeScreen.this, SplashScreen.class);
+        intent.putExtra("key_usernameId", Blake3.toString(generatedUserId));
+        startActivity(intent);
     }
 
     /***
