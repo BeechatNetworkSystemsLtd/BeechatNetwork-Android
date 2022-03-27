@@ -267,7 +267,11 @@ public class MainScreen extends AppCompatActivity {
                         outputStream.flush();
                         outputStream.close();
                         ChatScreen.setFileDelivery(0);
-                        ChatScreen.setFileText("", 0);
+                        ChatScreen.setFileText("", -1);
+                        ChatScreen.getMessages().add(
+                            new String(fileString + "\nS")
+                        );
+                        ChatScreen.setNotification();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -468,18 +472,17 @@ public class MainScreen extends AppCompatActivity {
             try {
                 String dir = Environment.getExternalStoragePublicDirectory(
                     Environment.DIRECTORY_DOWNLOADS
-                ).getAbsolutePath();
+                ).getAbsolutePath() + File.separator + "Beechat";
+
+                (new File(dir)).mkdirs();
+
                 outputStream = new FileOutputStream(
                     new File(
-                        dir + "/" + new String(message.getData()).split(" ")[0]
+                        dir + File.separator + new String(message.getData()).split(" ")[0]
                     )
                 );
                 fileString = new String(message.getData());
                 if (fileString.length() > 34) fileString = fileString.substring(fileString.length() - 20);
-                ChatScreen.getMessages().add(
-                    new String(message.getData()) + "\nS"
-                );
-                ChatScreen.setNotification();
             } catch (Exception e) {
                 e.printStackTrace();
             }
