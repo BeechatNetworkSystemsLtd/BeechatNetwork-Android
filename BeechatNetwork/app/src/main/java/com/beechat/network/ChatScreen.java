@@ -79,7 +79,7 @@ public class ChatScreen extends AppCompatActivity {
     static ChatDeviceAdapter chatDeviceAdapter;
     RemoteXBeeDevice remote;
     public static AppCompatActivity linkAct = null;
-    String message, filename, sizeFile;
+    String message, filename, sizeFile, fileString;
     Boolean fileFlag = false;
     int numberOfPackage;
     int remainOfPackage;
@@ -93,19 +93,23 @@ public class ChatScreen extends AppCompatActivity {
     static DatabaseHandler db;
 
     static void setFileDelivery(float val) {
-        if (transmitProgress != null) {
-            transmitProgress.setProgress((int)(val * transmitProgress.getMax()));
-        }
+        linkAct.runOnUiThread(() -> {
+            if (transmitProgress != null) {
+                transmitProgress.setProgress((int)(val * transmitProgress.getMax()));
+            }
+        });
     }
 
     static void setFileText(String text, int per) {
-        if (textViewAttachment != null) {
-            if (per != 0) {
-                textViewAttachment.setText(text + " " + Integer.toString(per) + "%");
-            } else {
-                textViewAttachment.setText("");
+        linkAct.runOnUiThread(() -> {
+            if (textViewAttachment != null) {
+                if (per != -1) {
+                    textViewAttachment.setText(text + " " + Integer.toString(per) + "%");
+                } else {
+                    textViewAttachment.setText("");
+                }
             }
-        }
+        });
     }
 
     static ArrayList<String> messages = new ArrayList<>();
@@ -260,12 +264,12 @@ public class ChatScreen extends AppCompatActivity {
                                     filePauseButton.setVisibility(View.VISIBLE);
                                 });
 
-                                for (short i = 0; i < (short)numberOfPackage; i++) {
+                                for (int i = 0; i < (int)numberOfPackage; i++) {
                                     bb.get(packageFile, 0, packageFile.length);
                                     sender.setData(
                                         Packet.Type.FILE_DATA
-                                      , (short)i
-                                      , (short)tcount
+                                      , (int)i
+                                      , (int)tcount
                                       , packageFile
                                       , SplashScreen.hasher
                                     );
@@ -273,11 +277,11 @@ public class ChatScreen extends AppCompatActivity {
                                         remote
                                       , sender.getData()
                                     );
-                                    transmitProgressValue = (int)(((float)i / (float)numberOfPackage) * transmitProgress.getMax());
+                                    transmitProgressValue = (int)(((float)i / (float)numberOfPackage) * (float)transmitProgress.getMax());
                                     transmitPercentageValue = (int)(((float)i / (float)numberOfPackage) * 100);
                                     ChatScreen.this.runOnUiThread(() -> {
                                         transmitProgress.setProgress(transmitProgressValue);
-                                        textViewAttachment.setText(filename + "  " + Integer.toString(transmitPercentageValue) + "%");
+                                        textViewAttachment.setText(fileString + "  " + Integer.toString(transmitPercentageValue) + "%");
                                     });
                                     if (fileStop) {
                                         break;
@@ -291,8 +295,8 @@ public class ChatScreen extends AppCompatActivity {
                                     bb.get(packageFile, 0, packageFile.length);
                                     sender.setData(
                                         Packet.Type.FILE_DATA
-                                      , (short)0
-                                      , (short)1
+                                      , (int)(tcount - 1)
+                                      , (int)tcount
                                       , packageFile
                                       , SplashScreen.hasher
                                     );
@@ -302,11 +306,15 @@ public class ChatScreen extends AppCompatActivity {
                                     );
                                 }
                                 ChatScreen.this.runOnUiThread(() -> {
+                                    messages.add(textViewAttachment.getText().toString() + "\n");
                                     fileStopButton.setVisibility(View.INVISIBLE);
                                     filePauseButton.setVisibility(View.INVISIBLE);
                                 });
                                 fileStop = false;
                             } catch (Exception e) {
+                                ChatScreen.this.runOnUiThread(() -> {
+                                    messages.add("No rights to read this file\n");
+                                });
                                 e.printStackTrace();
                             }
                             ChatScreen.this.runOnUiThread(() -> {
@@ -314,7 +322,6 @@ public class ChatScreen extends AppCompatActivity {
                                 transmitProgress.setProgress(0);
                             });
                         }).start();
-                        messages.add(textViewAttachment.getText().toString() + "\n");
                         inputField.setText("");
                         fileFlag = false;
                     }
@@ -556,7 +563,8 @@ public class ChatScreen extends AppCompatActivity {
                     if (mimeType == null) {
                         File file = new File(path);
                         filename = file.getName();
-                        if (filename.length() > 20) filename = filename.substring(filename.length() - 20);
+                        if (filename.length() > 34) fileString = filename.substring(filename.length() - 20);
+                        else fileString = filename;
                         /*if (path == null) {
                             filename = FilenameUtils.getName(uri.toString());
                         } else {
@@ -570,11 +578,13 @@ public class ChatScreen extends AppCompatActivity {
                         int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
                         returnCursor.moveToFirst();
                         filename = returnCursor.getString(nameIndex);
+                        if (filename.length() > 34) fileString = filename.substring(filename.length() - 20);
+                        else fileString = filename;
                         sizeFile = Long.toString(returnCursor.getLong(sizeIndex));
 
                     }
 
-                    textViewAttachment.setText(filename + " (" + sizeFile + ")");
+                    textViewAttachment.setText(fileString + " (" + sizeFile + ")");
                     File fileSave = getExternalFilesDir(null);
                     String sourcePath = getExternalFilesDir(null).toString();
                     array = method(new File(path));

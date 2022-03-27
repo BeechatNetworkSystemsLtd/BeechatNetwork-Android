@@ -18,23 +18,6 @@
             android:layout_marginBottom="20dp"
             android:orientation="horizontal">
 
-            <Switch
-                android:id="@+id/darkModeSwitch"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/nunito_regular"
-                android:text="@string/settingsDarkModeLabel"
-                android:textColor="@android:color/black"
-                android:textSize="30sp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:orientation="horizontal">
-
             <Button
                 android:id="@+id/savedDataButton"
                 android:layout_width="wrap_content"
@@ -124,6 +107,12 @@
                     android:textColor="@android:color/white"
                     android:textSize="16sp" />
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Version 0.1.4" />
 
         </LinearLayout>
 
