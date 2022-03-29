@@ -14,7 +14,7 @@ Beechat is an open source system which allows people to securely communicate ove
 
 If you want to send a message to someone outside your range, people in between you two can act as a bridge, without ever knowing the contents of the encrypted message.
 
-[Download Android APK](https://github.com/BeechatNetworkSystemsLtd/BeechatNetwork-Android/releases/tag/Android)
+[Download Android APK](https://github.com/BeechatNetworkSystemsLtd/BeechatNetwork-Android/releases/)
 -------------------
 
 Code 
