@@ -100,6 +100,9 @@ public class SettingsScreen extends Fragment {
         });
 
         logoutButton.setOnClickListener(v -> {
+            MainScreen.contactNames.clear();
+            MainScreen.contactXbeeAddress.clear();
+            MainScreen.contactUserIds.clear();
             Intent intent = new Intent(getActivity(), StartScreen.class);
             startActivity(intent);
             Objects.requireNonNull(getActivity()).finish();

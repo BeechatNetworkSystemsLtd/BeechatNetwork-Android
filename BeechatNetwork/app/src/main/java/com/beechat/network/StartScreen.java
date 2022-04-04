@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 public class StartScreen extends AppCompatActivity {
 
     // Variables
-    DatabaseHandler DB;
+    static DatabaseHandler DB;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,13 +20,15 @@ public class StartScreen extends AppCompatActivity {
 
         DB = new DatabaseHandler(this);
 
-        if (DB.checkCountUsers()) {
-            Intent intent = new Intent(getApplicationContext(), LogInScreen.class);
-            startActivity(intent);
-        } else {
-            Intent intent = new Intent(getApplicationContext(), WelcomeScreen.class);
-            startActivity(intent);
-        }
+        new Thread(() -> {
+            if (DB.checkCountUsers()) {
+                Intent intent = new Intent(getApplicationContext(), LogInScreen.class);
+                startActivity(intent);
+            } else {
+                Intent intent = new Intent(getApplicationContext(), WelcomeScreen.class);
+                startActivity(intent);
+            }
+        }).start();
     }
 }
 

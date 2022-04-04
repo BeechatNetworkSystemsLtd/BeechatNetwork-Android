@@ -33,6 +33,7 @@
             android:fontFamily="@font/nunito_regular"
             android:gravity="center"
             android:lines="2"
+            android:paddingTop="20dp"
             android:paddingBottom="20dp"
             android:text="@string/my_id_nempty"
             android:textColor="@android:color/black"
@@ -76,7 +77,8 @@
         <TextView
             android:id="@+id/textViewEULA"
             android:layout_width="match_parent"
-            android:layout_height="145dp"
+            android:layout_height="180dp"
+            android:background="@drawable/eula"
             android:fontFamily="@font/nunito_regular"
             android:isScrollContainer="true"
             android:paddingHorizontal="20dp"

@@ -54,9 +54,9 @@ public class MainScreen extends AppCompatActivity {
     static Fragment linkAct;
     public static boolean userAddLock = false;
     DataReceiveListener listener = new DataReceiveListener();
-    static ArrayList<String> contactNames = new ArrayList<>();
-    static ArrayList<String> contactXbeeAddress = new ArrayList<>();
-    static ArrayList<String> contactUserIds = new ArrayList<>();
+    public static ArrayList<String> contactNames = new ArrayList<>();
+    public static ArrayList<String> contactXbeeAddress = new ArrayList<>();
+    public static ArrayList<String> contactUserIds = new ArrayList<>();
     static String cname, cselectedUserId, cselectedXbeeDevice;
     static boolean replyReceived = false;
     int FILE_SELECT_CODE = 101;
@@ -91,7 +91,7 @@ public class MainScreen extends AppCompatActivity {
         fragments.add(new NearbyDevicesScreen());
         linkAct = new ContactsScreen();
         fragments.add(linkAct);
-        fragments.add(new BroadcastScreen());
+        //fragments.add(new BroadcastScreen());
         fragments.add(new SettingsScreen());
 
         FragmentAdapter pagerAdapter = new FragmentAdapter(getSupportFragmentManager(), getApplicationContext(), fragments);
@@ -101,8 +101,8 @@ public class MainScreen extends AppCompatActivity {
 
         tabLayout.getTabAt(0).setIcon(R.drawable.nearby_black);
         tabLayout.getTabAt(1).setIcon(R.drawable.chat_black);
-        tabLayout.getTabAt(2).setIcon(R.drawable.broadcast_black);
-        tabLayout.getTabAt(3).setIcon(R.drawable.settings_black);
+        //tabLayout.getTabAt(2).setIcon(R.drawable.broadcast_black);
+        tabLayout.getTabAt(2).setIcon(R.drawable.settings_black);
 
         if (SplashScreen.myXbeeDevice.isOpen() == false) {
             return;
@@ -269,7 +269,7 @@ public class MainScreen extends AppCompatActivity {
                         ChatScreen.setFileDelivery(0);
                         ChatScreen.setFileText("", -1);
                         ChatScreen.getMessages().add(
-                            new String(fileString + "\nS")
+                            new String(fileString + "\nF")
                         );
                         ChatScreen.setNotification();
                     }
@@ -483,6 +483,18 @@ public class MainScreen extends AppCompatActivity {
                 );
                 fileString = new String(message.getData());
                 if (fileString.length() > 34) fileString = fileString.substring(fileString.length() - 20);
+
+                String newMessageAddr =
+                    xbeeMessage.getDevice().get64BitAddress().toString();
+                db.insertMessage(
+                    new TextMessage(
+                        Blake3.toString(SplashScreen.myGeneratedUserId)
+                      , SplashScreen.addressMyXbeeDevice
+                      , contactUserIds.get(contactXbeeAddress.indexOf(newMessageAddr))
+                      , newMessageAddr
+                      , new String(fileString + "\nF")
+                    )
+                );
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -497,6 +509,10 @@ public class MainScreen extends AppCompatActivity {
                 Base58.decode((new String(message.getData())).substring(3))
             );
             int i = contactUserIds.indexOf(save);
+            if (NearbyDevicesScreen.devicesNodeIds.contains(save)) {
+                return;
+            }
+
             if (contactUserIds.contains(save)) {
                 NearbyDevicesScreen.devicesAN.add(
                     contactNames.get(i)

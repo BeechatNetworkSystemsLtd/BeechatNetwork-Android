@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Beechat Clip</string>
+    <string name="app_name">Beechat</string>
     <string name="select_device">Dispositivos radio cercanos</string>
     <string name="back">Atrás</string>
     <string name="send">Enviar</string>

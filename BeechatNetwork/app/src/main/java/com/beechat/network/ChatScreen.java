@@ -30,6 +30,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -167,13 +169,31 @@ public class ChatScreen extends AppCompatActivity {
         selectedUserId = extras.getString("key_selectedUserId");
         selectedXbeeAddress = extras.getString("key_selectedXbeeAddress");
 
-        List<TextMessage> messagesDB = db.getAllMessages(myUserId, myXbeeAddress, selectedUserId, selectedXbeeAddress);
-        for (TextMessage mg : messagesDB) {
-            messages.add(mg.getContent());
+        if (messages.size() == 0)
+        {
+            List<TextMessage> messagesDB = db.getAllMessages(myUserId, myXbeeAddress, selectedUserId, selectedXbeeAddress);
+            for (TextMessage mg : messagesDB) {
+                messages.add(mg.getContent());
+            }
         }
 
         chatDeviceAdapter = new ChatDeviceAdapter(this, messages);
         chatListView.setAdapter(chatDeviceAdapter);
+
+        chatListView.setOnItemClickListener(
+            new OnItemClickListener()
+            {
+                @Override
+                public void onItemClick(AdapterView<?> arg0, View view,
+                        int position, long id) {
+                    Object o = chatListView.getItemAtPosition(position);
+                    String pen = o.toString();
+                    if (pen.endsWith("P") || pen.endsWith("F")) {
+                        browseClick();
+                    }
+                }
+            }
+        );
 
         linkAct = this;
         nameTextView.setText(selectedName);
@@ -306,10 +326,11 @@ public class ChatScreen extends AppCompatActivity {
                                     );
                                 }
                                 ChatScreen.this.runOnUiThread(() -> {
-                                    messages.add(textViewAttachment.getText().toString() + "\n");
                                     fileStopButton.setVisibility(View.INVISIBLE);
                                     filePauseButton.setVisibility(View.INVISIBLE);
                                 });
+                                messages.add(textViewAttachment.getText().toString() + "\nP");
+                                message = textViewAttachment.getText().toString() + "\nP";
                                 fileStop = false;
                             } catch (Exception e) {
                                 ChatScreen.this.runOnUiThread(() -> {
@@ -711,6 +732,71 @@ public class ChatScreen extends AppCompatActivity {
                 }
                 layout.addView(layout2);
 
+
+                return layout;
+            } else if (message.endsWith("P")) {
+                message = removeLastChar(message);
+                message = removeLastChar(message);
+
+                int color = Color.parseColor("#010523");
+                RelativeLayout layout = new RelativeLayout(context);
+                //layout.setOrientation(LinearLayout.VERTICAL);
+                layout.setPadding(40, 30, 40, 30);
+
+                TextView nameText = new TextView(context);
+                nameText.setGravity(Gravity.RIGHT);
+                nameText.setText(message);
+                nameText.setTypeface(typeface);
+                nameText.setTextColor(color);
+                nameText.setTextSize(15);
+                nameText.setPadding(40, 20, 20, 15);
+                Drawable drawable = getResources().getDrawable(R.drawable.client_message_box);
+                Drawable iconTick = getResources().getDrawable(android.R.drawable.sym_contact_card);
+                ImageView imageView = new ImageView(context);
+                imageView.setImageDrawable(iconTick);
+
+                LinearLayout layout2 = new LinearLayout(context);
+                layout2.setOrientation(LinearLayout.HORIZONTAL);
+                layout2.setBackground(drawable);
+                layout2.setGravity(Gravity.RIGHT);
+
+                layout2.addView(imageView);
+                layout2.addView(nameText);
+                layout.addView(layout2);
+                layout.setGravity(Gravity.RIGHT);
+
+                return layout;
+            } else if (message.endsWith("F")) {
+                message = removeLastChar(message);
+                message = removeLastChar(message);
+
+                int color = Color.parseColor("#010523");
+                RelativeLayout layout = new RelativeLayout(context);
+                //layout.setOrientation(LinearLayout.VERTICAL);
+                layout.setPadding(40, 30, 40, 30);
+
+                TextView nameText = new TextView(context);
+                nameText.setGravity(Gravity.LEFT);
+                nameText.setText(message);
+                nameText.setTypeface(typeface);
+                nameText.setTextColor(color);
+                nameText.setTextSize(15);
+                nameText.setPadding(40, 20, 20, 15);
+                Drawable drawable = getResources().getDrawable(R.drawable.server_message_box);
+                Drawable iconTick = getResources().getDrawable(android.R.drawable.sym_contact_card);
+
+                ImageView imageView = new ImageView(context);
+                imageView.setImageDrawable(iconTick);
+
+                LinearLayout layout2 = new LinearLayout(context);
+                layout2.setOrientation(LinearLayout.HORIZONTAL);
+                layout2.setBackground(drawable);
+                layout2.setGravity(Gravity.LEFT);
+
+                layout2.addView(nameText);
+                layout2.addView(imageView);
+                layout.addView(layout2);
+                layout.setGravity(Gravity.LEFT);
 
                 return layout;
             } else {

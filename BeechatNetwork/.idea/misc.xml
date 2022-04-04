@@ -5,6 +5,7 @@
       <map>
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.19739583333333333" />
         <entry key="app/src/main/res/drawable/client_message_box.xml" value="0.24722222222222223" />
+        <entry key="app/src/main/res/drawable/eula.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.19739583333333333" />
         <entry key="app/src/main/res/drawable/round_attach_button.xml" value="0.19375" />
         <entry key="app/src/main/res/drawable/round_button.xml" value="0.19375" />
@@ -16,7 +17,7 @@
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="app/src/main/res/layout/add_contact_screen.xml" value="0.33" />
         <entry key="app/src/main/res/layout/broadcast_screen.xml" value="0.25" />
-        <entry key="app/src/main/res/layout/chat_screen.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/chat_screen.xml" value="0.67" />
         <entry key="app/src/main/res/layout/code_word_screen.xml" value="0.33" />
         <entry key="app/src/main/res/layout/contacts_screen.xml" value="0.33" />
         <entry key="app/src/main/res/layout/data_screen.xml" value="0.33" />
@@ -27,7 +28,7 @@
         <entry key="app/src/main/res/layout/log_in_screen.xml" value="0.33" />
         <entry key="app/src/main/res/layout/login_form_screen.xml" value="0.15780141843971632" />
         <entry key="app/src/main/res/layout/login_screen.xml" value="0.15780141843971632" />
-        <entry key="app/src/main/res/layout/main_screen.xml" value="0.10740740740740741" />
+        <entry key="app/src/main/res/layout/main_screen.xml" value="0.33" />
         <entry key="app/src/main/res/layout/nearby_devices_screen.xml" value="0.33" />
         <entry key="app/src/main/res/layout/popup_window.xml" value="0.1" />
         <entry key="app/src/main/res/layout/round_button.xml" value="0.12952898550724637" />
@@ -36,7 +37,7 @@
         <entry key="app/src/main/res/layout/sign_in_screen.xml" value="0.15780141843971632" />
         <entry key="app/src/main/res/layout/sign_up_screen.xml" value="0.15780141843971632" />
         <entry key="app/src/main/res/layout/splash_screen.xml" value="0.33" />
-        <entry key="app/src/main/res/layout/start_screen.xml" value="0.15780141843971632" />
+        <entry key="app/src/main/res/layout/start_screen.xml" value="0.33" />
         <entry key="app/src/main/res/layout/test_screen.xml" value="0.4267716535433071" />
         <entry key="app/src/main/res/layout/welcome_screen.xml" value="0.33" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.19739583333333333" />

@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".NearbyDevicesScreen">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:id="@+id/linearLayout3"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:orientation="vertical"
-        android:padding="15dp">
+        android:padding="15dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/devicesLabelTextView"
@@ -20,22 +26,56 @@
             android:textColor="@android:color/black"
             android:textSize="30sp" />
 
-        <ImageButton
-            android:id="@+id/refreshButton"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_gravity="end"
-            android:adjustViewBounds="true"
-            android:background="@drawable/round_refresh_button"
-            android:scaleType="fitCenter"
-            android:src="@drawable/refresh_black"
-            android:tint="@color/white" />
-
         <ListView
             android:id="@+id/devicesListView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:transcriptMode="alwaysScroll" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="80dp">
+
+            <ImageButton
+                android:id="@+id/pingButton"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_gravity="left"
+                android:layout_marginStart="3dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="224dp"
+                android:layout_marginBottom="5dp"
+                android:layout_weight="1"
+                android:adjustViewBounds="true"
+                android:background="@drawable/round_refresh_button"
+                android:scaleType="fitCenter"
+                android:src="@android:drawable/ic_lock_silent_mode_off"
+                android:tint="@color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/refreshButton"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:id="@+id/refreshButton"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_gravity="right"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="5dp"
+                android:adjustViewBounds="true"
+                android:background="@drawable/round_refresh_button"
+                android:scaleType="fitCenter"
+                android:src="@drawable/refresh_black"
+                android:tint="@color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/pingButton"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

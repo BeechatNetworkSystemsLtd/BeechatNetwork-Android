@@ -53,6 +53,7 @@ public class NearbyDevicesScreen extends Fragment {
     CustomDeviceAdapter remoteXBeeDeviceAdapter;
     ListView devicesListView;
     ImageButton refreshButton;
+    ImageButton pingButton;
     TextView devicesLabel;
     View view;
     DatabaseHandler db;
@@ -91,6 +92,7 @@ public class NearbyDevicesScreen extends Fragment {
 
         devicesLabel = view.findViewById(R.id.devicesLabelTextView);
         refreshButton = view.findViewById(R.id.refreshButton);
+        pingButton = view.findViewById(R.id.pingButton);
 
         devicesListView = view.findViewById(R.id.devicesListView);
         remoteXBeeDeviceAdapter = new CustomDeviceAdapter(Objects.requireNonNull(getActivity()), devicesAN);
@@ -120,6 +122,24 @@ public class NearbyDevicesScreen extends Fragment {
             public void onClick(View v) {
                 remoteXBeeDeviceAdapter.clear();
                 startScan();
+            }
+        });
+
+        pingButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                try {
+                    // Channel check events added to the device.
+                    byte[] toSend = new Packet(
+                        Packet.Type.INFO
+                      , (short)0
+                      , (short)1
+                      , (new String("ACK" + Base58.encode(SplashScreen.myGeneratedUserId))).getBytes()
+                      , SplashScreen.hasher
+                    ).getData();
+                    SplashScreen.myXbeeDevice.sendBroadcastData(toSend);
+                } catch (final XBeeException e) {
+                    e.printStackTrace();
+                }
             }
         });
 

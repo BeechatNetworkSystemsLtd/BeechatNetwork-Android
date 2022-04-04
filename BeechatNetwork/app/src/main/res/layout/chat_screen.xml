@@ -64,8 +64,9 @@
 
             <ImageButton
                 android:id="@+id/attachButton"
-                android:layout_width="43dp"
+                android:layout_width="0dp"
                 android:layout_height="34dp"
+                android:layout_weight="0.08"
                 android:background="@color/active"
                 android:scaleType="centerInside"
                 android:src="@android:drawable/ic_input_add"
@@ -73,9 +74,9 @@
 
             <EditText
                 android:id="@+id/inputField"
-                android:layout_width="332dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_weight="0.5"
                 android:background="@drawable/round_rect_shape"
                 android:gravity="center_vertical"
                 android:inputType="textMultiLine|textCapSentences"
@@ -85,9 +86,9 @@
 
             <ImageButton
                 android:id="@+id/sendButton"
-                android:layout_width="82dp"
+                android:layout_width="0dp"
                 android:layout_height="34dp"
-                android:layout_weight="1"
+                android:layout_weight="0.08"
                 android:background="@color/active"
                 android:focusable="auto"
                 android:paddingLeft="10dp"
