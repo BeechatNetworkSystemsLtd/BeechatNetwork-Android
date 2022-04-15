@@ -11,58 +11,23 @@
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginTop="1dp"
-        android:layout_marginBottom="9dp"
         android:gravity="bottom|center_horizontal"
         android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/textView6"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="120dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="7dp"
-        android:fontFamily="@font/nunito_regular"
-        android:text="beechat"
-        android:textColor="#FFFFFF"
-        android:textSize="48sp"
-        app:layout_constraintEnd_toStartOf="@+id/textView6"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
-
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="300dp"
         android:layout_height="0dp"
         android:layout_gravity="center|center_horizontal|center_vertical"
-        android:layout_marginTop="115dp"
-        android:layout_marginBottom="1dp"
-        app:layout_constraintBottom_toTopOf="@+id/textView6"
-        app:layout_constraintEnd_toStartOf="@+id/linearLayout2"
-        app:layout_constraintHorizontal_bias="0.506"
-        app:layout_constraintStart_toStartOf="@+id/linearLayout2"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/digi_icon" />
-
-    <TextView
-        android:id="@+id/textView6"
-        android:layout_width="35dp"
-        android:layout_height="0dp"
-        android:layout_marginEnd="73dp"
-        android:layout_marginBottom="281dp"
-        android:layout_weight="1"
-        android:fontFamily="@font/nunito_regular"
-        android:text="TM"
-        android:textColor="#FFFFFF"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/textView4"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+        app:layout_constraintHorizontal_bias="0.503"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/beechat_logo" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -36,13 +36,15 @@ public class SettingsScreen extends Fragment {
     View view;
     SeekBar baudRateSeekBar;
     TextView labelBaudRateTextView;
-    Button savedDataButton, applyButton, logoutButton, exportButton;
+    TextView settingsRadioAddr;
+    TextView settingsBeechatAddr;
+    Button savedDataButton, applyButton, logoutButton, reconnectButton;
     static DatabaseHandler db;
     int FILE_SELECT_CODE = 101;
 
     // Constants
-    List<Integer> listValues = Arrays.asList(2400, 4800, 9600, 19200, 39400, 57600, 115200);
-    long valueBaudRate = 2;
+    List<Integer> listValues = Arrays.asList(1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200, 230400);
+    long valueBaudRate = 3;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -55,17 +57,28 @@ public class SettingsScreen extends Fragment {
 
         baudRateSeekBar = view.findViewById(R.id.baudRateSeekBar);
         savedDataButton = view.findViewById(R.id.savedDataButton);
-        exportButton = view.findViewById(R.id.buttonExport);
+        reconnectButton = view.findViewById(R.id.buttonReconnect);
+        settingsRadioAddr = view.findViewById(R.id.settingsRadioAddr);
+        settingsBeechatAddr = view.findViewById(R.id.settingsBeechatAddr);
         applyButton = view.findViewById(R.id.buttonApply);
         logoutButton = view.findViewById(R.id.buttonLogOut);
         labelBaudRateTextView = view.findViewById(R.id.labelBaudRateTextView);
 
         int baud = db.getBaud();
-        labelBaudRateTextView.setText("Baud rate " + Integer.toString(baud));
-        for (int i = 0; i < 7; i++) {
-            if (listValues.get(i) != baud) continue;
-            baudRateSeekBar.setProgress(i);
+
+        labelBaudRateTextView.setText(Integer.toString(baud / 8) + " bps\n" + Integer.toString(baud) + " baud");
+        for (int i = 0; i < listValues.size(); i++) {
+            if (listValues.get(i) == baud) {
+                baudRateSeekBar.setProgress(i);
+            }
         }
+
+        if (SplashScreen.addressMyXbeeDevice != null) {
+            if (SplashScreen.addressMyXbeeDevice.length() > 0) {
+                settingsRadioAddr.setText(SplashScreen.addressMyXbeeDevice);
+            }
+        }
+        settingsBeechatAddr.setText(Blake3.toString(SplashScreen.myGeneratedUserId));
 
         baudRateSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
@@ -80,17 +93,24 @@ public class SettingsScreen extends Fragment {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                labelBaudRateTextView.setText("Baud rate " + Integer.toString(listValues.get((int)valueBaudRate)));
+                int speed = listValues.get((int)valueBaudRate) / 8;
+                labelBaudRateTextView.setText(Integer.toString(speed) + " bps\n" + Integer.toString(listValues.get((int)valueBaudRate)) + " baud");
                 SplashScreen.BAUD_RATE = listValues.get((int)valueBaudRate);
             }
         });
 
         // Handling the event of attaching files.
-        exportButton.setOnClickListener(new View.OnClickListener() {
+        reconnectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), CodeWordScreen.class);
-                startActivityForResult(intent, 14);
+                SplashScreen.myXbeeDevice = new XBeeDevice(getActivity(), listValues.get((int)valueBaudRate));
+                new Thread(() -> {
+                    try {
+                        SplashScreen.myXbeeDevice.open();
+                        SplashScreen.myXbeeDevice.setNodeID(Base58.encode(SplashScreen.myGeneratedUserId));
+                    } catch (Exception e) {
+                    }
+                }).start();
             }
         });
 
@@ -111,25 +131,15 @@ public class SettingsScreen extends Fragment {
         applyButton.setOnClickListener(v -> {
             db.setBaud(listValues.get((int)valueBaudRate));
             try {
-                valueBaudRate++;
                 SplashScreen.myXbeeDevice.setParameter("BD", ByteBuffer.allocate(8).putLong(valueBaudRate).array());
-                valueBaudRate--;
+                SplashScreen.myXbeeDevice.applyChanges();
+                SplashScreen.myXbeeDevice.writeChanges();
             } catch (Exception e) {
-                valueBaudRate--;
                 e.printStackTrace();
             }
-            SplashScreen.myXbeeDevice = new XBeeDevice(getActivity(), listValues.get((int)valueBaudRate));
-            new Thread(() -> {
-                try {
-                    SplashScreen.myXbeeDevice.open();
-                    SplashScreen.myXbeeDevice.setNodeID(Base58.encode(SplashScreen.myGeneratedUserId));
-                } catch (Exception e) {
-                }
-            }).start();
             Toast.makeText(getContext(), "The baud rate was changed to " + SplashScreen.BAUD_RATE, Toast.LENGTH_SHORT).show();
         });
 
         return view;
     }
-
 }

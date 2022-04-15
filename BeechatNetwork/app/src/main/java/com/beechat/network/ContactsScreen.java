@@ -22,6 +22,7 @@ import androidx.fragment.app.Fragment;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import android.widget.ImageButton;
 
 
 /***
@@ -38,10 +39,12 @@ public class ContactsScreen extends Fragment {
     List<Contact> contactsFromDb;
     static String selectedXbeeAddress, selectedUserId, selectedName;
 
+    ImageButton goToNearby;
     static CustomContactAdapter remoteXBeeDeviceAdapterName;
     static ArrayList<String> contactNames = new ArrayList<>();
     static ArrayList<String> contactXbeeAddress = new ArrayList<>();
     static ArrayList<String> contactUserIds = new ArrayList<>();
+    public static ArrayList<ContactInfo> contactInfos = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -49,12 +52,29 @@ public class ContactsScreen extends Fragment {
 
         context = LocaleHelper.setLocale(getActivity(), WelcomeScreen.language);
         resources = context.getResources();
+        goToNearby = view.findViewById(R.id.goToNearby);
+
+        goToNearby.setOnClickListener(new View.OnClickListener() {
+            /*final ProgressDialog dialog = ProgressDialog.show(getActivity(), resources.getString(R.string.connecting_device_title),
+                    resources.getString(R.string.connecting_device_description), true);
+            */
+            public void onClick(View v) {
+                new Thread(() -> {
+                    Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
+                        //dialog.dismiss();
+                        Intent intent = new Intent(getActivity(), NearbyDevicesScreen.class);
+                        startActivity(intent);
+                    });
+                }).start();
+            }
+        });
 
         db = new DatabaseHandler(getActivity());
 
         contactNames.clear();
         contactXbeeAddress.clear();
         contactUserIds.clear();
+        contactInfos.clear();
 
         contactsFromDb = db.getAllContacts(Blake3.toString(SplashScreen.myGeneratedUserId));
 
@@ -62,10 +82,40 @@ public class ContactsScreen extends Fragment {
             contactNames.add(cn.getName());
             contactXbeeAddress.add(cn.getXbeeDeviceNumber());
             contactUserIds.add(cn.getUserId());
+            ContactInfo ci = new ContactInfo();
+            ci.name = cn.getName();
+            if (ci.name == null) {
+                ci.name = "User";
+                ci.label = "U";
+                ci.mes = "";
+                ci.date = "";
+                contactInfos.add(ci);
+                continue;
+            }
+            ci.label = ci.name.substring(0, 1);
+            ci.mes = db.getLastMessage(Blake3.toString(SplashScreen.myGeneratedUserId), SplashScreen.addressMyXbeeDevice, cn.getUserId(), cn.getXbeeDeviceNumber());
+            if (ci.mes.endsWith("S") || ci.mes.endsWith("P") || ci.mes.endsWith("F")) {
+                ci.mes = ChatScreen.removeLastChar(ci.mes);
+                ci.mes = ChatScreen.removeLastChar(ci.mes);
+            }
+            if (ci.mes == null) {
+                ci.mes = "File";
+                ci.date = "06:14";
+                contactInfos.add(ci);
+                continue;
+            }
+            String[] mesData = ci.mes.split("\n");
+            ci.mes = mesData[0];
+            if (mesData.length > 1) {
+                ci.date = mesData[1];
+            }
+            if (ci.mes == null) ci.mes = "";
+            if (ci.date == null) ci.date = "";
+            contactInfos.add(ci);
         }
 
         contactsListView = view.findViewById(R.id.contactsListView);
-        remoteXBeeDeviceAdapterName = new CustomContactAdapter(Objects.requireNonNull(getActivity()), contactNames);
+        remoteXBeeDeviceAdapterName = new CustomContactAdapter(Objects.requireNonNull(getActivity()), contactInfos);
         contactsListView.setAdapter(remoteXBeeDeviceAdapterName);
 
         // Handling an event on clicking an item from the list of available devices.
@@ -81,34 +131,49 @@ public class ContactsScreen extends Fragment {
         return view;
     }
 
+    static class ContactInfo {
+        public String name;
+        public String mes;
+        public String date;
+        public String label;
+        public boolean checked;
+    }
+
     /***
      *  --- CustomContactAdapter ---
      *  The class that initializes the list of available devices.
      ***/
-    static class CustomContactAdapter extends ArrayAdapter<String> {
+    static class CustomContactAdapter extends ArrayAdapter<ContactInfo> {
         private final Context context;
 
-        CustomContactAdapter(@NonNull Context context, List<String> contacts) {
-            super(context, -1, contacts);
+        CustomContactAdapter(@NonNull Context context, List<ContactInfo> contacts) {
+            super(context, 0, contacts);
             this.context = context;
         }
 
         @NonNull
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-            String contact = contactNames.get(position);
+            View listItem = convertView;
+            if (listItem == null) {
+                listItem = LayoutInflater.from(context).inflate(R.layout.contact_layout, parent, false);
+            }
 
-            LinearLayout layout = new LinearLayout(context);
-            layout.setOrientation(LinearLayout.VERTICAL);
-            layout.setPadding(40, 30, 40, 30);
+            ContactInfo contact = contactInfos.get(position);
 
-            TextView nameText = new TextView(context);
-            nameText.setText(contact);
-            nameText.setTypeface(nameText.getTypeface(), Typeface.BOLD);
-            nameText.setTextSize(18);
-            layout.addView(nameText);
+            TextView label = (TextView)listItem.findViewById(R.id.contact_label);
+            label.setText(contact.label);
 
-            return layout;
+            TextView name = (TextView)listItem.findViewById(R.id.contact_name);
+            name.setText(contact.name);
+
+            TextView mes = (TextView)listItem.findViewById(R.id.contact_mes);
+            mes.setText(contact.mes);
+
+            TextView date = (TextView)listItem.findViewById(R.id.contact_date);
+            date.setText(contact.date);
+
+            return listItem;
         }
     }
 

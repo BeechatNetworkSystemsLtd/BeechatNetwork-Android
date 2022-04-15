@@ -21,7 +21,7 @@
     <string name="my_id_nempty">My ID \nempty</string>
     <string name="passwordLabel">Password</string>
     <string name="confirm_passwordLabel">Confirm Password</string>
-    <string name="finishLabelButton">Finish</string>
+    <string name="finishLabelButton">Accept</string>
     <string name="log_inLabel">Log in</string>
     <string name="import_accountButtonLabel">Import Account</string>
     <string name="create_accountButtonLabel">Create account</string>
@@ -31,9 +31,9 @@
     <string name="add_contactButtonLabel">Add contact</string>
     <string name="conversationsLabel">Conversations</string>
     <string name="broadcast_my_idButtonLabel">Broadcast my ID</string>
-    <string name="baud_rateLabel">Baud rate</string>
+    <string name="baud_rateLabel">Radio speed</string>
     <string name="applyButtonLabel">Apply</string>
-    <string name="data_settingsLabel">Data Settings</string>
+    <string name="data_settingsLabel">Saved data</string>
     <string name="wipe_dataButtonLabel">Wipe data</string>
     <string name="yesButtonLabel">Yes</string>
     <string name="noButtonLabel">No</string>
@@ -51,9 +51,12 @@
     <string name="editContactUpdateContactButton">Update Contact</string>
     <string name="settingsDarkModeLabel">Dark Mode</string>
     <string name="settingsSavedDataButton">Saved Data</string>
-    <string name="splashMainLabel">Connect to the device by clicking on the Request button</string>
-    <string name="splashReqButton">Request permisions</string>
+    <string name="splashMainLabel">Start using your Beechat radio by plugging it in, and then clicking on the Connect button below</string>
+    <string name="splashReqButton">Connect to device</string>
     <string name="splashSkipButton">Skip</string>
+    <string name="wellcomeLabel">Account setup</string>
+    <string name="wellcomeUsernameLabel">Username</string>
+    <string name="settingsLabel">Settings</string>
 </resources>
 
 

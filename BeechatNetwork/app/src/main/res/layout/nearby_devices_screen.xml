@@ -10,21 +10,43 @@
         android:id="@+id/linearLayout3"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:background="@color/active"
         android:orientation="vertical"
-        android:padding="15dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:paddingBottom="15dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/devicesLabelTextView"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/nunito_regular"
-            android:text="@string/select_device"
-            android:textColor="@android:color/black"
-            android:textSize="30sp" />
+            android:background="@drawable/top_name"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="1dp">
+
+            <ImageButton
+                android:id="@+id/backButton2"
+                android:layout_width="50dp"
+                android:layout_height="70dp"
+                android:background="@color/active"
+                android:scaleType="centerInside"
+                android:src="@drawable/back_button"
+                android:tint="@color/inActive" />
+
+            <TextView
+                android:id="@+id/devicesLabelTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/nunito_regular"
+                android:paddingBottom="10dp"
+                android:text="@string/select_device"
+                android:textColor="@android:color/white"
+                android:textSize="30sp" />
+        </LinearLayout>
 
         <ListView
             android:id="@+id/devicesListView"
@@ -39,12 +61,11 @@
 
             <ImageButton
                 android:id="@+id/pingButton"
-                android:layout_width="0dp"
+                android:layout_width="150dp"
                 android:layout_height="0dp"
                 android:layout_gravity="left"
                 android:layout_marginStart="3dp"
                 android:layout_marginTop="5dp"
-                android:layout_marginEnd="224dp"
                 android:layout_marginBottom="5dp"
                 android:layout_weight="1"
                 android:adjustViewBounds="true"
@@ -53,13 +74,12 @@
                 android:src="@android:drawable/ic_lock_silent_mode_off"
                 android:tint="@color/white"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/refreshButton"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageButton
                 android:id="@+id/refreshButton"
-                android:layout_width="0dp"
+                android:layout_width="150dp"
                 android:layout_height="0dp"
                 android:layout_gravity="right"
                 android:layout_marginTop="5dp"
@@ -72,7 +92,6 @@
                 android:tint="@color/white"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/pingButton"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.0" />
         </androidx.constraintlayout.widget.ConstraintLayout>

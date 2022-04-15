@@ -255,6 +255,7 @@ public class ChatScreen extends AppCompatActivity {
                 if (message.length() == 0 && !fileFlag) {
                     return;
                 }
+                String pureMes = message;
                 message = message + "\n" + currentTime;
                 try {
                     if (!fileFlag) {
@@ -264,6 +265,13 @@ public class ChatScreen extends AppCompatActivity {
                         );
                         m.send(SplashScreen.myXbeeDevice, remote, SplashScreen.hasher);
                         messages.add(message + "\n");
+                        for (ContactsScreen.ContactInfo ccn: ContactsScreen.contactInfos) {
+                            if (ccn.name.equals(selectedName)) {
+                                ccn.mes = pureMes;
+                                ContactsScreen.onRefresh();
+                                break;
+                            }
+                        }
                         inputField.setText("");
                     } else {
                         new Thread(() -> {

@@ -77,6 +77,12 @@ public class AddContactScreen extends AppCompatActivity {
                 ContactsScreen.contactNames.add(name);
                 ContactsScreen.contactUserIds.add(selectedUserId);
                 ContactsScreen.contactXbeeAddress.add(selectedXbeeDevice);
+                ContactsScreen.ContactInfo ci = new ContactsScreen.ContactInfo();
+                ci.name = name;
+                ci.label = name.substring(0, 1);
+                ci.mes = "";
+                ci.date = "";
+                ContactsScreen.contactInfos.add(ci);
                 ContactsScreen.onRefresh();
             } else {
                 if (MainScreen.userAddLock) {
@@ -90,7 +96,12 @@ public class AddContactScreen extends AppCompatActivity {
                     System.out.println("Exception: " + ex.getMessage());
                     ex.printStackTrace();
                 }
-                ContactsScreen.contactNames.add("Init ...");
+                ContactsScreen.ContactInfo ci = new ContactsScreen.ContactInfo();
+                ci.name = "Init ...";
+                ci.label = name.substring(0, 1);
+                ci.mes = "";
+                ci.date = "";
+                ContactsScreen.contactInfos.add(ci);
                 ContactsScreen.onRefresh();
                 Message getDP = new Message(Packet.Type.DP_KEY, SplashScreen.randomHash);
                 try {

@@ -31,7 +31,7 @@
     <string name="add_contactButtonLabel">Agregar contacto</string>
     <string name="conversationsLabel">Conversaciones</string>
     <string name="broadcast_my_idButtonLabel">Broadcast my ID</string>
-    <string name="baud_rateLabel">Velocidad</string>
+    <string name="baud_rateLabel">Radio speed</string>
     <string name="applyButtonLabel">Aplicar</string>
     <string name="data_settingsLabel">Ajustes de datos</string>
     <string name="wipe_dataButtonLabel">Eliminar datos</string>
@@ -54,5 +54,8 @@
     <string name="splashMainLabel">Conéctese al dispositivo haciendo clic en el botón Solicitar</string>
     <string name="splashReqButton">Solicitar permiso</string>
     <string name="splashSkipButton">Omitir</string>
+    <string name="wellcomeLabel">Account setup</string>
+    <string name="wellcomeUsernameLabel">Username</string>
+    <string name="settingsLabel">Settings</string>
 </resources>
 

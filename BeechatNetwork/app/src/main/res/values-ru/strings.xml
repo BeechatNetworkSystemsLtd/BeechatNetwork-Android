@@ -21,7 +21,7 @@
     <string name="my_id_nempty">Мой ID \nпуст</string>
     <string name="passwordLabel">Пароль</string>
     <string name="confirm_passwordLabel">Подтверждение пароля</string>
-    <string name="finishLabelButton">Завершить</string>
+    <string name="finishLabelButton">Применить</string>
     <string name="log_inLabel">Войти</string>
     <string name="import_accountButtonLabel">Импортировать пользователя</string>
     <string name="create_accountButtonLabel">Создать пользователя</string>
@@ -45,15 +45,18 @@
     <string name="log_outButtonLabel">Выйти</string>
     <string name="exportButtonLabel">Экспорт</string>
     <string name="codeWordText">Кодовое слово</string>
-    <string name="editContactLabel">Edit Contact</string>
-    <string name="editContactAddressLabel">Address</string>
-    <string name="editContactNameLabel">Name</string>
-    <string name="editContactUpdateContactButton">Update Contact</string>
-    <string name="settingsDarkModeLabel">Dark Mode</string>
-    <string name="settingsSavedDataButton">Saved Data</string>
-    <string name="splashMainLabel">Connect to the device by clicking on the Request button</string>
-    <string name="splashReqButton">Request permisions</string>
-    <string name="splashSkipButton">Skip</string>
+    <string name="editContactLabel">Редактировать контакт</string>
+    <string name="editContactAddressLabel">Адрес</string>
+    <string name="editContactNameLabel">Имя</string>
+    <string name="editContactUpdateContactButton">Обновить контакт</string>
+    <string name="settingsDarkModeLabel">Темный режим</string>
+    <string name="settingsSavedDataButton">Сохранить данные</string>
+    <string name="splashMainLabel">Начни использовать радио Beechat подключив его к смартфону и нажав на кнопку ниже</string>
+    <string name="splashReqButton">Подключиться</string>
+    <string name="splashSkipButton">Пропустить</string>
+    <string name="wellcomeLabel">Настройка аккаунта</string>
+    <string name="wellcomeUsernameLabel">Имя пользователя</string>
+    <string name="settingsLabel">Настройки</string>
 </resources>
 
 

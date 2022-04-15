@@ -1,18 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/active"
         android:orientation="vertical"
         android:padding="15dp">
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="wrap_content"
+            android:layout_height="290dp"
+            android:layout_marginBottom="20dp"
+            app:srcCompat="@drawable/beechat_logo" />
 
         <Spinner
             android:id="@+id/accountSpinner"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:backgroundTint="@android:color/white"
             android:drawSelectorOnTop="true"
             android:fontFamily="@font/nunito_regular"
             android:textSize="30sp" />
@@ -22,10 +32,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            android:backgroundTint="@android:color/white"
             android:fontFamily="@font/nunito_regular"
+            android:foregroundTint="@android:color/white"
             android:hint="@string/passwordLabel"
             android:inputType="textPassword"
-            android:textColor="@android:color/black"
+            android:textColor="@android:color/white"
+            android:textColorHint="@android:color/darker_gray"
             android:textSize="30sp" />
 
         <Button
@@ -36,7 +49,8 @@
             android:layout_marginTop="30dp"
             android:background="@drawable/rounded_corner_for_button"
             android:fontFamily="@font/nunito_regular"
-            android:padding="10dp"
+            android:paddingLeft="30dp"
+            android:paddingRight="30dp"
             android:text="@string/log_inLabel"
             android:textColor="@android:color/white"
             android:textSize="16sp" />
@@ -46,12 +60,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="20dp"
             android:background="@drawable/rounded_corner_for_button"
             android:fontFamily="@font/nunito_regular"
-            android:padding="10dp"
+            android:paddingLeft="30dp"
+            android:paddingRight="30dp"
             android:text="@string/create_accountButtonLabel"
             android:textColor="@android:color/white"
             android:textSize="16sp" />
+
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

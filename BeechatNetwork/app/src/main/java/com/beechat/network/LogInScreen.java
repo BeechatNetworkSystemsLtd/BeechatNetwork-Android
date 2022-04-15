@@ -63,7 +63,7 @@ public class LogInScreen extends AppCompatActivity {
         buttonCreateAccount = findViewById(R.id.buttonCreateAccount);
 
         spinnerUsernames = findViewById(R.id.accountSpinner);
-        ArrayAdapter<String> adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, listUsernames);
+        ArrayAdapter<String> adapter = new ArrayAdapter(this, R.layout.spinner_layout, listUsernames);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerUsernames.setAdapter(adapter);
 

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/sepa"
+    android:orientation="horizontal"
+    android:paddingBottom="5dp">
+
+    <TextView
+        android:id="@+id/contact_label"
+        android:layout_width="74dp"
+        android:layout_height="74dp"
+        android:background="@drawable/round_attach_button"
+        android:backgroundTint="#555"
+        android:fontFamily="@font/nunito_regular"
+        android:gravity="center"
+        android:padding="5dip"
+        android:textColor="#FFFFFF"
+        android:textSize="40sp" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="6"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/contact_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/active"
+            android:fontFamily="@font/nunito_regular"
+            android:gravity="start"
+            android:padding="5dip"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/contact_mes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/active"
+            android:fontFamily="@font/nunito_regular"
+            android:gravity="start"
+            android:padding="5dip"
+            android:textColor="#999999"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/contact_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_weight="1"
+        android:background="@color/active"
+        android:fontFamily="@font/nunito_regular"
+        android:gravity="start"
+        android:padding="5dip"
+        android:textColor="#999999"
+        android:textSize="20sp" />
+</LinearLayout>

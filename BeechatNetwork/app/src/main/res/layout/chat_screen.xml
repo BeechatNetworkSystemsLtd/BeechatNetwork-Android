@@ -10,21 +10,23 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/active"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="70dp"
             android:layout_marginBottom="20dp"
-            android:background="@color/active"
+            android:background="@drawable/top_name"
             android:gravity="center"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:paddingBottom="1dp">
 
             <ImageButton
                 android:id="@+id/backButton"
                 android:layout_width="50dp"
                 android:layout_height="70dp"
-                android:layout_marginStart="10dp"
                 android:background="@color/active"
                 android:scaleType="centerInside"
                 android:src="@drawable/back_button"
@@ -54,7 +56,16 @@
             android:isScrollContainer="true"
             android:listSelector="@android:color/transparent"
             android:transcriptMode="alwaysScroll"
-            android:verticalScrollbarPosition="right" />
+            android:verticalScrollbarPosition="right">
+
+        </ListView>
+
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/top_name"
+            android:text="TextView" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -104,8 +115,9 @@
 
             <TextView
                 android:id="@+id/textViewAttachment"
-                android:layout_width="250dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text=""
                 android:textColor="#FFFFFF" />
 

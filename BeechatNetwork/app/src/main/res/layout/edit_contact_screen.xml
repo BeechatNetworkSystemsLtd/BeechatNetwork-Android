@@ -8,52 +8,44 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:background="@color/active"
+        android:orientation="vertical"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="70dp"
             android:layout_marginBottom="20dp"
-            android:orientation="horizontal"
+            android:background="@drawable/top_name"
             android:gravity="center"
-            android:background="@color/active">
+            android:orientation="horizontal">
+
             <ImageButton
                 android:id="@+id/backButton"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
+                android:background="@color/active"
                 android:scaleType="centerInside"
                 android:src="@drawable/back_button"
-                android:tint="@color/colorAccent"
-                android:background="@drawable/round_button"
-                android:layout_marginLeft="10dp" />
+                android:tint="@color/inActive" />
 
             <TextView
                 android:id="@+id/labelTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
+                android:fontFamily="@font/nunito_regular"
                 android:text="@string/editContactLabel"
                 android:textColor="@color/white"
-                android:textSize="40dp" />
+                android:textSize="34sp" />
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="15dp">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:orientation="horizontal">
+            android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/addressTextView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/editContactAddressLabel" />
-            </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -64,12 +56,61 @@
                     android:id="@+id/labelNameTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/editContactNameLabel" />
+                    android:fontFamily="@font/nunito_regular"
+                    android:text="@string/editContactNameLabel"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp" />
+
                 <EditText
                     android:id="@+id/nameEditText"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@android:color/darker_gray"
+                    android:fontFamily="@font/nunito_regular"
+                    android:textColor="@android:color/white" />
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/baudRateTextView12"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:fontFamily="@font/nunito_regular"
+                android:text="Radio address"
+                android:textColor="@android:color/white"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/ecRadioAddrTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:layout_weight="0"
+                android:fontFamily="@font/nunito_regular"
+                android:text="none"
+                android:textColor="@color/grey"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/baudRateTextView14"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:fontFamily="@font/nunito_regular"
+                android:text="Beechat address"
+                android:textColor="@android:color/white"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/ecBeechatAddrTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:layout_weight="0"
+                android:fontFamily="@font/nunito_regular"
+                android:text="none"
+                android:textColor="@color/grey"
+                android:textSize="20sp" />
 
             <Button
                 android:id="@+id/updateContactButton"
@@ -78,14 +119,12 @@
                 android:layout_gravity="center"
                 android:background="@drawable/rounded_corner_for_button"
                 android:fontFamily="@font/nunito_regular"
-                android:padding="10dp"
+                android:paddingLeft="30dp"
+                android:paddingRight="30dp"
                 android:text="@string/editContactUpdateContactButton"
                 android:textColor="@android:color/white"
                 android:textSize="16sp" />
         </LinearLayout>
-
-
-
 
 
     </LinearLayout>

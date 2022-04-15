@@ -20,7 +20,8 @@ public class EditContactScreen extends AppCompatActivity {
     Context context;
     Resources resources;
 
-    TextView addressTextView;
+    TextView beechatAddressTextView;
+    TextView radioAddressTextView;
     EditText nameEditText;
     Button updateContactButton;
     ImageButton backButton;
@@ -37,15 +38,17 @@ public class EditContactScreen extends AppCompatActivity {
         db = new DatabaseHandler(this);
         Bundle extras = getIntent().getExtras();
 
-        addressTextView = findViewById(R.id.addressTextView);
+        radioAddressTextView = findViewById(R.id.ecRadioAddrTextView);
+        beechatAddressTextView = findViewById(R.id.ecBeechatAddrTextView);
         nameEditText = findViewById(R.id.nameEditText);
         backButton = findViewById(R.id.backButton);
         updateContactButton = findViewById(R.id.updateContactButton);
 
-        if(extras !=null) {
+        if (extras != null) {
             selectedXbeeAddress = extras.getString("key_selectedXbeeAddress");
             selectedUserId = extras.getString("key_selectedUserId");
-            addressTextView.setText("Address " + selectedXbeeAddress+"("+selectedUserId+")");
+            radioAddressTextView.setText(selectedXbeeAddress);
+            beechatAddressTextView.setText(selectedUserId);
         }
 
         ownerContact = Blake3.toString(SplashScreen.myGeneratedUserId);

@@ -8,13 +8,16 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:background="@color/active"
+        android:orientation="vertical"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="70dp"
             android:layout_marginBottom="20dp"
-            android:background="@color/active"
+            android:background="@drawable/top_name"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -24,18 +27,19 @@
                 android:layout_height="50dp"
                 android:layout_marginStart="10dp"
                 android:background="@drawable/round_button"
+                android:backgroundTint="@color/active"
                 android:scaleType="centerInside"
                 android:src="@drawable/back_button"
-                android:tint="@color/colorAccent" />
+                android:tint="@color/inActive" />
 
             <TextView
                 android:id="@+id/labelTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
+                android:gravity="center|left"
                 android:text="@string/add_contactLabel"
                 android:textColor="@color/white"
-                android:textSize="40sp" />
+                android:textSize="34sp" />
 
         </LinearLayout>
 
@@ -55,7 +59,8 @@
                     android:id="@+id/addressTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/addressLabelContact" />
+                    android:text="@string/addressLabelContact"
+                    android:textColor="@android:color/white" />
             </LinearLayout>
 
             <LinearLayout
@@ -68,12 +73,14 @@
                     android:id="@+id/labelNameTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/nameLabelContact" />
+                    android:text="@string/nameLabelContact"
+                    android:textColor="@android:color/white" />
 
                 <EditText
                     android:id="@+id/nameEditText"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/white" />
             </LinearLayout>
 
             <Button

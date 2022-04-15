@@ -11,13 +11,10 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.net.Uri;
@@ -32,23 +29,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Random;
 import java.io.BufferedInputStream;
-import java.io.IOException;
+
 import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import java.security.NoSuchAlgorithmException;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
+
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Objects;
 
@@ -63,6 +51,7 @@ public class WelcomeScreen extends AppCompatActivity {
     Resources resources;
     EditText password, logoName;
     ImageButton hidePassButton;
+    ImageButton regenerateButton;
     Button finishButton, importButton;
     CheckBox agreementCheckBox;
     TextView eulaTextView, userIdTextView;
@@ -100,6 +89,7 @@ public class WelcomeScreen extends AppCompatActivity {
         userIdTextView = findViewById(R.id.textViewMyID);
         finishButton = findViewById(R.id.finishButton);
         importButton = findViewById(R.id.buttonImport);
+        regenerateButton = findViewById(R.id.regenerateKey);
         hidePassButton = findViewById(R.id.hidePassButton);
         logoName = findViewById(R.id.logoName);
         password = findViewById(R.id.passwordOne);
@@ -133,7 +123,7 @@ public class WelcomeScreen extends AppCompatActivity {
             ex.printStackTrace();
         }
 
-        userIdTextView.setText("Your Beechat address\n" + Blake3.toString(generatedUserId));
+        userIdTextView.setText(Blake3.toString(generatedUserId));
 
         finishButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -167,6 +157,28 @@ public class WelcomeScreen extends AppCompatActivity {
                     password.setTransformationMethod(null);
                 }
                 passHide = !passHide;
+            }
+        });
+
+        regenerateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                generatedUserKPk = new byte[Kyber512.KYBER_PUBLICKEYBYTES];
+                generatedUserKSk = new byte[Kyber512.KYBER_SECRETKEYBYTES];
+                generatedUserDPk = new byte[Dilithium.CRYPTO_PUBLICKEYBYTES];
+                generatedUserDSk = new byte[Dilithium.CRYPTO_SECRETKEYBYTES];
+
+                try {
+                    Kyber512.crypto_kem_keypair(generatedUserKPk, generatedUserKSk);
+                    Dilithium.crypto_sign_keypair(generatedUserDPk, generatedUserDSk);
+                    Blake3 hasher = new Blake3();
+                    hasher.update(generatedUserDPk, Dilithium.CRYPTO_PUBLICKEYBYTES);
+                    generatedUserId = hasher.finalize(User.NODEID_SIZE);
+                } catch (Exception ex) {
+                    System.out.println("Exception: " + ex.getMessage());
+                    ex.printStackTrace();
+                }
+                userIdTextView.setText(Blake3.toString(generatedUserId));
             }
         });
 

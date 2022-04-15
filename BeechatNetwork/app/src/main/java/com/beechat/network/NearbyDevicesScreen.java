@@ -24,6 +24,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.digi.xbee.api.RemoteXBeeDevice;
@@ -45,19 +46,18 @@ import java.util.Objects;
  *  --- NearbyDevicesScreen ---
  *  The class is responsible for the search and display ids of XBEE devices.
  ***/
-public class NearbyDevicesScreen extends Fragment {
-
-    // Variables
+public class NearbyDevicesScreen extends AppCompatActivity {
     Context context;
     Resources resources;
     CustomDeviceAdapter remoteXBeeDeviceAdapter;
     ListView devicesListView;
     ImageButton refreshButton;
     ImageButton pingButton;
+    ImageButton backButton;
     TextView devicesLabel;
-    View view;
     DatabaseHandler db;
     String selectedXbeeDevice, selectedUserId;
+    public static String cname, cselectedUserId, cselectedXbeeDevice;
 
     public static ArrayList<String> devicesAN = new ArrayList<>();
     public static ArrayList<String> devicesAddress = new ArrayList<>();
@@ -74,13 +74,13 @@ public class NearbyDevicesScreen extends Fragment {
     private static final File fdelete = new File(gpxfile.getPath());
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.nearby_devices_screen, container, false);
-
-        context = LocaleHelper.setLocale(getActivity(), WelcomeScreen.language);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.nearby_devices_screen);
+        context = LocaleHelper.setLocale(Objects.requireNonNull(this), WelcomeScreen.language);
         resources = context.getResources();
 
-        db = new DatabaseHandler(getActivity());
+        db = new DatabaseHandler(Objects.requireNonNull(this));
 
         contactsFromDb.clear();
 
@@ -90,12 +90,13 @@ public class NearbyDevicesScreen extends Fragment {
             contactsFromDb.add(cn.getUserId() + " (" + cn.getXbeeDeviceNumber() + ")");
         }
 
-        devicesLabel = view.findViewById(R.id.devicesLabelTextView);
-        refreshButton = view.findViewById(R.id.refreshButton);
-        pingButton = view.findViewById(R.id.pingButton);
+        devicesLabel = findViewById(R.id.devicesLabelTextView);
+        refreshButton = findViewById(R.id.refreshButton);
+        pingButton = findViewById(R.id.pingButton);
+        backButton = findViewById(R.id.backButton2);
 
-        devicesListView = view.findViewById(R.id.devicesListView);
-        remoteXBeeDeviceAdapter = new CustomDeviceAdapter(Objects.requireNonNull(getActivity()), devicesAN);
+        devicesListView = findViewById(R.id.devicesListView);
+        remoteXBeeDeviceAdapter = new CustomDeviceAdapter(Objects.requireNonNull(Objects.requireNonNull(this)), devicesAN);
         devicesListView.setAdapter(remoteXBeeDeviceAdapter);
 
         // Handling an event on clicking an item from the list of available devices.
@@ -106,11 +107,11 @@ public class NearbyDevicesScreen extends Fragment {
 
             if (!contactsFromDb.isEmpty()) {
                 if (contactsFromDb.contains(selectedUserId + " (" + selectedXbeeDevice + ")")) {
-                    Toast.makeText(getActivity(), "The selected Beenode is already a contact, please navigate to Conversations window and click on the contact to begin chat.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Objects.requireNonNull(this), "The selected Beenode is already a contact, please navigate to Conversations window and click on the contact to begin chat.", Toast.LENGTH_SHORT).show();
                     return;
                 }
             }
-            Intent intent = new Intent(getActivity(), AddContactScreen.class);
+            Intent intent = new Intent(Objects.requireNonNull(this), AddContactScreen.class);
             intent.putExtra("key_selectedXbeeDevice", selectedXbeeDevice);
             intent.putExtra("key_selectedUserId", selectedUserId);
             intent.putExtra("num_selected", i);
@@ -122,6 +123,13 @@ public class NearbyDevicesScreen extends Fragment {
             public void onClick(View v) {
                 remoteXBeeDeviceAdapter.clear();
                 startScan();
+            }
+        });
+
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
             }
         });
 
@@ -162,7 +170,7 @@ public class NearbyDevicesScreen extends Fragment {
         new Thread(() -> {
             try {
                 while (true) {
-                    getActivity().runOnUiThread(() -> {
+                    Objects.requireNonNull(this).runOnUiThread(() -> {
                         remoteXBeeDeviceAdapter.notifyDataSetChanged();
                     });
                     Thread.sleep(500);
@@ -173,8 +181,18 @@ public class NearbyDevicesScreen extends Fragment {
                 e.printStackTrace();
             }
         }).start();
+    }
 
-        return view;
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        cname = data.getStringExtra("newname");
+        cselectedUserId = data.getStringExtra("userid");
+        cselectedXbeeDevice = data.getStringExtra("addr");
+        devicesAN.set(data.getIntExtra("id", 0), data.getStringExtra("name"));
+        contactsFromDb.add(data.getStringExtra("userid") + " (" + data.getStringExtra("addr") + ")");
+        MainScreen.contactUserIds.add(cselectedUserId);
+        MainScreen.contactXbeeAddress.add(cselectedXbeeDevice);
+        MainScreen.contactNames.add(cname);
     }
 
     /***
@@ -207,7 +225,7 @@ public class NearbyDevicesScreen extends Fragment {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1) {
             return false;
         }
-        int permission = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int permission = ContextCompat.checkSelfPermission(Objects.requireNonNull(this), Manifest.permission.WRITE_EXTERNAL_STORAGE);
         return (permission != PackageManager.PERMISSION_GRANTED);
     }
 
@@ -220,11 +238,11 @@ public class NearbyDevicesScreen extends Fragment {
                 "android.permission.READ_EXTERNAL_STORAGE",
                 "android.permission.WRITE_EXTERNAL_STORAGE"
         };
-        int permission = ActivityCompat.checkSelfPermission(Objects.requireNonNull(getActivity()), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int permission = ActivityCompat.checkSelfPermission(Objects.requireNonNull(this), Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
         if (permission != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(
-                    getActivity(), permissions, 1);
+                    Objects.requireNonNull(this), permissions, 1);
         }
     }
 
@@ -246,14 +264,14 @@ public class NearbyDevicesScreen extends Fragment {
      *  The function of starting scanning for available Xbee devices.
      ***/
     private void startScan() {
-        final ProgressDialog dialog = ProgressDialog.show(getActivity(), resources.getString(R.string.scanning_device_title),
+        final ProgressDialog dialog = ProgressDialog.show(Objects.requireNonNull(this), resources.getString(R.string.scanning_device_title),
                 resources.getString(R.string.scanning_devices), true);
 
         new Thread(() -> {
             try {
                 listNodes(SplashScreen.myXbeeDevice);
 
-                getActivity().runOnUiThread(() -> {
+                Objects.requireNonNull(this).runOnUiThread(() -> {
                     dialog.dismiss();
                     remoteXBeeDeviceAdapter.notifyDataSetChanged();
                 });
@@ -274,7 +292,7 @@ public class NearbyDevicesScreen extends Fragment {
         private final Context context;
 
         CustomDeviceAdapter(@NonNull Context context, ArrayList<String> devices) {
-            super(context, -1, devices);
+            super(context, 0, devices);
             this.context = context;
         }
 
@@ -282,18 +300,15 @@ public class NearbyDevicesScreen extends Fragment {
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             String device = devicesAN.get(position);
+            View listItem = convertView;
+            if (listItem == null) {
+                listItem = LayoutInflater.from(context).inflate(R.layout.nearby_layout, parent, false);
+            }
 
-            LinearLayout layout = new LinearLayout(context);
-            layout.setOrientation(LinearLayout.VERTICAL);
-            layout.setPadding(40, 30, 40, 30);
-
-            TextView nameText = new TextView(context);
+            TextView nameText = (TextView)listItem.findViewById(R.id.nearby_name);
             nameText.setText(device);
-            nameText.setTypeface(nameText.getTypeface(), Typeface.BOLD);
-            nameText.setTextSize(18);
-            layout.addView(nameText);
 
-            return layout;
+            return listItem;
         }
     }
 

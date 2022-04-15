@@ -32,6 +32,7 @@
         <activity android:name="com.beechat.network.AddContactScreen" />
         <activity android:name="com.beechat.network.EditContactScreen" />
         <activity android:name="com.beechat.network.DataScreen" />
+        <activity android:name="com.beechat.network.NearbyDevicesScreen" />
 
     </application>
 

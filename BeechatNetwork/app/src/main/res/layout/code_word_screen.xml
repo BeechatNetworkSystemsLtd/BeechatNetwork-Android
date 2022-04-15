@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/active">
 
     <EditText
         android:id="@+id/codeWordEdit"
@@ -11,9 +12,12 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="304dp"
+        android:backgroundTint="@android:color/darker_gray"
         android:fontFamily="@font/nunito_regular"
+        android:foregroundTint="@android:color/white"
         android:hint="@string/codeWordText"
-        android:textColor="@android:color/black"
+        android:textColor="@android:color/white"
+        android:textColorHint="@android:color/darker_gray"
         android:textSize="30sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

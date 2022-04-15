@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,13 +9,16 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:background="@color/active"
+        android:orientation="vertical"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="70dp"
             android:layout_marginBottom="10dp"
-            android:background="@color/active"
+            android:background="@drawable/top_name"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -22,16 +26,26 @@
                 android:id="@+id/textView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:fontFamily="@font/nunito_regular"
-                android:gravity="center"
+                android:gravity="left"
                 android:text="@string/conversationsLabel"
                 android:textColor="@color/white"
                 android:textSize="30sp" />
+
+            <ImageButton
+                android:id="@+id/goToNearby"
+                android:layout_width="64dp"
+                android:layout_height="wrap_content"
+                android:background="@color/active"
+                android:src="@drawable/nearby_black_small"
+                android:tint="@android:color/white" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/active"
             android:orientation="vertical"
             android:padding="15dp">
 

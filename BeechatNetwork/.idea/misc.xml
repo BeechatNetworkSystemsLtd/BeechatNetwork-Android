@@ -9,16 +9,22 @@
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.19739583333333333" />
         <entry key="app/src/main/res/drawable/round_attach_button.xml" value="0.19375" />
         <entry key="app/src/main/res/drawable/round_button.xml" value="0.19375" />
+        <entry key="app/src/main/res/drawable/round_rect_shape.xml" value="0.342" />
         <entry key="app/src/main/res/drawable/round_refresh_button.xml" value="0.18611111111111112" />
         <entry key="app/src/main/res/drawable/rounded_corner_for_button.xml" value="0.30185185185185187" />
+        <entry key="app/src/main/res/drawable/sepa.xml" value="0.2455" />
         <entry key="app/src/main/res/drawable/server_message_box.xml" value="0.19739583333333333" />
+        <entry key="app/src/main/res/drawable/spinner_item.xml" value="0.245" />
+        <entry key="app/src/main/res/drawable/spinner_layout.xml" value="0.245" />
         <entry key="app/src/main/res/drawable/tab_background.xml" value="0.24722222222222223" />
+        <entry key="app/src/main/res/drawable/top_name.xml" value="0.245" />
         <entry key="app/src/main/res/layout/activity_chat.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="app/src/main/res/layout/add_contact_screen.xml" value="0.33" />
         <entry key="app/src/main/res/layout/broadcast_screen.xml" value="0.25" />
-        <entry key="app/src/main/res/layout/chat_screen.xml" value="0.67" />
+        <entry key="app/src/main/res/layout/chat_screen.xml" value="0.25" />
         <entry key="app/src/main/res/layout/code_word_screen.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/contact_layout.xml" value="0.5" />
         <entry key="app/src/main/res/layout/contacts_screen.xml" value="0.33" />
         <entry key="app/src/main/res/layout/data_screen.xml" value="0.33" />
         <entry key="app/src/main/res/layout/edit_contact_screen.xml" value="0.33" />
@@ -30,12 +36,14 @@
         <entry key="app/src/main/res/layout/login_screen.xml" value="0.15780141843971632" />
         <entry key="app/src/main/res/layout/main_screen.xml" value="0.33" />
         <entry key="app/src/main/res/layout/nearby_devices_screen.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/nearby_layout.xml" value="0.22192028985507245" />
         <entry key="app/src/main/res/layout/popup_window.xml" value="0.1" />
         <entry key="app/src/main/res/layout/round_button.xml" value="0.12952898550724637" />
         <entry key="app/src/main/res/layout/select_language_screen.xml" value="0.15780141843971632" />
         <entry key="app/src/main/res/layout/settings_screen.xml" value="0.33" />
         <entry key="app/src/main/res/layout/sign_in_screen.xml" value="0.15780141843971632" />
         <entry key="app/src/main/res/layout/sign_up_screen.xml" value="0.15780141843971632" />
+        <entry key="app/src/main/res/layout/spinner_layout.xml" value="0.3885416666666667" />
         <entry key="app/src/main/res/layout/splash_screen.xml" value="0.33" />
         <entry key="app/src/main/res/layout/start_screen.xml" value="0.33" />
         <entry key="app/src/main/res/layout/test_screen.xml" value="0.4267716535433071" />

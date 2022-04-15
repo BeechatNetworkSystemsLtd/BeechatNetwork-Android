@@ -481,4 +481,34 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         return messagesList;
     }
+
+    /***
+     *  --- getLastMessage(String, String, String, String) ---
+     *  The function for retrieving last message from 'Messages' table.
+     *
+     *  @param chatSenderId My user id.
+     *  @param chatXbeeSender My Xbee address.
+     *  @param chatReceiverId Selected user id.
+     *  @param chatXbeeReceiver Selected Xbee address.
+     ***/
+    public String getLastMessage(
+        String chatSenderId
+      , String chatXbeeSender
+      , String chatReceiverId
+      , String chatXbeeReceiver
+    ) {
+        String retmes = "";
+        List<TextMessage> messagesList = new ArrayList<>();
+        String selectQuery = "SELECT  * FROM " + TABLE_MESSAGES + " WHERE " + MESSAGES_SENDER_ID + " = '" + chatSenderId + "' and " +
+                MESSAGES_XBEE_DEVICE_NUMBER_SENDER + " = '" + chatXbeeSender + "' and " + MESSAGES_RECEIVER_ID + " = '" + chatReceiverId + "' and " +
+                MESSAGES_XBEE_DEVICE_NUMBER_RECEIVER + " = '" + chatXbeeReceiver + "' ";
+        SQLiteDatabase.loadLibs(mContext.getApplicationContext());
+        SQLiteDatabase db = this.getReadableDatabase(SECRET_KEY);
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToLast()) {
+            retmes = cursor.getString(5);
+        }
+        return retmes;
+    }
 }

@@ -57,7 +57,6 @@ public class MainScreen extends AppCompatActivity {
     public static ArrayList<String> contactNames = new ArrayList<>();
     public static ArrayList<String> contactXbeeAddress = new ArrayList<>();
     public static ArrayList<String> contactUserIds = new ArrayList<>();
-    static String cname, cselectedUserId, cselectedXbeeDevice;
     static boolean replyReceived = false;
     int FILE_SELECT_CODE = 101;
     List<Contact> contactsFromDb;
@@ -88,7 +87,7 @@ public class MainScreen extends AppCompatActivity {
 
         fragments = new ArrayList<>();
 
-        fragments.add(new NearbyDevicesScreen());
+        //fragments.add(new NearbyDevicesScreen());
         linkAct = new ContactsScreen();
         fragments.add(linkAct);
         //fragments.add(new BroadcastScreen());
@@ -99,10 +98,10 @@ public class MainScreen extends AppCompatActivity {
 
         tabLayout.setupWithViewPager(viewPager);
 
-        tabLayout.getTabAt(0).setIcon(R.drawable.nearby_black);
-        tabLayout.getTabAt(1).setIcon(R.drawable.chat_black);
+        //tabLayout.getTabAt(0).setIcon(R.drawable.nearby_black);
+        tabLayout.getTabAt(0).setIcon(R.drawable.chat_black);
         //tabLayout.getTabAt(2).setIcon(R.drawable.broadcast_black);
-        tabLayout.getTabAt(2).setIcon(R.drawable.settings_black);
+        tabLayout.getTabAt(1).setIcon(R.drawable.settings_black);
 
         if (SplashScreen.myXbeeDevice.isOpen() == false) {
             return;
@@ -149,70 +148,6 @@ public class MainScreen extends AppCompatActivity {
         if (data == null) {
             return;
         }
-        if (requestCode == 65536 + 14) {
-            String cw = data.getStringExtra("cw");
-            SecretKey skey = getAESKeyFromPassword(cw, "AES");
-            try {
-                String dir = Environment.getExternalStoragePublicDirectory(
-                    Environment.DIRECTORY_DOWNLOADS
-                ).getAbsolutePath();
-                FileOutputStream outputStream = new FileOutputStream(
-                    new File(
-                        dir + "/" + SplashScreen.neo.getLogo() + ".user"
-                    )
-                );
-                int seek = 0;
-                byte[] towrite = new byte[
-                    User.NODEID_SIZE * 2
-                  + User.PASS_HASH_SIZE * 2
-                  + Dilithium.CRYPTO_PUBLICKEYBYTES
-                  + Dilithium.CRYPTO_SECRETKEYBYTES
-                  + Kyber512.KYBER_PUBLICKEYBYTES
-                  + Kyber512.KYBER_SECRETKEYBYTES
-                  + SplashScreen.neo.getLogo().length()
-                ];
-
-                System.arraycopy(SplashScreen.neo.getUsername().getBytes(), 0, towrite, seek, User.NODEID_SIZE * 2);
-                seek += User.NODEID_SIZE * 2;
-
-                System.arraycopy(SplashScreen.neo.getPassword().getBytes(), 0, towrite, seek, User.PASS_HASH_SIZE * 2);
-                seek += User.PASS_HASH_SIZE * 2;
-
-                System.arraycopy(SplashScreen.neo.getDPubKey(), 0, towrite, seek, Dilithium.CRYPTO_PUBLICKEYBYTES);
-                seek += Dilithium.CRYPTO_PUBLICKEYBYTES;
-
-                System.arraycopy(SplashScreen.neo.getDPrivKey(), 0, towrite, seek, Dilithium.CRYPTO_SECRETKEYBYTES);
-                seek += Dilithium.CRYPTO_SECRETKEYBYTES;
-
-                System.arraycopy(SplashScreen.neo.getKPubKey(), 0, towrite, seek, Kyber512.KYBER_PUBLICKEYBYTES);
-                seek += Kyber512.KYBER_PUBLICKEYBYTES;
-
-                System.arraycopy(SplashScreen.neo.getKPrivKey(), 0, towrite, seek, Kyber512.KYBER_SECRETKEYBYTES);
-                seek += Kyber512.KYBER_SECRETKEYBYTES;
-
-                System.arraycopy(SplashScreen.neo.getLogo().getBytes(), 0, towrite, seek, SplashScreen.neo.getLogo().length());
-
-                Cipher cipher = Cipher.getInstance("AES");
-                cipher.init(Cipher.ENCRYPT_MODE, skey);
-                outputStream.write(cipher.doFinal(towrite));
-                outputStream.flush();
-                outputStream.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-                Toast.makeText(this, "Export error!", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            Toast.makeText(this, "Current user was exported!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        cname = data.getStringExtra("newname");
-        cselectedUserId = data.getStringExtra("userid");
-        cselectedXbeeDevice = data.getStringExtra("addr");
-        NearbyDevicesScreen.devicesAN.set(data.getIntExtra("id", 0), data.getStringExtra("name"));
-        contactUserIds.add(cselectedUserId);
-        contactXbeeAddress.add(cselectedXbeeDevice);
-        contactNames.add(cname);
-        NearbyDevicesScreen.contactsFromDb.add(data.getStringExtra("userid") + " (" + data.getStringExtra("addr") + ")");
     }
 
     /***
@@ -376,8 +311,13 @@ public class MainScreen extends AppCompatActivity {
                 System.out.println("Exception: " + ex.getMessage());
                 ex.printStackTrace();
             }
-            ContactsScreen.contactNames.remove(ContactsScreen.contactNames.size() - 1);
-            ContactsScreen.contactNames.add("Verify ...");
+            ContactsScreen.contactInfos.remove(ContactsScreen.contactInfos.size() - 1);
+            ContactsScreen.ContactInfo ci = new ContactsScreen.ContactInfo();
+            ci.name = "Verify ...";
+            ci.label = NearbyDevicesScreen.cname.substring(0, 1);
+            ci.mes = "";
+            ci.date = "";
+            ContactsScreen.contactInfos.add(ci);
             linkAct.getActivity().runOnUiThread(() -> {
                 ContactsScreen.onRefresh();
             });
@@ -434,16 +374,22 @@ public class MainScreen extends AppCompatActivity {
 
             db.addContact(
                 new Contact(
-                    cselectedUserId
-                  , cselectedXbeeDevice
-                  , cname
+                    NearbyDevicesScreen.cselectedUserId
+                  , NearbyDevicesScreen.cselectedXbeeDevice
+                  , NearbyDevicesScreen.cname
                   , Blake3.toString(SplashScreen.myGeneratedUserId)
                 )
             );
-            ContactsScreen.contactNames.remove(ContactsScreen.contactNames.size() - 1);
-            ContactsScreen.contactNames.add(cname);
-            ContactsScreen.contactUserIds.add(cselectedUserId);
-            ContactsScreen.contactXbeeAddress.add(cselectedXbeeDevice);
+            ContactsScreen.contactInfos.remove(ContactsScreen.contactInfos.size() - 1);
+            ContactsScreen.ContactInfo ci = new ContactsScreen.ContactInfo();
+            ci.name = NearbyDevicesScreen.cname;
+            ci.label = NearbyDevicesScreen.cname.substring(0, 1);
+            ci.mes = "";
+            ci.date = "";
+            ContactsScreen.contactInfos.add(ci);
+            ContactsScreen.contactNames.add(NearbyDevicesScreen.cname);
+            ContactsScreen.contactUserIds.add(NearbyDevicesScreen.cselectedUserId);
+            ContactsScreen.contactXbeeAddress.add(NearbyDevicesScreen.cselectedXbeeDevice);
             linkAct.getActivity().runOnUiThread(() -> {
                 ContactsScreen.onRefresh();
             });
@@ -464,6 +410,16 @@ public class MainScreen extends AppCompatActivity {
             );
             ChatScreen.getMessages().add(new String(message.getData()) + "\nS");
             ChatScreen.setNotification();
+            int i = contactXbeeAddress.indexOf(newMessageAddr);
+            String searchedName = contactNames.get(i);
+            for (ContactsScreen.ContactInfo cn: ContactsScreen.contactInfos) {
+                if (cn.name.equals(searchedName)) {
+                    String[] mesData = new String(message.getData()).split("\n");
+                    cn.mes = mesData[0];
+                    ContactsScreen.onRefresh();
+                    break;
+                }
+            }
             message.Clear();
         }
 
