@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/app.iml" filepath="$PROJECT_DIR$/.idea/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/BeechatNetwork.iml" filepath="$PROJECT_DIR$/.idea/modules/BeechatNetwork.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/BeechatNetwork.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/BeechatNetwork.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/xbee_android_library/BeechatNetwork.xbee_android_library.iml" filepath="$PROJECT_DIR$/.idea/modules/xbee_android_library/BeechatNetwork.xbee_android_library.iml" />
     </modules>
   </component>
 </project>
