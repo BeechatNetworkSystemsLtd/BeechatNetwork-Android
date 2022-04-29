@@ -169,8 +169,9 @@ public class ChatScreen extends AppCompatActivity {
         selectedUserId = extras.getString("key_selectedUserId");
         selectedXbeeAddress = extras.getString("key_selectedXbeeAddress");
 
-        if (messages.size() == 0)
-        {
+        //if (messages.size() == 0) {
+        if (true) {
+            messages.clear();
             List<TextMessage> messagesDB = db.getAllMessages(myUserId, myXbeeAddress, selectedUserId, selectedXbeeAddress);
             for (TextMessage mg : messagesDB) {
                 messages.add(mg.getContent());
@@ -181,15 +182,14 @@ public class ChatScreen extends AppCompatActivity {
         chatListView.setAdapter(chatDeviceAdapter);
 
         chatListView.setOnItemClickListener(
-            new OnItemClickListener()
-            {
+            new OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> arg0, View view,
                         int position, long id) {
                     Object o = chatListView.getItemAtPosition(position);
                     String pen = o.toString();
                     if (pen.endsWith("P") || pen.endsWith("F")) {
-                        browseClick();
+                        requestToOpenFile(removeLastChar(removeLastChar(pen)));
                     }
                 }
             }
@@ -263,8 +263,8 @@ public class ChatScreen extends AppCompatActivity {
                             Packet.Type.MESSAGE_DATA
                           , message.getBytes()
                         );
-                        m.send(SplashScreen.myXbeeDevice, remote, SplashScreen.hasher);
                         messages.add(message + "\n");
+                        m.send(SplashScreen.myXbeeDevice, remote, SplashScreen.hasher);
                         for (ContactsScreen.ContactInfo ccn: ContactsScreen.contactInfos) {
                             if (ccn.name.equals(selectedName)) {
                                 ccn.mes = pureMes;
@@ -337,8 +337,8 @@ public class ChatScreen extends AppCompatActivity {
                                     fileStopButton.setVisibility(View.INVISIBLE);
                                     filePauseButton.setVisibility(View.INVISIBLE);
                                 });
-                                messages.add(textViewAttachment.getText().toString() + "\nP");
-                                message = textViewAttachment.getText().toString() + "\nP";
+                                messages.add(fileString + "\nP");
+                                message = fileString + "\nP";
                                 fileStop = false;
                             } catch (Exception e) {
                                 ChatScreen.this.runOnUiThread(() -> {
@@ -427,6 +427,21 @@ public class ChatScreen extends AppCompatActivity {
             System.out.println("browseClick :" + ex);
         }
     }
+
+    public void requestToOpenFile(String name) {
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                             name);
+        Uri path = Uri.fromFile(file);
+        String mimeType = getContentResolver().getType(path);
+        Intent openIntent = new Intent(Intent.ACTION_VIEW);
+        openIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        openIntent.setDataAndType(path, mimeType);
+        try {
+            startActivity(openIntent);
+        } catch (Exception e) {
+        }
+    }
+
 
     public static String getPath(Context context, Uri uri) {
 

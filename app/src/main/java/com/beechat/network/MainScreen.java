@@ -253,6 +253,7 @@ public class MainScreen extends AppCompatActivity {
                     break;
                 }
             }
+            message.Clear();
         }
 
 
@@ -420,7 +421,6 @@ public class MainScreen extends AppCompatActivity {
                     break;
                 }
             }
-            message.Clear();
         }
 
 

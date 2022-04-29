@@ -43,7 +43,7 @@ public class ContactsScreen extends Fragment {
     static CustomContactAdapter remoteXBeeDeviceAdapterName;
     static ArrayList<String> contactNames = new ArrayList<>();
     static ArrayList<String> contactXbeeAddress = new ArrayList<>();
-    static ArrayList<String> contactUserIds = new ArrayList<>();
+    public static ArrayList<String> contactUserIds = new ArrayList<>();
     public static ArrayList<ContactInfo> contactInfos = new ArrayList<>();
 
     @Override

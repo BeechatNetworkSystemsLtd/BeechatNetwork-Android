@@ -57,6 +57,8 @@ public class EditContactScreen extends AppCompatActivity {
         updateContactButton.setOnClickListener(v -> {
             name = nameEditText.getText().toString();
             db.updateContact(new Contact(selectedUserId, selectedXbeeAddress, name, ownerContact));
+            int i = ContactsScreen.contactUserIds.indexOf(selectedUserId);
+            ContactsScreen.contactInfos.get(i).name = name;
             ChatScreen.nameTextView.setText(name);
             ContactsScreen.onRefresh();
             finish();

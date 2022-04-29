@@ -112,7 +112,10 @@ public class DataScreen extends AppCompatActivity {
             try {
                 String dir = Environment.getExternalStoragePublicDirectory(
                     Environment.DIRECTORY_DOWNLOADS
-                ).getAbsolutePath();
+                ).getAbsolutePath() + File.separator + "Beechat";
+
+                (new File(dir)).mkdirs();
+
                 FileOutputStream outputStream = new FileOutputStream(
                     new File(
                         dir + "/" + SplashScreen.neo.getLogo() + ".user"

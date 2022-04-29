@@ -66,7 +66,7 @@ public class SettingsScreen extends Fragment {
 
         int baud = db.getBaud();
 
-        labelBaudRateTextView.setText(Integer.toString(baud / 8) + " bps\n" + Integer.toString(baud) + " baud");
+        labelBaudRateTextView.setText(Integer.toString(baud / 8) + " B/s\n" + Integer.toString(baud) + " baud");
         for (int i = 0; i < listValues.size(); i++) {
             if (listValues.get(i) == baud) {
                 baudRateSeekBar.setProgress(i);
@@ -94,7 +94,7 @@ public class SettingsScreen extends Fragment {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 int speed = listValues.get((int)valueBaudRate) / 8;
-                labelBaudRateTextView.setText(Integer.toString(speed) + " bps\n" + Integer.toString(listValues.get((int)valueBaudRate)) + " baud");
+                labelBaudRateTextView.setText(Integer.toString(speed) + " B/s\n" + Integer.toString(listValues.get((int)valueBaudRate)) + " baud");
                 SplashScreen.BAUD_RATE = listValues.get((int)valueBaudRate);
             }
         });
@@ -103,6 +103,10 @@ public class SettingsScreen extends Fragment {
         reconnectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                try {
+                    SplashScreen.myXbeeDevice.close();
+                } catch (Exception e) {
+                }
                 SplashScreen.myXbeeDevice = new XBeeDevice(getActivity(), listValues.get((int)valueBaudRate));
                 new Thread(() -> {
                     try {
