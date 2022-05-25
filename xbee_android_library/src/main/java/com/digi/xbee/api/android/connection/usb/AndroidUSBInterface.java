@@ -48,8 +48,12 @@ import com.digi.xbee.api.exceptions.PermissionDeniedException;
 public class AndroidUSBInterface implements IConnectionInterface {
 
 	// Constants.
-	private static final int VID = 0x0403;
-	private static final int[] FTDI_PIDS = {
+	private static final int[] VID = { 
+		        0x0403, // FTDI  
+		        0x04E2, // EXAR
+	};
+	private static final int[] UART_PIDS = {
+		        0x1410, // XR21V1410
 			0x6001, // FT232 and FT245
 			//0x6010, // FT2232
 			0x6011, // FT4232
@@ -410,8 +414,8 @@ public class AndroidUSBInterface implements IConnectionInterface {
 		UsbDevice usbDevice = null;
 		HashMap<String, UsbDevice> deviceList = usbManager.getDeviceList();
 		for (UsbDevice device:deviceList.values()) {
-			if (device.getVendorId() == VID) {
-				for (int pid:FTDI_PIDS) {
+			if (device.getVendorId() == VID[0] || device.getVendorId() == VID[1]) {
+				for (int pid:UART_PIDS) {
 					if (device.getProductId() == pid) {
 						usbDevice = device;
 						logger.info("USB XBee Android device found: " + usbDevice.getDeviceName());
