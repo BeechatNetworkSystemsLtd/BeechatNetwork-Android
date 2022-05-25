@@ -67,7 +67,6 @@ public class Message extends ArrayList<Packet> {
         }
         totalNumber = packetTotal;
         if (totalNumber == partNumber + 1) {
-            ready = true;
             int len = 0;
             add(e);
             for (Packet pack : (ArrayList<Packet>)this) {
@@ -83,6 +82,7 @@ public class Message extends ArrayList<Packet> {
                 System.arraycopy(tempb, 0, result, pos, tempb.length);
                 pos += tempb.length;
             }
+            ready = true;
             return true;
         }
         return add(e);

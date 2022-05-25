@@ -43,6 +43,8 @@
             android:background="@color/active"
             android:fontFamily="@font/nunito_regular"
             android:gravity="start"
+            android:lines="1"
+            android:maxLines="1"
             android:padding="5dip"
             android:textColor="#999999"
             android:textSize="20sp" />

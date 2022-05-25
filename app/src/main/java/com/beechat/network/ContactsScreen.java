@@ -94,15 +94,15 @@ public class ContactsScreen extends Fragment {
             }
             ci.label = ci.name.substring(0, 1);
             ci.mes = db.getLastMessage(Blake3.toString(SplashScreen.myGeneratedUserId), SplashScreen.addressMyXbeeDevice, cn.getUserId(), cn.getXbeeDeviceNumber());
-            if (ci.mes.endsWith("S") || ci.mes.endsWith("P") || ci.mes.endsWith("F")) {
-                ci.mes = ChatScreen.removeLastChar(ci.mes);
-                ci.mes = ChatScreen.removeLastChar(ci.mes);
-            }
             if (ci.mes == null) {
                 ci.mes = "File";
                 ci.date = "06:14";
                 contactInfos.add(ci);
                 continue;
+            }
+            if (ci.mes.endsWith("S") || ci.mes.endsWith("P") || ci.mes.endsWith("F")) {
+                ci.mes = ChatScreen.removeLastChar(ci.mes);
+                ci.mes = ChatScreen.removeLastChar(ci.mes);
             }
             String[] mesData = ci.mes.split("\n");
             ci.mes = mesData[0];

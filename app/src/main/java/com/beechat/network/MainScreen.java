@@ -157,9 +157,10 @@ public class MainScreen extends AppCompatActivity {
     private static class DataReceiveListener implements IDataReceiveListener {
         static Packet temp;
         static Blake3 tempBlake;
-        static Packet.Type currentType = Packet.Type.MESSAGE_DATA;
+        static Packet.Type currentType = Packet.Type.NONE;
         static int currentPart = -1;
         static int currentTotal = 1;
+        static boolean shortMesFlag = true;
         static Message message = new Message();
 
         public DataReceiveListener() {
@@ -177,6 +178,15 @@ public class MainScreen extends AppCompatActivity {
         public void dataReceived(XBeeMessage xbeeMessage) {
             temp = new Packet(tempBlake);
             temp.setRaw(xbeeMessage.getData());
+            if (shortMesFlag) {
+                message.Clear();
+                shortMesFlag = false;
+            }
+            if (temp.getType() == Packet.Type.MESSAGE_DATA) {
+                if (temp.getTotalNumber() == 1) {
+                    shortMesFlag = true;
+                }
+            }
             if (!temp.isCorrect()) {
                 return;
             }
@@ -207,6 +217,7 @@ public class MainScreen extends AppCompatActivity {
                             new String(fileString + "\nF")
                         );
                         ChatScreen.setNotification();
+                        currentType = Packet.Type.NONE;
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -218,6 +229,8 @@ public class MainScreen extends AppCompatActivity {
             }
             if (message.isReady()) {
                 processMessage(xbeeMessage);
+                currentType = Packet.Type.NONE;
+                message.Clear();
             }
         }
 
@@ -253,7 +266,6 @@ public class MainScreen extends AppCompatActivity {
                     break;
                 }
             }
-            message.Clear();
         }
 
 

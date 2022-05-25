@@ -37,6 +37,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.text.TextUtils;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.core.content.FileProvider;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -276,9 +277,21 @@ public class ChatScreen extends AppCompatActivity {
                     } else {
                         new Thread(() -> {
                             try {
+                                String dir = Environment.getExternalStoragePublicDirectory(
+                                    Environment.DIRECTORY_DOWNLOADS
+                                ).getAbsolutePath() + File.separator + "Beechat";
+
+                                (new File(dir)).mkdirs();
+
+                                FileOutputStream outputStream = new FileOutputStream(
+                                    new File(
+                                        dir + File.separator + fileString
+                                    )
+                                );
+
                                 Message m = new Message(
                                     Packet.Type.FILE_NAME_DATA
-                                  , textViewAttachment.getText().toString().getBytes()
+                                  , fileString.getBytes()
                                 );
                                 m.send(SplashScreen.myXbeeDevice, remote, SplashScreen.hasher);
 
@@ -294,6 +307,7 @@ public class ChatScreen extends AppCompatActivity {
 
                                 for (int i = 0; i < (int)numberOfPackage; i++) {
                                     bb.get(packageFile, 0, packageFile.length);
+                                    outputStream.write(packageFile);
                                     sender.setData(
                                         Packet.Type.FILE_DATA
                                       , (int)i
@@ -321,6 +335,7 @@ public class ChatScreen extends AppCompatActivity {
                                     sender = new Packet(SplashScreen.hasher);
                                     packageFile = new byte[remainOfPackage];
                                     bb.get(packageFile, 0, packageFile.length);
+                                    outputStream.write(packageFile);
                                     sender.setData(
                                         Packet.Type.FILE_DATA
                                       , (int)(tcount - 1)
@@ -333,12 +348,14 @@ public class ChatScreen extends AppCompatActivity {
                                       , sender.getData()
                                     );
                                 }
+                                outputStream.flush();
+                                outputStream.close();
+                                messages.add(fileString + "\n" + "P");
                                 ChatScreen.this.runOnUiThread(() -> {
                                     fileStopButton.setVisibility(View.INVISIBLE);
                                     filePauseButton.setVisibility(View.INVISIBLE);
                                 });
-                                messages.add(fileString + "\nP");
-                                message = fileString + "\nP";
+                                message = fileString + "\n" + "P";
                                 fileStop = false;
                             } catch (Exception e) {
                                 ChatScreen.this.runOnUiThread(() -> {
@@ -346,20 +363,25 @@ public class ChatScreen extends AppCompatActivity {
                                 });
                                 e.printStackTrace();
                             }
+                            db.insertMessage(new TextMessage(myUserId, myXbeeAddress, selectedUserId, selectedXbeeAddress, message));
                             ChatScreen.this.runOnUiThread(() -> {
                                 textViewAttachment.setText("");
                                 transmitProgress.setProgress(0);
+                                chatDeviceAdapter.notifyDataSetChanged();
                             });
                         }).start();
                         inputField.setText("");
                         fileFlag = false;
+                        return;
                     }
                 } catch (Exception e) {
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
                     messages.add("Error transmitting message: " + e.getMessage());
                 }
                 db.insertMessage(new TextMessage(myUserId, myXbeeAddress, selectedUserId, selectedXbeeAddress, message));
-                chatDeviceAdapter.notifyDataSetChanged();
+                ChatScreen.this.runOnUiThread(() -> {
+                    chatDeviceAdapter.notifyDataSetChanged();
+                });
             }
         });
 
@@ -429,16 +451,18 @@ public class ChatScreen extends AppCompatActivity {
     }
 
     public void requestToOpenFile(String name) {
-        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                             name);
-        Uri path = Uri.fromFile(file);
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                             + File.separator + "Beechat" + File.separator + name);
+        Uri path = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider", file);
         String mimeType = getContentResolver().getType(path);
         Intent openIntent = new Intent(Intent.ACTION_VIEW);
-        openIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        openIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        openIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         openIntent.setDataAndType(path, mimeType);
         try {
             startActivity(openIntent);
         } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -718,6 +742,10 @@ public class ChatScreen extends AppCompatActivity {
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             String message = messages.get(position);
+            if (message == null) {
+                return new RelativeLayout(context);
+            }
+
             Typeface typeface = ResourcesCompat.getFont(context, R.font.nunito_regular);
 
             if (message.endsWith("S")) {
@@ -774,16 +802,16 @@ public class ChatScreen extends AppCompatActivity {
                 nameText.setTextSize(15);
                 nameText.setPadding(40, 20, 20, 15);
                 Drawable drawable = getResources().getDrawable(R.drawable.client_message_box);
-                Drawable iconTick = getResources().getDrawable(android.R.drawable.sym_contact_card);
-                ImageView imageView = new ImageView(context);
-                imageView.setImageDrawable(iconTick);
+                //Drawable iconTick = getResources().getDrawable(android.R.drawable.sym_contact_card);
+                //ImageView imageView = new ImageView(context);
+                //imageView.setImageDrawable(iconTick);
 
                 LinearLayout layout2 = new LinearLayout(context);
                 layout2.setOrientation(LinearLayout.HORIZONTAL);
                 layout2.setBackground(drawable);
                 layout2.setGravity(Gravity.RIGHT);
 
-                layout2.addView(imageView);
+                //layout2.addView(imageView);
                 layout2.addView(nameText);
                 layout.addView(layout2);
                 layout.setGravity(Gravity.RIGHT);
@@ -806,10 +834,10 @@ public class ChatScreen extends AppCompatActivity {
                 nameText.setTextSize(15);
                 nameText.setPadding(40, 20, 20, 15);
                 Drawable drawable = getResources().getDrawable(R.drawable.server_message_box);
-                Drawable iconTick = getResources().getDrawable(android.R.drawable.sym_contact_card);
+                //Drawable iconTick = getResources().getDrawable(android.R.drawable.sym_contact_card);
 
-                ImageView imageView = new ImageView(context);
-                imageView.setImageDrawable(iconTick);
+                //ImageView imageView = new ImageView(context);
+                //imageView.setImageDrawable(iconTick);
 
                 LinearLayout layout2 = new LinearLayout(context);
                 layout2.setOrientation(LinearLayout.HORIZONTAL);
@@ -817,7 +845,7 @@ public class ChatScreen extends AppCompatActivity {
                 layout2.setGravity(Gravity.LEFT);
 
                 layout2.addView(nameText);
-                layout2.addView(imageView);
+                //layout2.addView(imageView);
                 layout.addView(layout2);
                 layout.setGravity(Gravity.LEFT);
 

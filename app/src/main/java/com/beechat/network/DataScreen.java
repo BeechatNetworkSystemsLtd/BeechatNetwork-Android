@@ -106,7 +106,7 @@ public class DataScreen extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 65536 + 14) {
+        if (requestCode == 14) {
             String cw = data.getStringExtra("cw");
             SecretKey skey = MainScreen.getAESKeyFromPassword(cw, "AES");
             try {
