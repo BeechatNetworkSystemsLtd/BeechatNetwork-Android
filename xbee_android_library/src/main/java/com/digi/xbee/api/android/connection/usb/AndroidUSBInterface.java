@@ -414,14 +414,18 @@ public class AndroidUSBInterface implements IConnectionInterface {
 		UsbDevice usbDevice = null;
 		HashMap<String, UsbDevice> deviceList = usbManager.getDeviceList();
 		for (UsbDevice device:deviceList.values()) {
-			if (device.getVendorId() == VID[0] || device.getVendorId() == VID[1]) {
+			if (device.getVendorId() == VID[0]) {
 				for (int pid:UART_PIDS) {
 					if (device.getProductId() == pid) {
 						usbDevice = device;
-						logger.info("USB XBee Android device found: " + usbDevice.getDeviceName());
+						logger.info("USB XBee Android device from FTDI vendor found: " + usbDevice.getDeviceName());
 						break;
 					}
 				}
+			} else if (device.getVendorId() == VID[1] && device.getProductId() == UART_PIDS[0]){
+			        usbDevice = device;
+			        logger.info("USB XBee Android device from EXAR vendor found: " + usbDevice.getDeviceName());
+				break;
 			}
 			if (usbDevice != null) {
 				break;
