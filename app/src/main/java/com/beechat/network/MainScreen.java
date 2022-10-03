@@ -410,24 +410,31 @@ public class MainScreen extends AppCompatActivity {
 
 
         private void addNewMessage(XBeeMessage xbeeMessage) {
-            String newMessageAddr =
-                xbeeMessage.getDevice().get64BitAddress().toString();
+            String decrypt = "", newMessageAddr = "";
+            try {
+                Cipher cipher = Cipher.getInstance("AES");
+                newMessageAddr = xbeeMessage.getDevice().get64BitAddress().toString();
+                cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(db.getKey(newMessageAddr), "AES"));
+                decrypt = new String(cipher.doFinal(message.getData()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             db.insertMessage(
                 new TextMessage(
                     Blake3.toString(SplashScreen.myGeneratedUserId)
                   , SplashScreen.addressMyXbeeDevice
                   , contactUserIds.get(contactXbeeAddress.indexOf(newMessageAddr))
                   , newMessageAddr
-                  , new String(message.getData()) + "\nS"
+                  , decrypt + "\nS"
                 )
             );
-            ChatScreen.getMessages().add(new String(message.getData()) + "\nS");
+            ChatScreen.getMessages().add(decrypt + "\nS");
             ChatScreen.setNotification();
             int i = contactXbeeAddress.indexOf(newMessageAddr);
             String searchedName = contactNames.get(i);
             for (ContactsScreen.ContactInfo cn: ContactsScreen.contactInfos) {
                 if (cn.name.equals(searchedName)) {
-                    String[] mesData = new String(message.getData()).split("\n");
+                    String[] mesData = decrypt.split("\n");
                     cn.mes = mesData[0];
                     ContactsScreen.onRefresh();
                     break;
@@ -438,6 +445,11 @@ public class MainScreen extends AppCompatActivity {
 
         private void createNewFile(XBeeMessage xbeeMessage) {
             try {
+                Cipher cipher = Cipher.getInstance("AES");
+                String newMessageAddr =
+                    xbeeMessage.getDevice().get64BitAddress().toString();
+                cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(db.getKey(newMessageAddr), "AES"));
+                String decrypt = new String(cipher.doFinal(message.getData()));
                 String dir = Environment.getExternalStoragePublicDirectory(
                     Environment.DIRECTORY_DOWNLOADS
                 ).getAbsolutePath() + File.separator + "Beechat";
@@ -446,14 +458,12 @@ public class MainScreen extends AppCompatActivity {
 
                 outputStream = new FileOutputStream(
                     new File(
-                        dir + File.separator + new String(message.getData()).split(" ")[0]
+                        dir + File.separator + decrypt.split(" ")[0]
                     )
                 );
-                fileString = new String(message.getData());
+                fileString = decrypt;
                 if (fileString.length() > 34) fileString = fileString.substring(fileString.length() - 20);
 
-                String newMessageAddr =
-                    xbeeMessage.getDevice().get64BitAddress().toString();
                 db.insertMessage(
                     new TextMessage(
                         Blake3.toString(SplashScreen.myGeneratedUserId)

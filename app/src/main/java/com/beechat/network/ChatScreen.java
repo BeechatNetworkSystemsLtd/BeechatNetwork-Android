@@ -50,6 +50,8 @@ import com.digi.xbee.api.RemoteXBeeDevice;
 import com.digi.xbee.api.exceptions.XBeeException;
 import com.digi.xbee.api.models.XBee64BitAddress;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -129,6 +131,7 @@ public class ChatScreen extends AppCompatActivity {
     }
 
     static String myUserId, myXbeeAddress, selectedName, selectedUserId, selectedXbeeAddress;
+    Cipher cipher;
     static TextView nameTextView;
 
     // Constants
@@ -169,6 +172,12 @@ public class ChatScreen extends AppCompatActivity {
         selectedName = extras.getString("key_selectedName");
         selectedUserId = extras.getString("key_selectedUserId");
         selectedXbeeAddress = extras.getString("key_selectedXbeeAddress");
+        try {
+            cipher = Cipher.getInstance("AES");
+            cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(db.getKey(selectedXbeeAddress), "AES"));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
 
         //if (messages.size() == 0) {
         if (true) {
@@ -260,6 +269,8 @@ public class ChatScreen extends AppCompatActivity {
                 message = message + "\n" + currentTime;
                 try {
                     if (!fileFlag) {
+                        message = new String(cipher.doFinal(message.getBytes()));
+
                         Message m = new Message(
                             Packet.Type.MESSAGE_DATA
                           , message.getBytes()
@@ -291,7 +302,7 @@ public class ChatScreen extends AppCompatActivity {
 
                                 Message m = new Message(
                                     Packet.Type.FILE_NAME_DATA
-                                  , fileString.getBytes()
+                                  , cipher.doFinal(fileString.getBytes())
                                 );
                                 m.send(SplashScreen.myXbeeDevice, remote, SplashScreen.hasher);
 
@@ -655,7 +666,7 @@ public class ChatScreen extends AppCompatActivity {
                     textViewAttachment.setText(fileString + " (" + sizeFile + ")");
                     File fileSave = getExternalFilesDir(null);
                     String sourcePath = getExternalFilesDir(null).toString();
-                    array = method(new File(path));
+                    array = cipher.doFinal(method(new File(path)));
                     numberOfPackage = array.length/sizeOfPackage;
                     remainOfPackage = array.length % sizeOfPackage;
                     fileFlag = true;
